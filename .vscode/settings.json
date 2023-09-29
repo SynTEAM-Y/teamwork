@@ -1,0 +1,8 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "workbench.preferredDarkColorTheme": "Visual Studio Dark",
+    "workbench.colorCustomizations": {
+        "[Visual Studio Light]": {"editor.background": "#e3e1e1"}
+    }
+}

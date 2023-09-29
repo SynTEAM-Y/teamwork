@@ -1,0 +1,783 @@
+package com.syntm.lts;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.function.BiFunction;
+
+import com.syntm.util.GraphPrinter;
+import com.syntm.util.StringUtil;
+
+public class TS {
+    private String name;
+    private Set<State> states;
+    private State initState;
+    private Int Interface;
+    private Set<Trans> transitions;
+    private BiFunction<State, Listen, Listen> LS;
+    private BiFunction<State, Label, Label> L;
+    private Set<TS> agents;
+    private Set<TS> parameters;
+
+    public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
+        this.name = name;
+        this.states = states;
+        this.initState = initState;
+        Interface = interface1;
+        this.transitions = transitions;
+        this.agents = new HashSet<TS>();
+        this.parameters = new HashSet<TS>();
+        LS = (s, ls) -> s.setListen(ls);
+
+        L = (s, l) -> s.setLabel(l);
+
+    }
+
+    public TS(String name) {
+        this.name = name;
+        this.states = new HashSet<State>();
+        this.Interface = new Int(null, null);
+        this.initState = new State();
+        this.transitions = new HashSet<Trans>();
+        this.agents = new HashSet<TS>();
+        this.parameters = new HashSet<TS>();
+        LS = (s, ls) -> s.setListen(ls);
+        L = (s, l) -> s.setLabel(l);
+    }
+
+    public void setInterface(Int interface1) {
+        Interface = interface1;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Set<State> getStates() {
+        return states;
+    }
+
+    public State getStateById(String id) {
+        for (State st : this.states) {
+            if (st.getId().equals(id)) {
+                return st;
+            }
+        }
+
+        return null;
+    }
+
+    public void applyLabel(String id, Label l) {
+        for (State st : this.states) {
+            if (st.getId().equals(id)) {
+                this.L.apply(st, l);
+            }
+        }
+    }
+
+    public void setStates(Set<State> states) {
+        this.states = states;
+    }
+
+    public State getInitState() {
+        return initState;
+    }
+
+    public void setInitState(String id) {
+        this.initState = getStateById(id);
+    }
+
+    public Int getInterface() {
+        return Interface;
+    }
+
+    public String shortString(Set<String> longString) {
+        String st = "";
+        for (String string : longString) {
+            st += string + ",";
+        }
+        if (st.endsWith(",")) {
+            st = st.substring(0, st.length() - 1);
+        }
+
+        return st;
+    }
+
+    public String formatListen(Set<String> longString) {
+        String st = "{";
+        for (String string : longString) {
+            st += string + ",";
+        }
+        if (st.endsWith(",")) {
+            st = st.substring(0, st.length() - 1);
+        }
+        st += "}";
+        return st;
+    }
+
+    public void toDot(TS ts, String name) {
+
+        GraphPrinter gp = new GraphPrinter(name);
+        gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
+        gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
+        gp.addln("\"" + ts.getInterface().toString());
+        gp.addln(
+                "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
+        gp.addln("\n\n\n\n");
+        gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
+
+        gp.addln("init [shape=point,style=invis];");
+        for (State state : ts.states) {
+            gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                    + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                    + this.shortString(state.getLabel().getOutput()) + "\n\n\n" + "\"]" + "\n");
+        }
+
+        gp.addln("\t" + " init -> " + ts.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+                + ";\n");
+        for (Trans t : ts.getTransitions()) {
+            String source = t.getSource().getId().toString();
+            String dest = t.getDestination().getId().toString();
+            String action = t.getAction().toString();
+            gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
+        }
+
+        gp.print();
+
+    }
+
+    public Set<Trans> getTransitions() {
+        return transitions;
+    }
+
+    public Set<TS> getAgents() {
+        return agents;
+    }
+
+    public TS getAgentById(String id) {
+        TS t = new TS("");
+        for (TS ts : agents) {
+            if (ts.getName().equals(id.substring(2))) {
+                t = ts;
+                break;
+            }
+        }
+        return t;
+    }
+
+    public Set<TS> getParameters() {
+        return parameters;
+    }
+
+    public void setTransitions(Set<Trans> transitions) {
+        this.transitions = transitions;
+    }
+
+    public BiFunction<State, Listen, Listen> getLS() {
+        return LS;
+    }
+
+    public void setLS(BiFunction<State, Listen, Listen> lS) {
+        LS = lS;
+    }
+
+    public BiFunction<State, Label, Label> getL() {
+        return L;
+    }
+
+    public void setL(BiFunction<State, Label, Label> l) {
+        L = l;
+    }
+
+    public static TS parse(final String filePath) throws IOException {
+        TS ts = new TS("T");
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+        String line;
+        while (!(line = reader.readLine()).equalsIgnoreCase("!")) {
+            String[] parts = line.split(":");
+            switch (parts[0].trim()) {
+                case "Init":
+                    ts.setInitState(parts[1].trim());
+                    break;
+                case "Int":
+                    Set<String> chan = new HashSet<>(Arrays.asList(parts[1].trim().split(",")));
+                    Set<String> out = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
+                    ts.setInterface(new Int(chan, out));
+                    break;
+                case "LS":
+                    State st = new State(parts[1].trim());
+                    Set<String> sch = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
+                    Listen ls = new Listen(sch);
+                    if (ts.getStateById(parts[1].trim()) != null) {
+                        ts.getLS().apply(ts.getStateById(parts[1].trim()), ls);
+                    } else {
+                        ts.addState(st);
+                        ts.getLS().apply(st, ls);
+                    }
+                    break;
+                case "L":
+                    Set<String> chs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
+                    Set<String> o = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
+                    Label l = new Label(chs, o);
+                    ts.applyLabel(parts[1].trim(), l);
+
+                    break;
+                case "T":
+                    String[] t = parts[1].trim().split(",");
+                    ts.getTransitions()
+                            .add(new Trans(ts.getStateById(t[0].trim()), t[1].trim(), ts.getStateById(t[2].trim())));
+                    ts.getStateById(t[0].trim()).getTrans()
+                            .add(new Trans(ts.getStateById(t[0].trim()), t[1].trim(), ts.getStateById(t[2].trim())));
+                    break;
+                case "A":
+                    Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
+                    Set<String> ao = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
+                    ts.initialDecomposition(ts, parts[1].trim(), achs, ao);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        reader.close();
+        return ts;
+    }
+
+    public State getStateByComposiStates(TS t, State s_1, State s_2) {
+        for (State s : t.getStates()) {
+            if (s.getComStates().equals(new HashSet<>(Arrays.asList(s_1, s_2)))) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public TS openParallelCompTS(TS T1, TS T2) {
+
+        TS t = new TS(T1.getName() + " || " + T2.getName());
+
+        Set<String> chan = new HashSet<>(T1.getInterface().getChannels());
+        Set<String> output = new HashSet<>(T1.getInterface().getOutput());
+
+        chan.addAll(T2.getInterface().getChannels());
+        output.addAll(T2.getInterface().getOutput());
+        Int i = new Int(chan, output);
+        t.setInterface(i);
+        for (State s_1 : T1.getStates()) {
+            for (State s_2 : T2.getStates()) {
+                State sc = new State(s_1.getId() + "" + s_2.getId());
+                sc.setComStates(new HashSet<>(Arrays.asList(s_1, s_2)));
+                Set<String> ls = new HashSet<>(s_1.getListen().getChannels());
+                ls.addAll(s_2.getListen().getChannels());
+                Set<String> ch = new HashSet<>(s_1.getLabel().getChannel());
+                ch.addAll(s_2.getLabel().getChannel());
+                Set<String> out = new HashSet<>(s_1.getLabel().getOutput());
+                out.addAll(s_2.getLabel().getOutput());
+                sc.setListen(new Listen(ls));
+                sc.setLabel(new Label(ch, out));
+                t.addState(sc);
+                if (sc.getComStates().contains(s_1.getOwner().getInitState())
+                        && sc.getComStates().contains(s_2.getOwner().getInitState())) {
+                    t.setInitState(sc.getId());
+
+                }
+
+            }
+        }
+
+        for (State sc : t.getStates()) {
+            Set<Trans> trs_1 = new HashSet<>();
+            Set<Trans> trs_2 = new HashSet<>();
+            int n = sc.getComStates().size();
+            State cStates[] = new State[n];
+            cStates = sc.getComStates().toArray(cStates);
+
+            trs_1.addAll(cStates[0].getTrans());
+            trs_2.addAll(cStates[1].getTrans());
+
+             trs_1.addAll(cStates[0].getTrans());
+            trs_2.addAll(cStates[1].getTrans());
+
+           
+            if (trs_2.isEmpty()) {
+                for (Trans t1 : trs_1) {
+                    t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
+
+                            t.getStateByComposiStates(t, t1.getSource(), cStates[1])
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
+                }
+            }
+            if (trs_1.isEmpty()) {
+                for (Trans t2 : trs_2) {
+                    t.addTransition(t, t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
+
+                            t.getStateByComposiStates(t, t2.getSource(), cStates[0])
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                            t2.getAction(),
+                                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
+                }
+            } else {
+
+            for (Trans t1 : trs_1) {
+
+                for (Trans t2 : trs_2) {
+                    if (t1.getAction().equals(t2.getAction())
+                            && !t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                            && !t2
+                                    .getSource().getOwner().getInterface().getChannels()
+                                    .contains(t1.getAction())) {
+
+                        t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                t1.getAction(),
+                                t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
+
+                        t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
+
+                    }
+                    if (t1.getAction().equals(t2.getAction())
+                            && (t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                    || t2
+                                            .getSource().getOwner().getInterface().getChannels()
+                                            .contains(t1.getAction()))) {
+
+                        t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                t1.getAction(),
+                                t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
+
+                        t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
+
+                    } else {
+                        if (!t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                && !t2.getSource().getOwner().getInterface().getChannels()
+                                        .contains(t1.getAction())
+                                && !t2.getSource().getListen().getChannels().contains(t1.getAction())) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                        }
+
+                        if (!t1.getSource().getOwner().getInterface().getChannels().contains(t2.getAction())
+                                && !t2.getSource().getOwner().getInterface().getChannels()
+                                        .contains(t2.getAction())
+                                && !t1.getSource().getListen().getChannels().contains(t2.getAction())) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+
+                        }
+                        if (!t2.getSource().getListen().getChannels().contains(t1.getAction())) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                        }
+                        if (!t1.getSource().getListen().getChannels().contains(t2.getAction())) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t2.getAction(),
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                        }
+                        if (!t2.getSource().getListen().getChannels().contains(t1.getAction())
+                                && t1.getSource().getOwner().getInterface().getChannels()
+                                        .contains(t1.getAction())) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                        }
+                        if (!t1.getSource().getListen().getChannels().contains(t2.getAction())
+                                && (t2.getSource().getOwner().getInterface().getChannels()
+                                        .contains(t2.getAction()))) {
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t2.getAction(),
+                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                        }
+                    }
+                }
+
+            }}
+
+        }
+
+        t.setStates(reachFrom(t, t.getInitState()));
+        Set<Trans> trans = new HashSet<>();
+        for (Trans tr : t.getTransitions()) {
+            if (!t.getStates().contains(tr.getSource())) {
+                trans.add(tr);
+            }
+        }
+        t.getTransitions().removeAll(trans);
+        t.toDot(t, t.getName());
+
+        return t;
+    }
+
+    public TS closedParallelCompTS(TS T1, TS T2) { // MAKE SURE TO HIGHLIGHT THE LISTENING FUCTION
+
+        TS t = new TS(T1.getName() + " ||| " + T2.getName());
+
+        Set<String> chan = new HashSet<>(T1.getInterface().getChannels());
+        Set<String> output = new HashSet<>(T1.getInterface().getOutput());
+
+        chan.addAll(T2.getInterface().getChannels());
+        output.addAll(T2.getInterface().getOutput());
+        Int i = new Int(chan, output);
+        t.setInterface(i);
+        for (State s_1 : T1.getStates()) {
+            for (State s_2 : T2.getStates()) {
+                State sc = new State(s_1.getId() + "" + s_2.getId());
+                sc.setComStates(new HashSet<>(Arrays.asList(s_1, s_2)));
+                Set<String> ls = new HashSet<>(s_1.getListen().getChannels());
+                ls.addAll(s_2.getListen().getChannels());
+                Set<String> ch = new HashSet<>(s_1.getLabel().getChannel());
+                ch.addAll(s_2.getLabel().getChannel());
+                Set<String> out = new HashSet<>(s_1.getLabel().getOutput());
+                out.addAll(s_2.getLabel().getOutput());
+                sc.setListen(new Listen(ls));
+                sc.setLabel(new Label(ch, out));
+                t.addState(sc);
+                if (sc.getComStates().contains(s_1.getOwner().getInitState())
+                        && sc.getComStates().contains(s_2.getOwner().getInitState())) {
+                    t.setInitState(sc.getId());
+
+                }
+
+            }
+        }
+
+        for (State sc : t.getStates()) {
+            Set<Trans> trs_1 = new HashSet<>();
+            Set<Trans> trs_2 = new HashSet<>();
+            int n = sc.getComStates().size();
+            State cStates[] = new State[n];
+            cStates = sc.getComStates().toArray(cStates);
+
+            trs_1.addAll(cStates[0].getTrans());
+            trs_2.addAll(cStates[1].getTrans());
+
+           
+            if (trs_2.isEmpty()) {
+                for (Trans t1 : trs_1) {
+                    t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
+
+                            t.getStateByComposiStates(t, t1.getSource(), cStates[1])
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
+                }
+            }
+            if (trs_1.isEmpty()) {
+                for (Trans t2 : trs_2) {
+                    t.addTransition(t, t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
+
+                            t.getStateByComposiStates(t, t2.getSource(), cStates[0])
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                            t2.getAction(),
+                                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
+                }
+            } else {
+                for (Trans t1 : trs_1) {
+
+                    for (Trans t2 : trs_2) {
+                        if (t1.getAction().equals(t2.getAction())
+                                && (t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                        || t2
+                                                .getSource().getOwner().getInterface().getChannels()
+                                                .contains(t1.getAction()))) {
+
+                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
+
+                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                            t1.getAction(),
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
+
+                        }
+                        {
+                            if (!t2.getSource().getListen().getChannels().contains(t1.getAction())
+                                    && t1.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t1.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t1.getAction(),
+                                                t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                            }
+                            if (!t1.getSource().getListen().getChannels().contains(t2.getAction())
+                                    && (t2.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t2.getAction()))) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t2.getAction(),
+                                        t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t2.getAction(),
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        t.setStates(reachFrom(t, t.getInitState()));
+        Set<Trans> trans = new HashSet<>();
+        for (Trans tr : t.getTransitions()) {
+            if (!t.getStates().contains(tr.getSource())) {
+                trans.add(tr);
+            }
+        }
+        t.getTransitions().removeAll(trans);
+        t.toDot(t, t.getName());
+
+        return t;
+    }
+
+    public Set<State> reachFrom(TS ts, State s) {
+
+        HashMap<State, Boolean> visited = new HashMap<>();
+        for (State st : ts.getStates()) {
+            visited.put(st, false);
+        }
+        LinkedList<State> queue = new LinkedList<State>();
+        Set<Trans> transitiveC = new HashSet<>();
+        Set<State> reach = new HashSet<>();
+        visited.put(s, false);
+        queue.add(s);
+        while (queue.size() != 0) {
+            s = queue.poll();
+            reach.add(s);
+            transitiveC = hasTransitions(ts, s);
+            if (transitiveC != null) {
+                if (transitiveC.size() != 0) {
+                    for (Trans tr : transitiveC) {
+                        if (!visited.get(tr.getDestination())) {
+                            visited.put(tr.getDestination(), true);
+                            queue.add(tr.getDestination());
+                        }
+                    }
+                }
+            }
+        }
+        return reach;
+    }
+
+    private Set<Trans> hasTransitions(TS ts, State s) {
+        Set<Trans> trSet = new HashSet<>();
+
+        for (Trans tr : ts.getTransitions()) {
+            try {
+                if (tr.getSource().equals(s)) {
+                    trSet.add(tr);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+
+        return trSet;
+    }
+
+    public void initialDecomposition(TS ts, String name, Set<String> channels, Set<String> outputs) {
+        TS t = new TS(name);
+        TS p = new TS("P-" + name);
+        Int i = new Int(channels, outputs);
+        Set<String> pCh = new HashSet<>(ts.getInterface().getChannels());
+        pCh.removeAll(channels);
+        Set<String> pOut = new HashSet<>(ts.getInterface().getOutput());
+        pOut.removeAll(outputs);
+        Int pInt = new Int(pCh, pOut);
+        t.setInterface(i);
+        p.setInterface(pInt);
+        for (State s : ts.getStates()) {
+            Set<String> chan = new HashSet<>(i.getChannels());
+            Set<String> pChan = new HashSet<>(pInt.getChannels());
+            chan.retainAll(s.getLabel().getChannel());
+            pChan.retainAll(s.getLabel().getChannel());
+            Set<String> out = new HashSet<>(i.getOutput());
+            Set<String> pO = new HashSet<>(pInt.getOutput());
+            out.retainAll(s.getLabel().getOutput());
+            pO.retainAll(s.getLabel().getOutput());
+            Label lab = new Label(chan, out);
+            Label pLab = new Label(pChan, pO);
+            State st = new State(s.getId(), lab, s.getListen());
+            State pSt = new State(s.getId(), pLab, s.getListen());
+            t.addState(st);
+            p.addState(pSt);
+
+        }
+
+        t.setInitState(ts.getInitState().getId());
+        p.setInitState(ts.getInitState().getId());
+        for (Trans tr : ts.getTransitions()) {
+            t.addTransition(t, t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId()));
+
+            p.addTransition(p, p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId()));
+
+            t.getStateById(tr.source.getId()).getTrans().add(
+                    new Trans(t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId())));
+            p.getStateById(tr.source.getId()).getTrans().add(
+                    new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
+        }
+        ts.agents.add(t);
+        ts.parameters.add(p);
+    }
+
+    public void addTransition(TS ts, State src, String action, State des) {
+        src.setOwner(ts);
+        des.setOwner(ts);
+        ts.transitions.add(new Trans(src, action, des));
+
+    }
+
+    public void addState(State state) {
+        state.setOwner(this);
+        this.states.add(state);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((Interface == null) ? 0 : Interface.hashCode());
+        result = prime * result + ((L == null) ? 0 : L.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        TS other = (TS) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (initState == null) {
+            if (other.initState != null)
+                return false;
+        } else if (!initState.equals(other.initState))
+            return false;
+        if (Interface == null) {
+            if (other.Interface != null)
+                return false;
+        } else if (!Interface.equals(other.Interface))
+            return false;
+        if (L == null) {
+            if (other.L != null)
+                return false;
+        } else if (!L.equals(other.L))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder b = new StringBuilder();
+        b.append("\n\n");
+        b.append(this.name + " [ \n\n");
+
+        b.append("States = (");
+        b.append(StringUtil.join(this.getStates(), ", ") + " ),\n\n");
+        b.append("Initial State = ");
+        b.append(StringUtil.join(new HashSet<State>(Arrays.asList(this.getInitState())), ",") + ",\n\n");
+        b.append("Interface = ");
+        b.append(StringUtil.join(new HashSet<Int>(Arrays.asList(this.getInterface())), ",") + ",\n\n");
+
+        b.append("Transitions = ( ");
+        b.append(StringUtil.join(this.getTransitions(), ", ") + " )\n\n");
+        b.append("Agents = ( ");
+        b.append(StringUtil.join(this.getAgents(), ", ") + " )\n\n");
+        b.append("]\n\n");
+        b.append("Parameters = ( ");
+        b.append(StringUtil.join(this.parameters, ", ") + " )\n\n");
+        b.append("]\n\n");
+        return b.toString();
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+}
