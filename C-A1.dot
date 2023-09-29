@@ -1,0 +1,118 @@
+digraph G {
+graph [rankdir=LR,ranksep=.6,nodesep=0.5];
+
+
+subgraph cluster_L { "" [shape=box fontsize=16 style="filled" label=
+
+"Interface: [channels=[r1], output=[g1]]
+
+Any generated TS is open to interaction\l with the external world. Some transtions\l are only reactions and cannot execute\l without an external initiator.\l\l According to the semantics, a transition is\l a reaction if its channel is not included in\l channel labelling of the reached state.\l"]}
+
+
+
+
+
+node[shape=circle style=filled fixedsize=true fontsize=10]
+
+init [shape=point,style=invis];
+	13[label="{r2,r1}
+
+/g1
+
+
+"]
+
+	9[label="{r1}
+
+/
+
+
+"]
+
+	8[label="{r2,r1}
+
+r1/g1
+
+
+"]
+
+	14[label="{r2,r1}
+
+/
+
+
+"]
+
+	10[label="{r2,r1}
+
+r1/
+
+
+"]
+
+	0[label="{r2,r1}
+
+/
+
+
+"]
+
+	2[label="{r2,r1}
+
+/
+
+
+"]
+
+	6[label="{r2,r1}
+
+r1/
+
+
+"]
+
+	12[label="{r2,r1}
+
+r1/g1
+
+
+"]
+
+	 init -> 0[penwidth=0,tooltip="initial state"];
+
+	6 -> 13[label="r2"];
+
+	6 -> 8[label="r1"];
+
+	10 -> 8[label="r1"];
+
+	9 -> 6[label="r1"];
+
+	8 -> 8[label="r1"];
+
+	13 -> 9[label="r2"];
+
+	12 -> 10[label="r1"];
+
+	14 -> 13[label="r2"];
+
+	0 -> 2[label="r2"];
+
+	12 -> 9[label="r2"];
+
+	2 -> 10[label="r1"];
+
+	14 -> 12[label="r1"];
+
+	0 -> 6[label="r1"];
+
+	10 -> 14[label="r2"];
+
+	13 -> 10[label="r1"];
+
+	2 -> 9[label="r2"];
+
+	8 -> 2[label="r2"];
+
+
+}
