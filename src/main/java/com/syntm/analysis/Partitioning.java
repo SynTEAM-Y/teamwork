@@ -1,4 +1,4 @@
-package com.syntm;
+package com.syntm.analysis;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.syntm.lts.Label;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
-import com.syntm.util.ConcurrentSolver;
+
 
 public class Partitioning {
     private TS T;

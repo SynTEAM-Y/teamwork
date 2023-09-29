@@ -55,7 +55,7 @@ public class GraphPrinter {
     }
 
     private void writeTextToFile(String fileName, String text) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream(fileName);
+        FileOutputStream outputStream = new FileOutputStream("Examples/SynrTS/"+fileName);
         outputStream.write(text.getBytes());
         outputStream.close();
     }

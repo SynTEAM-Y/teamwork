@@ -6,20 +6,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 
-public class ParseTS {
+public class RunEngine {
 	private TS mainTS;
 
 	public static void main(final String[] args) throws IOException {
-		ParseTS parseTS = new ParseTS();
+		RunEngine parseTS = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
 		System.out.println("Enter a TS for decomposition: ");
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
 		parseTS.readInput(fileP);
-		parseTS.writeOutput("TStext");
+		parseTS.writeOutput("Examples/TStext");
 
 	}
 

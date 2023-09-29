@@ -1,4 +1,4 @@
-package com.syntm.util;
+package com.syntm.analysis;
 
 import java.util.ArrayList;
 import java.util.HashSet;
