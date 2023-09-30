@@ -54,19 +54,19 @@ public class ConcurrentSolver {
 
       }
       updateBarrier.reset();
-    //  State s = eMap.keySet().iterator().next();
-   //  Set<Set<State>> rho_f = new HashSet<>(eMap.get(s));
+      // State s = eMap.keySet().iterator().next();
+      // Set<Set<State>> rho_f = new HashSet<>(eMap.get(s));
 
-     Set<Set<State>> rho_f=new HashSet<>();
-     String id=ts.getInitState().getId();
-     for (State s : eMap.keySet()) {
-      if (s.getId().equals(id)) {
-         rho_f = new HashSet<>(eMap.get(s));
+      Set<Set<State>> rho_f = new HashSet<>();
+      String id = ts.getInitState().getId();
+      for (State s : eMap.keySet()) {
+        if (s.getId().equals(id)) {
+          rho_f = new HashSet<>(eMap.get(s));
+        }
       }
-     }
-      
+
       // for (State epState : eMap.keySet()) {
-      //   rho_f.retainAll(eMap.get(epState));
+      // rho_f.retainAll(eMap.get(epState));
       // }
       System.out.println("This is the coarsest partition ->\n\n\n" + rho_f);
       CompressedTS c = new CompressedTS("s-" + this.ts.getName());
@@ -173,49 +173,22 @@ public class ConcurrentSolver {
           && epsilon.getListen().getChannels().contains(channel)) {
         for (State s : p) {
           if (s.canTakeInitiative(s.getOwner(), s, channel)) {
-            for (State sPrime : p) {
-              if (sPrime.canTakeInitiative(sPrime.getOwner(), sPrime, channel)
-                  && ePrime.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())
-                  && ePrime.contains(sPrime.takeInitiative(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                out.add(s);
-                out.add(sPrime);
-              }
+            if (ePrime.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
+              out.add(s);
             }
-          }
 
+          }
         }
       }
-
-      // if (!epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
-      //     && epsilon.getListen().getChannels().contains(channel)) {
-      //   for (State s : p) {
-      //     if (s.getOwner().getInterface().getChannels().contains(channel)) {
-      //       for (State sPrime : p) {
-      //         if (sPrime.getOwner().getInterface().getChannels().contains(channel) && !s.canTakeInitiative(s.getOwner(), s, channel) && !sPrime.canTakeInitiative(sPrime.getOwner(), sPrime, channel)
-      //            ) {
-      //           out.add(s);
-      //           out.add(sPrime);
-      //         }
-      //       }
-      //     }
-
-      //   }
-      // }
 
       if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
         for (Set<State> partition : rho_epsilon) {
           for (State s : p) {
             if (s.canTakeInitiative(s.getOwner(), s, channel)) {
-              for (State sPrime : p) {
-                if (sPrime.canTakeInitiative(sPrime.getOwner(), sPrime, channel)
-                    && partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())
-                    && partition.contains(sPrime.takeInitiative(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                  out.add(s);
-                  out.add(sPrime);  
-                }
+              if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
+                out.add(s);
               }
             }
-
           }
           if (!out.isEmpty() && !out.equals(p)) {
             break;
@@ -230,15 +203,8 @@ public class ConcurrentSolver {
           && trEpsilon.getAction().equals(channel)) {
         for (State s : p) {
           if (s.canDirectReaction(s.getOwner(), s, channel)) {
-            for (State sPrime : p) {
-              if (!sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)
-                  && sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)
-                  && ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
-                  && ePrime
-                      .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                out.add(s);
-                out.add(sPrime);
-              }
+            if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())) {
+              out.add(s);
             }
           }
         }
@@ -248,15 +214,10 @@ public class ConcurrentSolver {
           && trEpsilon.getAction().equals(channel)) {
         for (State s : p) {
           if (s.canExactSilent(s.getOwner(), s, channel)) {
-            for (State sPrime : p) {
-              if (!sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)
-                  && sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)
-                  && ePrime.contains(s.takeExactSilent(s.getOwner(), s, channel).getDestination())
-                  && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                out.add(s);
-                out.add(sPrime);
-              }
+            if (ePrime.contains(s.takeExactSilent(s.getOwner(), s, channel).getDestination())) {
+              out.add(s);
             }
+
           }
         }
       }
@@ -265,13 +226,9 @@ public class ConcurrentSolver {
           && trEpsilon.getAction().equals(channel)) {
         for (State s : p) {
           if (!s.getListen().getChannels().contains(channel)) {
-            for (State sPrime : p) {
-              if (!sPrime.getListen().getChannels().contains(channel) && ePrime.contains(s)
-                  && ePrime.contains(sPrime)) {
+              if (ePrime.contains(s)) {
                 out.add(s);
-                out.add(sPrime);
               }
-            }
           }
         }
       }

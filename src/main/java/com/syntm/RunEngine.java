@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
+import java.lang.ProcessBuilder.Redirect;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 
@@ -15,6 +15,22 @@ public class RunEngine {
 	public static void main(final String[] args) throws IOException {
 		RunEngine parseTS = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+
+		// ProcessBuilder pb = new ProcessBuilder("./ltlsynt", "--ins=request_0,request_1", "--outs=grant_0,grant_1" , "-f" , "G ((grant_0 & G ! request_0) -> (F ! grant_0))& G ((grant_1 & G ! request_1) -> (F ! grant_1)) & G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0)) & G ((grant_1 & X (! request_1 & ! grant_1)) -> X (request_1 R ! grant_1)) & G (! grant_0 | ! grant_1) & (request_0 R ! grant_0) & (request_1 R ! grant_1) & G (request_0 -> F grant_0) & G (request_1 -> F grant_1)");
+
+		// ProcessBuilder p =new ProcessBuilder("docker", "run", "lazkany/strix", "-f", "G ((grant_0 & G ! request_0) -> (F ! grant_0))& G ((grant_1 & G ! request_1) -> (F ! grant_1)) & G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0)) & G ((grant_1 & X (! request_1 & ! grant_1)) -> X (request_1 R ! grant_1)) & G (! grant_0 | ! grant_1) & (request_0 R ! grant_0) & (request_1 R ! grant_1) & G (request_0 -> F grant_0) & G (request_1 -> F grant_1)", "--ins=request_0,request_1", "--outs=grant_0,grant_1", "--k");
+
+		
+
+		// System.out.println("Enter SPEC: ");
+		// String spec = stdin.readLine();
+		// ProcessBuilder p =new ProcessBuilder(spec);
+		// //pb.directory(new File("bin"));
+		// File log = new File("Mealy");
+		// p.redirectErrorStream(true);
+		// p.redirectOutput(Redirect.appendTo(log));
+		// p.start();
+		
 
 		System.out.println("Enter a TS for decomposition: ");
 		String fileP = stdin.readLine();
@@ -37,15 +53,15 @@ public class RunEngine {
 			for (TS a : this.mainTS.getAgents()) {
 				a.toDot(a, a.getName());
 			}
-			 for (TS p : this.mainTS.getParameters()) {
+			for (TS p : this.mainTS.getParameters()) {
 				p.openParallelCompTS(p, mainTS.getAgentById(p.getName()));
 				p.closedParallelCompTS(p, mainTS.getAgentById(p.getName()));
-			//	if (mainTS.getAgentById(p.getName()).getName().equals("Proc")) {
-					Partitioning lp = new Partitioning(p, mainTS.getAgentById(p.getName()));
-					TS pPrime = lp.computeCompressedTS();
-					p.openParallelCompTS(p, pPrime);
-					p.closedParallelCompTS(p, pPrime);
-			//	}
+				// if (mainTS.getAgentById(p.getName()).getName().equals("Proc")) {
+				Partitioning lp = new Partitioning(p, mainTS.getAgentById(p.getName()));
+				TS pPrime = lp.computeCompressedTS();
+				p.openParallelCompTS(p, pPrime);
+				p.closedParallelCompTS(p, pPrime);
+				// }
 
 			}
 		} catch (IOException e) {
