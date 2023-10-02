@@ -42,7 +42,6 @@ public class ConcurrentSolver {
     int counter = 0;
     boolean fixed = false;
     try {
-      // roundBarrier.await();
       while (!fixed) {
         counter += 1;
         System.out.println("This is Computation round #" + counter + "\n\n");
@@ -54,8 +53,6 @@ public class ConcurrentSolver {
 
       }
       updateBarrier.reset();
-      // State s = eMap.keySet().iterator().next();
-      // Set<Set<State>> rho_f = new HashSet<>(eMap.get(s));
 
       Set<Set<State>> rho_f = new HashSet<>();
       String id = ts.getInitState().getId();
@@ -134,10 +131,7 @@ public class ConcurrentSolver {
     }
 
     public void run() {
-
-      // localParitioning();
       try {
-        // roundBarrier.await();
         while (true) {
           for (String ch : channels) {
             for (Trans trEpsilon : epsilon.getTrans()) {
@@ -150,6 +144,7 @@ public class ConcurrentSolver {
                     splitP = split(partition, splitter);
                     rho_temp.remove(partition);
                     rho_temp.addAll(splitP);
+
                   }
                 }
               }
@@ -198,40 +193,92 @@ public class ConcurrentSolver {
           }
         }
       }
-
       if (out.isEmpty() && epsilon.enable(epsilon, channel) != null
           && trEpsilon.getAction().equals(channel)) {
-        for (State s : p) {
-          if (s.canDirectReaction(s.getOwner(), s, channel)) {
-            if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())) {
-              out.add(s);
-            }
-          }
-        }
+        for (State s : p) { // try double for loop
+          for (State sPrime : p) {
+            if (s.canExactSilent(s.getOwner(), s, channel)
+                && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
+              if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
+                if (ePrime.contains(s.takeExactSilent(s.getOwner(), s, channel).getDestination())
+                    && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime, channel).getDestination())) {
+                  out.add(s);
+                  out.add(sPrime);
+                }
+              } else {
+                // if (s.weakBFS(s.getOwner(), s, channel).size()!=1) {
+                // for (State sReach : s.weakBFS(s.getOwner(), s, channel)) {
+                // if (sReach.canExactSilent(sReach.getOwner(), sReach, channel)) {
+                // if (ePrime.contains(sReach.takeExactSilent(sReach.getOwner(), sReach,
+                // channel).getDestination())) {
+                // out.add(s);
+                // break;
+                // }
+                // }
+                // }
+                // }
+                if (!sPrime.getListen().getChannels().contains(channel)) {
+                  if (ePrime.contains(sPrime)
+                      && ePrime.contains(s.takeExactSilent(s.getOwner(), s, channel).getDestination())) {
+                    out.add(s);
+                    out.add(sPrime);
+                  }
+                }
 
-      }
-      if (out.isEmpty() && epsilon.enable(epsilon, channel) != null
-          && trEpsilon.getAction().equals(channel)) {
-        for (State s : p) {
-          if (s.canExactSilent(s.getOwner(), s, channel)) {
-            if (ePrime.contains(s.takeExactSilent(s.getOwner(), s, channel).getDestination())) {
-              out.add(s);
-            }
-
-          }
-        }
-      }
-
-      if (out.isEmpty() && epsilon.enable(epsilon, channel) != null
-          && trEpsilon.getAction().equals(channel)) {
-        for (State s : p) {
-          if (!s.getListen().getChannels().contains(channel)) {
-              if (ePrime.contains(s)) {
-                out.add(s);
               }
+
+            }
           }
         }
       }
+      if (out.isEmpty() && epsilon.enable(epsilon, channel) != null // change to boolean
+          && trEpsilon.getAction().equals(channel)) {
+        for (State s : p) { // try double for loop
+          for (State sPrime : p) {
+            if (s.canDirectReaction(s.getOwner(), s, channel)
+                && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
+              if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
+                if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
+                    && ePrime
+                        .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel).getDestination())) {
+                  out.add(s);
+                  out.add(sPrime);
+                }
+              } else {
+                Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel);
+                if (reach.size() != 1) {
+                  for (State sReach : reach) {
+                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                      if (ePrime
+                          .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach, channel).getDestination())) {
+                        out.add(s);
+                        out.add(sPrime);
+                        // break;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+          }
+        }
+      }
+
+      // if (out.isEmpty() && epsilon.enable(epsilon, channel) == null
+      //     && trEpsilon.getAction().equals(channel)) {
+      //   for (State s : p) {
+      //     for (State sPrime : p) {
+      //       if (!s.getListen().getChannels().contains(channel) && !sPrime.getListen().getChannels().contains(channel)) {
+      //         if (ePrime.contains(s) && ePrime.contains(sPrime)) {
+      //           out.add(s);
+      //           out.add(sPrime);
+      //         }
+      //       }
+      //     }
+
+      //   }
+      // }
 
       return out;
     }

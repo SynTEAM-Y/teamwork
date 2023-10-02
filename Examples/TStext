@@ -1,100 +1,68 @@
-
-
-T [ 
-
-States = ( State(id=0, L=[]/[], LS=[d]),  State(id=9, L=[g]/[], LS=[]),  State(id=2, L=[b]/[], LS=[c]),  State(id=7, L=[f]/[], LS=[]),  State(id=1, L=[d]/[], LS=[b]),  State(id=8, L=[e]/[], LS=[]),  State(id=3, L=[c]/[], LS=[a, b, c]),  State(id=6, L=[c]/[], LS=[g]),  State(id=4, L=[a]/[], LS=[f]),  State(id=5, L=[b]/[], LS=[e]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[d]),
-
-Interface = Interface: [channels=[a, b, c, d, e, f, g], output=[]],
-
-Transitions = ( (state(3),c,state(6)), (state(6),g,state(9)), (state(2),c,state(3)), (state(4),f,state(7)), (state(0),d,state(1)), (state(3),a,state(4)), (state(3),b,state(5)), (state(5),e,state(8)), (state(1),b,state(2)) )
-
-Agents = ( 
-
-T1 [ 
-
-States = ( State(id=7, L=[f]/[], LS=[]),  State(id=8, L=[e]/[], LS=[]),  State(id=6, L=[]/[], LS=[g]),  State(id=4, L=[]/[], LS=[f]),  State(id=5, L=[]/[], LS=[e]),  State(id=3, L=[]/[], LS=[a, b, c]),  State(id=0, L=[]/[], LS=[d]),  State(id=2, L=[]/[], LS=[c]),  State(id=1, L=[]/[], LS=[b]),  State(id=9, L=[g]/[], LS=[]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[d]),
-
-Interface = Interface: [channels=[e, f, g], output=[]],
-
-Transitions = ( (state(2),c,state(3)), (state(6),g,state(9)), (state(5),e,state(8)), (state(3),c,state(6)), (state(4),f,state(7)), (state(1),b,state(2)), (state(3),a,state(4)), (state(3),b,state(5)), (state(0),d,state(1)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-T2 [ 
-
-States = ( State(id=2, L=[b]/[], LS=[c]),  State(id=1, L=[d]/[], LS=[b]),  State(id=0, L=[]/[], LS=[d]),  State(id=8, L=[]/[], LS=[]),  State(id=7, L=[]/[], LS=[]),  State(id=9, L=[]/[], LS=[]),  State(id=6, L=[c]/[], LS=[g]),  State(id=3, L=[c]/[], LS=[a, b, c]),  State(id=4, L=[a]/[], LS=[f]),  State(id=5, L=[b]/[], LS=[e]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[d]),
-
-Interface = Interface: [channels=[a, b, c, d], output=[]],
-
-Transitions = ( (state(3),a,state(4)), (state(3),b,state(5)), (state(6),g,state(9)), (state(5),e,state(8)), (state(0),d,state(1)), (state(1),b,state(2)), (state(4),f,state(7)), (state(2),c,state(3)), (state(3),c,state(6)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
- )
-
-]
-
-Parameters = ( 
-
-P-T1 [ 
-
-States = ( State(id=7, L=[]/[], LS=[]),  State(id=3, L=[c]/[], LS=[a, b, c]),  State(id=0, L=[]/[], LS=[d]),  State(id=9, L=[]/[], LS=[]),  State(id=8, L=[]/[], LS=[]),  State(id=2, L=[b]/[], LS=[c]),  State(id=6, L=[c]/[], LS=[g]),  State(id=1, L=[d]/[], LS=[b]),  State(id=4, L=[a]/[], LS=[f]),  State(id=5, L=[b]/[], LS=[e]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[d]),
-
-Interface = Interface: [channels=[a, b, c, d], output=[]],
-
-Transitions = ( (state(3),c,state(6)), (state(4),f,state(7)), (state(1),b,state(2)), (state(6),g,state(9)), (state(3),a,state(4)), (state(0),d,state(1)), (state(5),e,state(8)), (state(2),c,state(3)), (state(3),b,state(5)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-P-T2 [ 
-
-States = ( State(id=0, L=[]/[], LS=[d]),  State(id=2, L=[]/[], LS=[c]),  State(id=9, L=[g]/[], LS=[]),  State(id=1, L=[]/[], LS=[b]),  State(id=7, L=[f]/[], LS=[]),  State(id=8, L=[e]/[], LS=[]),  State(id=6, L=[]/[], LS=[g]),  State(id=3, L=[]/[], LS=[a, b, c]),  State(id=5, L=[]/[], LS=[e]),  State(id=4, L=[]/[], LS=[f]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[d]),
-
-Interface = Interface: [channels=[e, f, g], output=[]],
-
-Transitions = ( (state(5),e,state(8)), (state(6),g,state(9)), (state(3),c,state(6)), (state(2),c,state(3)), (state(3),a,state(4)), (state(3),b,state(5)), (state(0),d,state(1)), (state(1),b,state(2)), (state(4),f,state(7)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
- )
-
-]
-
+Fixed map -> { 
+    State(id=5, L=[a]/[rD, rF], LS=[d, f])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=0, L=[]/[], LS=[a])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=9, L=[d]/[], LS=[p])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=8, L=[]/[rP], LS=[d])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=5, L=[]/[], LS=[d, f]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])]], 
+        
+    State(id=2, L=[f]/[], LS=[p])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=8, L=[]/[rP], LS=[d])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=5, L=[]/[], LS=[d, f]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])]], 
+        
+    State(id=1, L=[a]/[rF], LS=[f])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=3, L=[]/[rD], LS=[a, d])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=6, L=[a]/[rF], LS=[f])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=4, L=[d]/[], LS=[a])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=7, L=[d]/[rF], LS=[f])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])], 
+        [ State(id=5, L=[]/[], LS=[d, f])], 
+        [ State(id=8, L=[]/[rP], LS=[d])]],  
+        
+    State(id=8, L=[f]/[rD], LS=[d])=[
+        [ State(id=3, L=[p]/[], LS=[a, d])], 
+        [ State(id=2, L=[]/[rP], LS=[p]),  State(id=9, L=[]/[rP], LS=[p])], 
+        [ State(id=8, L=[]/[rP], LS=[d])], 
+        [ State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=5, L=[]/[], LS=[d, f]),  State(id=1, L=[]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])]]}
+This is the coarsest partition ->

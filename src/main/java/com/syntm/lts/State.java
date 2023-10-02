@@ -302,22 +302,4 @@ public class State{
         }
         return null;
     }
-
-
-    // public Set<Trans> hasTransitions(TS ts, State s) {
-    //     Set<Trans> trSet = new HashSet<>();
-
-    //     for (Trans tr : ts.getTransitions()) {
-    //         try {
-    //             if (tr.getSource().equals(s)) {
-    //                 trSet.add(tr);
-    //             }
-    //         } catch (Exception e) {
-    //              System.out.println(e);
-    //         }
-
-    //     }
-
-    //     return trSet;
-    // }
 }

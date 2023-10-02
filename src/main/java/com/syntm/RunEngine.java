@@ -18,18 +18,18 @@ public class RunEngine {
 
 		// ProcessBuilder pb = new ProcessBuilder("./ltlsynt", "--ins=request_0,request_1", "--outs=grant_0,grant_1" , "-f" , "G ((grant_0 & G ! request_0) -> (F ! grant_0))& G ((grant_1 & G ! request_1) -> (F ! grant_1)) & G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0)) & G ((grant_1 & X (! request_1 & ! grant_1)) -> X (request_1 R ! grant_1)) & G (! grant_0 | ! grant_1) & (request_0 R ! grant_0) & (request_1 R ! grant_1) & G (request_0 -> F grant_0) & G (request_1 -> F grant_1)");
 
-		// ProcessBuilder p =new ProcessBuilder("docker", "run", "lazkany/strix", "-f", "G ((grant_0 & G ! request_0) -> (F ! grant_0))& G ((grant_1 & G ! request_1) -> (F ! grant_1)) & G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0)) & G ((grant_1 & X (! request_1 & ! grant_1)) -> X (request_1 R ! grant_1)) & G (! grant_0 | ! grant_1) & (request_0 R ! grant_0) & (request_1 R ! grant_1) & G (request_0 -> F grant_0) & G (request_1 -> F grant_1)", "--ins=request_0,request_1", "--outs=grant_0,grant_1", "--k");
+		ProcessBuilder p =new ProcessBuilder("docker", "run", "lazkany/strix", "-f", "G ((grant_0 & G ! request_0) -> (F ! grant_0))& G ((grant_1 & G ! request_1) -> (F ! grant_1)) & G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0)) & G ((grant_1 & X (! request_1 & ! grant_1)) -> X (request_1 R ! grant_1)) & G (! grant_0 | ! grant_1) & (request_0 R ! grant_0) & (request_1 R ! grant_1) & G (request_0 -> F grant_0) & G (request_1 -> F grant_1)", "--ins=request_0,request_1", "--outs=grant_0,grant_1", "--k");
 
 		
 
 		// System.out.println("Enter SPEC: ");
 		// String spec = stdin.readLine();
-		// ProcessBuilder p =new ProcessBuilder(spec);
-		// //pb.directory(new File("bin"));
-		// File log = new File("Mealy");
-		// p.redirectErrorStream(true);
-		// p.redirectOutput(Redirect.appendTo(log));
-		// p.start();
+		//ProcessBuilder p =new ProcessBuilder(spec);
+		//pb.directory(new File("bin"));
+		File log = new File("Mealy");
+		p.redirectErrorStream(true);
+		p.redirectOutput(Redirect.appendTo(log));
+		p.start();
 		
 
 		System.out.println("Enter a TS for decomposition: ");
