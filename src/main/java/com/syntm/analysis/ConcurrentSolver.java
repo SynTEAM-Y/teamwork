@@ -265,20 +265,20 @@ public class ConcurrentSolver {
         }
       }
 
-      // if (out.isEmpty() && epsilon.enable(epsilon, channel) == null
-      //     && trEpsilon.getAction().equals(channel)) {
-      //   for (State s : p) {
-      //     for (State sPrime : p) {
-      //       if (!s.getListen().getChannels().contains(channel) && !sPrime.getListen().getChannels().contains(channel)) {
-      //         if (ePrime.contains(s) && ePrime.contains(sPrime)) {
-      //           out.add(s);
-      //           out.add(sPrime);
-      //         }
-      //       }
-      //     }
+      if (out.isEmpty() && epsilon.enable(epsilon, channel) != null
+          && trEpsilon.getAction().equals(channel)) {
+        for (State s : p) {
+          for (State sPrime : p) {
+            if (!s.getListen().getChannels().contains(channel) && !sPrime.getListen().getChannels().contains(channel)) {
+              if (ePrime.contains(s) && ePrime.contains(sPrime)) {
+                out.add(s);
+                out.add(sPrime);
+              }
+            }
+          }
 
-      //   }
-      // }
+        }
+      }
 
       return out;
     }
