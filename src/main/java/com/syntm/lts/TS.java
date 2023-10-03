@@ -41,7 +41,7 @@ public class TS {
     public TS(String name) {
         this.name = name;
         this.states = new HashSet<State>();
-        this.Interface = new Int(null, null);
+        this.Interface = new Int(new HashSet<>(), new HashSet<>());
         this.initState = new State();
         this.transitions = new HashSet<Trans>();
         this.agents = new HashSet<TS>();
@@ -262,6 +262,12 @@ public class TS {
     public TS openParallelCompTS(TS T1, TS T2) {
 
         TS t = new TS(T1.getName() + " || " + T2.getName());
+        if (T1.getName().equals("")) {
+            t.setName(T2.getName());
+        }
+        if (T2.getName().equals("")) {
+            t.setName(T1.getName());
+        }
 
         Set<String> chan = new HashSet<>(T1.getInterface().getChannels());
         Set<String> output = new HashSet<>(T1.getInterface().getOutput());
@@ -302,155 +308,155 @@ public class TS {
             trs_1.addAll(cStates[0].getTrans());
             trs_2.addAll(cStates[1].getTrans());
 
-             trs_1.addAll(cStates[0].getTrans());
+            trs_1.addAll(cStates[0].getTrans());
             trs_2.addAll(cStates[1].getTrans());
 
-           
             if (trs_2.isEmpty()) {
                 for (Trans t1 : trs_1) {
                     t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
-                                    t1.getAction(),
-                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
+                            t1.getAction(),
+                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
 
-                            t.getStateByComposiStates(t, t1.getSource(), cStates[1])
-                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
-                                            t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
+                    t.getStateByComposiStates(t, t1.getSource(), cStates[1])
+                            .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
                 }
             }
             if (trs_1.isEmpty()) {
                 for (Trans t2 : trs_2) {
                     t.addTransition(t, t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
-                                    t2.getAction(),
-                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
+                            t2.getAction(),
+                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
 
-                            t.getStateByComposiStates(t, t2.getSource(), cStates[0])
-                                    .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
-                                            t2.getAction(),
-                                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
+                    t.getStateByComposiStates(t, t2.getSource(), cStates[0])
+                            .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
                 }
             } else {
 
-            for (Trans t1 : trs_1) {
+                for (Trans t1 : trs_1) {
 
-                for (Trans t2 : trs_2) {
-                    if (t1.getAction().equals(t2.getAction())
-                            && !t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
-                            && !t2
-                                    .getSource().getOwner().getInterface().getChannels()
-                                    .contains(t1.getAction())) {
+                    for (Trans t2 : trs_2) {
+                        if (t1.getAction().equals(t2.getAction())
+                                && !t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                && !t2
+                                        .getSource().getOwner().getInterface().getChannels()
+                                        .contains(t1.getAction())) {
 
-                        t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                t1.getAction(),
-                                t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
-
-                        t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                        t1.getAction(),
-                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
-
-                    }
-                    if (t1.getAction().equals(t2.getAction())
-                            && (t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
-                                    || t2
-                                            .getSource().getOwner().getInterface().getChannels()
-                                            .contains(t1.getAction()))) {
-
-                        t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                t1.getAction(),
-                                t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
-
-                        t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                        t1.getAction(),
-                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
-
-                    } else {
-                        if (!t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
-                                && !t2.getSource().getOwner().getInterface().getChannels()
-                                        .contains(t1.getAction())
-                                && !t2.getSource().getListen().getChannels().contains(t1.getAction())) {
                             t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
                                     t1.getAction(),
-                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
-
-                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                            t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
-
-                        }
-
-                        if (!t1.getSource().getOwner().getInterface().getChannels().contains(t2.getAction())
-                                && !t2.getSource().getOwner().getInterface().getChannels()
-                                        .contains(t2.getAction())
-                                && !t1.getSource().getListen().getChannels().contains(t2.getAction())) {
-                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                    t2.getAction(),
                                     t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
 
                             t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
                                             t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
 
                         }
-                        if (!t2.getSource().getListen().getChannels().contains(t1.getAction())) {
+                        if (t1.getAction().equals(t2.getAction())
+                                && (t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                        || t2
+                                                .getSource().getOwner().getInterface().getChannels()
+                                                .contains(t1.getAction()))) {
+
                             t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
                                     t1.getAction(),
-                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
 
                             t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
                                             t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination())), t);
 
-                        }
-                        if (!t1.getSource().getListen().getChannels().contains(t2.getAction())) {
-                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                    t2.getAction(),
-                                    t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+                        } else {
+                            if (!t1.getSource().getOwner().getInterface().getChannels().contains(t1.getAction())
+                                    && !t2.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t1.getAction())
+                                    && !t2.getSource().getListen().getChannels().contains(t1.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
 
-                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                            t2.getAction(),
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
-                        }
-                        if (!t2.getSource().getListen().getChannels().contains(t1.getAction())
-                                && t1.getSource().getOwner().getInterface().getChannels()
-                                        .contains(t1.getAction())) {
-                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                    t1.getAction(),
-                                    t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t1.getAction(),
+                                                t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
 
-                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                            t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+                            }
 
-                        }
-                        if (!t1.getSource().getListen().getChannels().contains(t2.getAction())
-                                && (t2.getSource().getOwner().getInterface().getChannels()
-                                        .contains(t2.getAction()))) {
-                            t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                    t2.getAction(),
-                                    t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+                            if (!t1.getSource().getOwner().getInterface().getChannels().contains(t2.getAction())
+                                    && !t2.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t2.getAction())
+                                    && !t1.getSource().getListen().getChannels().contains(t2.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t2.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getDestination()));
 
-                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
-                                    .addTrans(new Trans(
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
-                                            t2.getAction(),
-                                            t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t1.getAction(),
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+
+                            }
+                            if (!t2.getSource().getListen().getChannels().contains(t1.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t1.getAction(),
+                                                t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                            }
+                            if (!t1.getSource().getListen().getChannels().contains(t2.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t2.getAction(),
+                                        t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t2.getAction(),
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                            }
+                            if (!t2.getSource().getListen().getChannels().contains(t1.getAction())
+                                    && t1.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t1.getAction())) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t1.getAction(),
+                                        t.getStateByComposiStates(t, t1.getDestination(), t2.getSource()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t1.getAction(),
+                                                t.getStateByComposiStates(t, t1.getDestination(), t2.getSource())), t);
+
+                            }
+                            if (!t1.getSource().getListen().getChannels().contains(t2.getAction())
+                                    && (t2.getSource().getOwner().getInterface().getChannels()
+                                            .contains(t2.getAction()))) {
+                                t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                        t2.getAction(),
+                                        t.getStateByComposiStates(t, t1.getSource(), t2.getDestination()));
+
+                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource())
+                                        .addTrans(new Trans(
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getSource()),
+                                                t2.getAction(),
+                                                t.getStateByComposiStates(t, t1.getSource(), t2.getDestination())), t);
+                            }
                         }
                     }
-                }
 
-            }}
+                }
+            }
 
         }
 
@@ -461,10 +467,51 @@ public class TS {
                 trans.add(tr);
             }
         }
-        t.getTransitions().removeAll(trans);
-        t.toDot(t, t.getName());
+        t.transitions.removeAll(trans);
+        //t.toDot(t, t.getName());
 
         return t;
+    }
+
+    public TS prunedTS(TS t) {
+         //REMEMBER TO FIX FOR MERGED ACTIONS. THE TRANSFORMATION HERE IS NOT CORRECT.
+        TS ts = new TS("B-" + t.getName());
+        ts.setInterface(t.getInterface());
+        for (State pState : t.getStates()) {
+            ts.addState(pState);
+        }
+        ts.setInitState(t.getInitState().getId());
+
+        for (Trans tr : t.getTransitions()) {
+
+            ts.transitions.add(tr);
+            ts.getStateById(tr.getSource().getId()).addTrans(tr, ts);
+        }
+        Set<Trans> trs = new HashSet<>(ts.transitions);
+        Set<Trans> trans = new HashSet<>();
+
+        for (Trans tr : ts.getTransitions()) {
+            if (!tr.getDestination().getLabel().getChannel().contains(tr.getAction())
+                  ) {
+                trans.add(tr);
+                ts.getStateById(tr.getSource().getId()).getTrans().remove(tr);
+            }
+        }
+
+        trs.removeAll(trans);
+        ts.setTransitions(trs);
+        ts.setStates(reachFrom(ts, ts.getInitState()));
+        trans.clear();
+        for (State st : ts.getStates()) {
+            for (Trans trans2 : st.getTrans()) {
+                if (trans2.getDestination().getLabel().getChannel().contains(trans2.getAction())) {
+                    trans.add(trans2);
+                }
+                
+            }
+        }
+        ts.setTransitions(trans);
+        return ts;
     }
 
     public TS closedParallelCompTS(TS T1, TS T2) { // MAKE SURE TO HIGHLIGHT THE LISTENING FUCTION
@@ -510,29 +557,28 @@ public class TS {
             trs_1.addAll(cStates[0].getTrans());
             trs_2.addAll(cStates[1].getTrans());
 
-           
             if (trs_2.isEmpty()) {
                 for (Trans t1 : trs_1) {
                     t.addTransition(t, t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
-                                    t1.getAction(),
-                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
+                            t1.getAction(),
+                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1]));
 
-                            t.getStateByComposiStates(t, t1.getSource(), cStates[1])
-                                    .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
-                                            t1.getAction(),
-                                            t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
+                    t.getStateByComposiStates(t, t1.getSource(), cStates[1])
+                            .addTrans(new Trans(t.getStateByComposiStates(t, t1.getSource(), cStates[1]),
+                                    t1.getAction(),
+                                    t.getStateByComposiStates(t, t1.getDestination(), cStates[1])), t);
                 }
             }
             if (trs_1.isEmpty()) {
                 for (Trans t2 : trs_2) {
                     t.addTransition(t, t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
-                                    t2.getAction(),
-                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
+                            t2.getAction(),
+                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0]));
 
-                            t.getStateByComposiStates(t, t2.getSource(), cStates[0])
-                                    .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
-                                            t2.getAction(),
-                                            t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
+                    t.getStateByComposiStates(t, t2.getSource(), cStates[0])
+                            .addTrans(new Trans(t.getStateByComposiStates(t, t2.getSource(), cStates[0]),
+                                    t2.getAction(),
+                                    t.getStateByComposiStates(t, t2.getDestination(), cStates[0])), t);
                 }
             } else {
                 for (Trans t1 : trs_1) {
@@ -597,8 +643,8 @@ public class TS {
                 trans.add(tr);
             }
         }
-        t.getTransitions().removeAll(trans);
-        t.toDot(t, t.getName());
+        t.transitions.removeAll(trans);
+       // t.toDot(t, t.getName());
 
         return t;
     }

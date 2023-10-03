@@ -294,12 +294,12 @@ public class State{
         return null;
     }
 
-    public Trans enable(State s, String ch) {
+    public Boolean enable(State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {
-                return tr;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 }
