@@ -191,7 +191,7 @@ public class CompressedTS {
     }
 
     public TS compressedTS(TS ts, Set<Set<State>> rho) {
-        CompressedTS t = new CompressedTS("C-" + ts.getName());
+        CompressedTS t = new CompressedTS("[" + ts.getName()+"]~");
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);
 

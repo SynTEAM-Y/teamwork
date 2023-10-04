@@ -36,6 +36,15 @@ public class State{
 		this.trans=new HashSet<Trans>();
 		this.comStates=new HashSet<State>();
 	}
+
+    public State(String id, Label label) {
+		this.id = id;
+		this.label = label;
+		this.listen = new Listen();
+		this.trans=new HashSet<Trans>();
+		this.comStates=new HashSet<State>();
+	}
+
 	public State(String id, Label label, Listen listen, Set<Trans> trans) {
 		this.id = id;
 		this.label = label;

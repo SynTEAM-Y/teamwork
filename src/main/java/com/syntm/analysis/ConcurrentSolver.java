@@ -44,13 +44,12 @@ public class ConcurrentSolver {
     try {
       while (!fixed) {
         counter += 1;
-        System.out.println("This is Computation round #" + counter + "\n\n");
+        System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
         roundBarrier.await();
         fixed = updateMap();
         if (!fixed) {
           updateBarrier.await();
         }
-
       }
       updateBarrier.reset();
 
@@ -62,10 +61,6 @@ public class ConcurrentSolver {
         }
       }
 
-      // for (State epState : eMap.keySet()) {
-      // rho_f.retainAll(eMap.get(epState));
-      // }
-      System.out.println("This is the coarsest partition ->\n\n\n" + rho_f);
       CompressedTS c = new CompressedTS("s-" + this.ts.getName());
       TS t = c.compressedTS(this.ts, rho_f);
       return t;
@@ -88,8 +83,6 @@ public class ConcurrentSolver {
     }
     if (fixedPoint) {
       System.out.println("Fixed map -> " + eMap);
-    } else {
-      System.out.println("Non fixed map -> " + eMap);
     }
 
     for (int i = 0; i < wList.size(); i++) {
@@ -154,7 +147,6 @@ public class ConcurrentSolver {
           updateBarrier.await();
         }
       } catch (InterruptedException ex) {
-        System.out.println("Worker" + this.epsilon.getId() + " InterruptedException");
         return;
       } catch (BrokenBarrierException ex) {
         return;
@@ -166,7 +158,7 @@ public class ConcurrentSolver {
 
       if (epsilon.enable(epsilon, channel)
           && trEpsilon.getAction().equals(channel)) {
-        for (State s : p) { 
+        for (State s : p) {
           for (State sPrime : p) {
 
             if (s.canExactSilent(s.getOwner(), s, channel)
@@ -179,28 +171,25 @@ public class ConcurrentSolver {
                   out.add(s);
                   out.add(sPrime);
                 }
-              }
-              else {
-                  if (!sPrime.getListen().getChannels().contains(channel)) {
-                    if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                        channel).getDestination())
-                        && ePrime.contains(sPrime)) {
-                      out.add(s);
-                      out.add(sPrime);
-                    }
+              } else {
+                if (!sPrime.getListen().getChannels().contains(channel)) {
+                  if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
+                      channel).getDestination())
+                      && ePrime.contains(sPrime)) {
+                    out.add(s);
+                    out.add(sPrime);
                   }
                 }
+              }
             }
 
-            
-              if (!s.getListen().getChannels().contains(channel) &&
-                  !sPrime.getListen().getChannels().contains(channel)) {
-                if (ePrime.contains(s) && ePrime.contains(sPrime)) {
-                  out.add(s);
-                  out.add(sPrime);
-                }
+            if (!s.getListen().getChannels().contains(channel) &&
+                !sPrime.getListen().getChannels().contains(channel)) {
+              if (ePrime.contains(s) && ePrime.contains(sPrime)) {
+                out.add(s);
+                out.add(sPrime);
               }
-            
+            }
 
             if (s.canDirectReaction(s.getOwner(), s, channel)
                 && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
@@ -224,58 +213,16 @@ public class ConcurrentSolver {
                               channel).getDestination())) {
                         out.add(s);
                         out.add(sPrime);
-                        // break;
                       }
                     }
                   }
-                } 
-                // else {
-                //   if (!sPrime.getListen().getChannels().contains(channel)) {
-                //     if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s,
-                //         channel).getDestination())
-                //         && ePrime.contains(sPrime)) {
-                //       out.add(s);
-                //       out.add(sPrime);
-                //     }
-                //   }
-                // }
+                }
               }
-            } 
+            }
           }
         }
       }
 
-      // if ( epsilon.enable(epsilon, channel) != null
-      // && trEpsilon.getAction().equals(channel)) {
-      // for (State s : p) {
-      // for (State sPrime : p) {
-      // if (!s.canDirectReaction(s.getOwner(), s, channel)
-      // && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-      // if (ePrime.contains(s) && ePrime.contains(sPrime)) {
-      // out.add(s);
-      // out.add(sPrime);
-      // }
-      // }
-      // }
-
-      // }
-      // }
-
-      // if (out.isEmpty() && epsilon.enable(epsilon, channel) != null
-      // && trEpsilon.getAction().equals(channel)) {
-      // for (State s : p) {
-      // for (State sPrime : p) {
-      // if (!s.getListen().getChannels().contains(channel) &&
-      // !sPrime.getListen().getChannels().contains(channel)) {
-      // if (ePrime.contains(s) && ePrime.contains(sPrime)) {
-      // out.add(s);
-      // out.add(sPrime);
-      // }
-      // }
-      // }
-
-      // }
-      // }
       if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
           && epsilon.getListen().getChannels().contains(channel)) {
         for (State s : p) {
@@ -283,7 +230,6 @@ public class ConcurrentSolver {
             if (ePrime.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
               out.add(s);
             }
-
           }
         }
       }

@@ -468,14 +468,12 @@ public class TS {
             }
         }
         t.transitions.removeAll(trans);
-        //t.toDot(t, t.getName());
-
         return t;
     }
 
-    public TS prunedTS(TS t) {
-         //REMEMBER TO FIX FOR MERGED ACTIONS. THE TRANSFORMATION HERE IS NOT CORRECT.
-        TS ts = new TS("B-" + t.getName());
+    public TS prunedTS(TS t) { // This is the outcome of closed composition as in the paper
+        // REMEMBER TO FIX FOR MERGED ACTIONS. THE TRANSFORMATION HERE IS NOT CORRECT.
+        TS ts = new TS("C[" + t.getName()+"]");
         ts.setInterface(t.getInterface());
         for (State pState : t.getStates()) {
             ts.addState(pState);
@@ -491,8 +489,7 @@ public class TS {
         Set<Trans> trans = new HashSet<>();
 
         for (Trans tr : ts.getTransitions()) {
-            if (!tr.getDestination().getLabel().getChannel().contains(tr.getAction())
-                  ) {
+            if (!tr.getDestination().getLabel().getChannel().contains(tr.getAction())) {
                 trans.add(tr);
                 ts.getStateById(tr.getSource().getId()).getTrans().remove(tr);
             }
@@ -507,14 +504,14 @@ public class TS {
                 if (trans2.getDestination().getLabel().getChannel().contains(trans2.getAction())) {
                     trans.add(trans2);
                 }
-                
+
             }
         }
         ts.setTransitions(trans);
         return ts;
     }
 
-    public TS closedParallelCompTS(TS T1, TS T2) { // MAKE SURE TO HIGHLIGHT THE LISTENING FUCTION
+    public TS closedParallelCompTS(TS T1, TS T2) {
 
         TS t = new TS(T1.getName() + " ||| " + T2.getName());
 
@@ -644,8 +641,6 @@ public class TS {
             }
         }
         t.transitions.removeAll(trans);
-       // t.toDot(t, t.getName());
-
         return t;
     }
 

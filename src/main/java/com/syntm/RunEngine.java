@@ -34,7 +34,7 @@ public class RunEngine {
 		p.redirectOutput(Redirect.appendTo(log));
 		p.start();
 		
-
+		//System.out.println("Y=x".setTextRise+"2+k");
 		System.out.println("Enter a TS for decomposition: ");
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);

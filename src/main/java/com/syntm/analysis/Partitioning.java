@@ -22,7 +22,7 @@ public class Partitioning {
 
     public TS computeCompressedTS() {
 
-        // partition locally based on label;
+        // Partition Locally Based On Label;
 
         Set<Set<State>> rho = new HashSet<Set<State>>();
         rho.add(this.T.getStates());

@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "RunEngine",
+            "request": "launch",
+            "mainClass": "com.syntm.RunEngine",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
+            "name": "Automata",
+            "request": "launch",
+            "mainClass": "com.syntm.analysis.Automata",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
+            "name": "Mealy",
+            "request": "launch",
+            "mainClass": "com.syntm.lts.Mealy",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
