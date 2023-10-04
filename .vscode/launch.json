@@ -13,37 +13,9 @@
         },
         {
             "type": "java",
-            "name": "Automata",
-            "request": "launch",
-            "mainClass": "com.syntm.analysis.Automata",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "Mealy",
-            "request": "launch",
-            "mainClass": "com.syntm.lts.Mealy",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "ParseTS",
-            "request": "launch",
-            "mainClass": "com.syntm.ParseTS",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "Solver",
-            "request": "launch",
-            "mainClass": "com.syntm.util.Solver",
-            "projectName": "teamwork"
         }
     ]
 }

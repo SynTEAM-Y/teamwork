@@ -1,5 +1,7 @@
 package com.syntm.lts;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,6 +16,12 @@ public class Mealy {
     private Trans initTrans;
     private Int Interface;
     private Set<Trans> transitions;
+
+    private enum Implementabillty {
+        REALIZABLE, UNREALIZABLE;
+    }
+
+    private Implementabillty status;
 
     public Mealy(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
@@ -91,6 +99,14 @@ public class Mealy {
         return null;
     }
 
+    public Implementabillty getStatus() {
+        return status;
+    }
+
+    public void setStatus(Implementabillty status) {
+        this.status = status;
+    }
+
     public String formatAction(String action) {
         String st = "";
         String[] parts = action.split("/");
@@ -113,11 +129,74 @@ public class Mealy {
         return s;
     }
 
-    public Mealy kissToMealy(Mealy m, String name) {
-        return null;
+    public Mealy kissToMealy(final String filePath) throws IOException {
+        Mealy m = new Mealy("Strategy");
+        Int mInt = new Int();
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+        String line;
+        String recent = "";
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(" ");
+            String[] mParts = new String[parts.length - 1];
+            for (int i = 1; i < parts.length; i++) {
+                mParts[i - 1] = parts[i];
+            }
+            switch (parts[0].trim()) {
+                case "REALIZABLE":
+                    status = Implementabillty.REALIZABLE;
+                    System.out.println(
+                            "\n\n Specification is REALIZABLE\n\n You will get a distributed Implementation :)\n\n");
+                    break;
+                case "UNREALIZABLE":
+                    status = Implementabillty.UNREALIZABLE;
+                    m.setName("Counter Strategy");
+                    System.out.println("\n\n Specification is UNREALIZABLE\n\n You will get a counter strategy :(\n\n");
+                    break;
+
+                case ".inputs":
+                    Set<String> chan = new HashSet<>();
+                    for (String ch : mParts) {
+                        chan.add(ch);
+                    }
+                    mInt.setChannels(chan);
+
+                    break;
+                case ".outputs":
+                    Set<String> out = new HashSet<>();
+                    for (String o : mParts) {
+                        out.add(o);
+                    }
+                    mInt.setOutput(out);
+                    m.setInterface(mInt);
+                    break;
+                case ".s":
+                    int n = Integer.parseInt(mParts[0].trim());
+                    for (int i = 0; i < n; i++) {
+                        m.states.add(new State(i + ""));
+                    }
+                    break;
+                case ".r":
+                    recent = ".r";
+                    m.setInitState(m.getStateById(parts[1].substring(1).trim()));
+                    break;
+
+                default:
+                    if (recent.equals(".r")) {
+                        m.transitions.add(new Trans(m.getStateById(parts[1].substring(1).trim()),
+                                parts[0].trim() + "/" + parts[3].trim(), m.getStateById(parts[2].substring(1).trim())));
+                    }
+                    break;
+            }
+
+        }
+
+        reader.close();
+        m.toDot(m, m.getName());
+        return m;
     }
 
-    public TS toTS(Mealy m, String name) { // COMPLETE THIS
+    public TS toTS(Mealy m, String name) {
         TS ts = new TS("T[" + name + "]");
         ts.setInterface(m.getInterface());
         for (Trans tr : m.getTransitions()) {
@@ -150,10 +229,10 @@ public class Mealy {
                 chans.add(tr.getAction());
             }
             ts.getLS().apply(st, new Listen(chans));
-            
+
         }
 
-        ts.setInitState(IdState(m.getInitTrans()));
+        ts.setInitState(m.getInitState().getId());
         ts.toDot(ts, ts.getName());
         return ts;
     }
@@ -169,13 +248,12 @@ public class Mealy {
         gp.addln("\n\n\n\n");
         gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
 
-        gp.addln(m.initTrans.getSource().getId() + " [shape=point,style=invis];");
+        gp.addln("init [shape=point,style=invis];");
         for (State state : m.states) {
             gp.addln("\t" + state.getId().toString() + "[label=\"" + state.getId().toString() + "\"]" + "\n");
         }
 
-        gp.addln("\t" + m.initTrans.getSource().getId() + "-> " + m.getInitState().getId().toString() + "[label=\""
-                + this.initTrans.getAction() + "\", penwidth=.5,tooltip=\"initial state\"]"
+        gp.addln("\t" + " init -> " + m.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
                 + ";\n");
         for (Trans t : m.getTransitions()) {
             String source = t.getSource().getId().toString();
@@ -250,28 +328,6 @@ public class Mealy {
     public String toString() {
         return "Mealy [name=" + name + ", states=" + states + ", initState=" + initState + ", initTrans=" + initTrans
                 + ", Interface=" + Interface + ", transitions=" + transitions + "]";
-    }
-
-    public static void main(final String[] args) throws IOException {
-        Mealy m = new Mealy("M");
-        m.setInterface(new Int(new HashSet<>(Arrays.asList("y")), new HashSet<>(Arrays.asList("o"))));
-        for (int i = 0; i < 4; i++) {
-            m.states.add(new State(i + ""));
-        }
-        m.setInitState(m.getStateById("0"));
-        int i = 0;
-        for (State st : m.getStates()) {
-            for (State s : m.getStates()) {
-
-                m.transitions.add(new Trans(st, i + "/o", s));
-                i += 1;
-            }
-        }
-        m.setInitTrans(new Trans(new State("init"), "0/0", m.getInitState()));
-        // m.setInitState(m.getStateById("0"));
-        m.toTS(m, m.getName());
-        m.toDot(m, m.getName());
-
     }
 
 }
