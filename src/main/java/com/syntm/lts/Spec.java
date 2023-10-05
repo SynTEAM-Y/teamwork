@@ -131,16 +131,16 @@ public class Spec {
     }
 
     public String interleave(String ch) {
-        String st = "X G ("+ ch +" -> ";
+        String st = "(";
         for (String c : this.sInterface.getChannels()) {
             if (!c.equals(ch)) {
-                st += "!"+c+ " & ";
+                st += "!" + c + " & ";
             }
         }
         if (st.endsWith("& ")) {
             st = st.substring(0, st.length() - 2);
         }
-        st+=") &\n";
+        st += ") | ";
         return st;
     }
 
@@ -176,19 +176,23 @@ public class Spec {
                     specBuilder.add(" X G (");
                     st = "";
                     for (String ch : this.sInterface.getChannels()) {
-                        st += ch + " | ";
+                    st += ch + " | ";
                     }
                     if (st.endsWith(" | ")) {
-                        st = st.substring(0, st.length() - 2);
+                    st = st.substring(0, st.length() - 2);
                     }
                     st += ") &\n";
                     specBuilder.add(st);
                     st = "";
+                    specBuilder.add(" X G (");
                     for (String ch : this.sInterface.getChannels()) {
-                        st+=interleave(ch)+"\n";
+                        st += interleave(ch);
                     }
-                    specBuilder.add(st);
-                    st="";
+                    if (st.endsWith("| ")) {
+                        st = st.substring(0, st.length() - 2);
+                    }
+                    specBuilder.add(st + " ) &\n");
+                    st = "";
                     break;
                 case "EndAssumptions":
                     if (st.endsWith(" &\n")) {
