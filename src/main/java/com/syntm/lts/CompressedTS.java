@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import com.syntm.util.GraphPrinter;
+import com.syntm.util.Printer;
 
 public class CompressedTS {
     private String name;
@@ -166,7 +166,7 @@ public class CompressedTS {
 
     public void toDot(CompressedTS ts, String name) {
 
-        GraphPrinter gp = new GraphPrinter(name);
+        Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
 

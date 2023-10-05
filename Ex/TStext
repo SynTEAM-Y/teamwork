@@ -1,140 +1,15 @@
-
-
-T [ 
-
-States = ( State(id=0, L=[]/[], LS=[a]),  State(id=9, L=[d]/[rP], LS=[p]),  State(id=3, L=[p]/[rD], LS=[a, d]),  State(id=8, L=[f]/[rD, rP], LS=[d]),  State(id=4, L=[d]/[], LS=[a]),  State(id=1, L=[a]/[rF], LS=[f]),  State(id=2, L=[f]/[rP], LS=[p]),  State(id=5, L=[a]/[rD, rF], LS=[d, f]),  State(id=6, L=[a]/[rF], LS=[f]),  State(id=7, L=[d]/[rF], LS=[f]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[p, a, d, f], output=[rD, rF, rP]],
-
-Transitions = ( (state(9),p,state(3)), (state(3),a,state(5)), (state(4),a,state(6)), (state(1),f,state(2)), (state(2),p,state(3)), (state(5),d,state(7)), (state(8),d,state(9)), (state(0),a,state(1)), (state(6),f,state(2)), (state(3),d,state(4)), (state(7),f,state(2)), (state(5),f,state(8)) )
-
-Agents = ( 
-
-Proc [ 
-
-States = ( State(id=2, L=[]/[rP], LS=[p]),  State(id=3, L=[p]/[], LS=[a, d]),  State(id=4, L=[]/[], LS=[a]),  State(id=0, L=[]/[], LS=[a]),  State(id=9, L=[]/[rP], LS=[p]),  State(id=5, L=[]/[], LS=[d, f]),  State(id=1, L=[]/[], LS=[f]),  State(id=8, L=[]/[rP], LS=[d]),  State(id=6, L=[]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[p], output=[rP]],
-
-Transitions = ( (state(4),a,state(6)), (state(9),p,state(3)), (state(5),d,state(7)), (state(3),d,state(4)), (state(1),f,state(2)), (state(6),f,state(2)), (state(5),f,state(8)), (state(7),f,state(2)), (state(8),d,state(9)), (state(3),a,state(5)), (state(2),p,state(3)), (state(0),a,state(1)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-Pkg [ 
-
-States = ( State(id=4, L=[d]/[], LS=[a]),  State(id=7, L=[d]/[], LS=[f]),  State(id=0, L=[]/[], LS=[a]),  State(id=8, L=[]/[rD], LS=[d]),  State(id=2, L=[]/[], LS=[p]),  State(id=3, L=[]/[rD], LS=[a, d]),  State(id=6, L=[]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=1, L=[]/[], LS=[f]),  State(id=5, L=[]/[rD], LS=[d, f]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[d], output=[rD]],
-
-Transitions = ( (state(6),f,state(2)), (state(5),f,state(8)), (state(3),d,state(4)), (state(7),f,state(2)), (state(1),f,state(2)), (state(4),a,state(6)), (state(0),a,state(1)), (state(3),a,state(5)), (state(8),d,state(9)), (state(9),p,state(3)), (state(2),p,state(3)), (state(5),d,state(7)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-InTray [ 
-
-States = ( State(id=3, L=[]/[], LS=[a, d]),  State(id=2, L=[f]/[], LS=[p]),  State(id=8, L=[f]/[], LS=[d]),  State(id=0, L=[]/[], LS=[a]),  State(id=5, L=[a]/[rF], LS=[d, f]),  State(id=7, L=[]/[rF], LS=[f]),  State(id=4, L=[]/[], LS=[a]),  State(id=1, L=[a]/[rF], LS=[f]),  State(id=6, L=[a]/[rF], LS=[f]),  State(id=9, L=[]/[], LS=[p]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[a, f], output=[rF]],
-
-Transitions = ( (state(4),a,state(6)), (state(5),f,state(8)), (state(5),d,state(7)), (state(9),p,state(3)), (state(6),f,state(2)), (state(3),d,state(4)), (state(2),p,state(3)), (state(7),f,state(2)), (state(1),f,state(2)), (state(3),a,state(5)), (state(8),d,state(9)), (state(0),a,state(1)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
- )
-
-]
-
-Parameters = ( 
-
-P-InTray [ 
-
-States = ( State(id=0, L=[]/[], LS=[a]),  State(id=7, L=[d]/[], LS=[f]),  State(id=3, L=[p]/[rD], LS=[a, d]),  State(id=8, L=[]/[rD, rP], LS=[d]),  State(id=2, L=[]/[rP], LS=[p]),  State(id=4, L=[d]/[], LS=[a]),  State(id=9, L=[d]/[rP], LS=[p]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=6, L=[]/[], LS=[f]),  State(id=1, L=[]/[], LS=[f]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[p, d], output=[rD, rP]],
-
-Transitions = ( (state(1),f,state(2)), (state(4),a,state(6)), (state(5),d,state(7)), (state(8),d,state(9)), (state(9),p,state(3)), (state(0),a,state(1)), (state(7),f,state(2)), (state(5),f,state(8)), (state(3),a,state(5)), (state(3),d,state(4)), (state(2),p,state(3)), (state(6),f,state(2)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-P-Proc [ 
-
-States = ( State(id=1, L=[a]/[rF], LS=[f]),  State(id=5, L=[a]/[rD, rF], LS=[d, f]),  State(id=0, L=[]/[], LS=[a]),  State(id=3, L=[]/[rD], LS=[a, d]),  State(id=6, L=[a]/[rF], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a]),  State(id=7, L=[d]/[rF], LS=[f]),  State(id=8, L=[f]/[rD], LS=[d]),  State(id=2, L=[f]/[], LS=[p]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[a, d, f], output=[rD, rF]],
-
-Transitions = ( (state(2),p,state(3)), (state(3),d,state(4)), (state(7),f,state(2)), (state(5),d,state(7)), (state(4),a,state(6)), (state(6),f,state(2)), (state(3),a,state(5)), (state(9),p,state(3)), (state(0),a,state(1)), (state(5),f,state(8)), (state(1),f,state(2)), (state(8),d,state(9)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
-, 
-
-P-Pkg [ 
-
-States = ( State(id=1, L=[a]/[rF], LS=[f]),  State(id=9, L=[]/[rP], LS=[p]),  State(id=8, L=[f]/[rP], LS=[d]),  State(id=6, L=[a]/[rF], LS=[f]),  State(id=2, L=[f]/[rP], LS=[p]),  State(id=5, L=[a]/[rF], LS=[d, f]),  State(id=0, L=[]/[], LS=[a]),  State(id=7, L=[]/[rF], LS=[f]),  State(id=4, L=[]/[], LS=[a]),  State(id=3, L=[p]/[], LS=[a, d]) ),
-
-Initial State =  State(id=0, L=[]/[], LS=[a]),
-
-Interface = Interface: [channels=[p, a, f], output=[rF, rP]],
-
-Transitions = ( (state(9),p,state(3)), (state(1),f,state(2)), (state(6),f,state(2)), (state(5),f,state(8)), (state(2),p,state(3)), (state(7),f,state(2)), (state(5),d,state(7)), (state(8),d,state(9)), (state(3),a,state(5)), (state(4),a,state(6)), (state(3),d,state(4)), (state(0),a,state(1)) )
-
-Agents = (  )
-
-]
-
-Parameters = (  )
-
-]
-
- )
-
-]
-
+Mealy [name=Strategy, 
+states=
+[ State(id=1, L=[]/[], LS=[]),  State(id=0, L=[]/[], LS=[]),  State(id=2, L=[]/[], LS=[]),  State(id=3, L=[]/[], LS=[]),  State(id=6, L=[]/[], LS=[]),  State(id=7, L=[]/[], LS=[]),  State(id=5, L=[]/[], LS=[]),  State(id=4, L=[]/[], LS=[]),  State(id=8, L=[]/[], LS=[])], 
+initState= State(id=0, L=[]/[], LS=[]), 
+initTrans=(state(0),00/00,state(1)), 
+Interface=Interface: [channels=[request_0, request_1], 
+output=[grant_0, grant_1]], 
+transitions=[
+    (state(6),10/10,state(4)), 
+    (state(2),01/10,state(5)), 
+    (state(3),01/01,state(7)), 
+    (state(8),01/10,state(5)), 
+    (state(3),10/01,state(6)), (state(2),10/10,state(4)), (state(4),01/00,state(3)), (state(0),00/00,state(1)), (state(4),10/10,state(4)), (state(7),10/00,state(2)), (state(1),01/00,state(3)), (state(6),01/00,state(8)), (state(1),10/00,state(2)), (state(5),10/01,state(6)), (state(7),01/01,state(7)), (state(5),01/01,state(7)), (state(8),10/10,state(5))]]
+No Initial?--> (state(0),00/00,state(1))
+No TS?-->  State(id=0458056791, L=[00]/[00], LS=[01, 10])

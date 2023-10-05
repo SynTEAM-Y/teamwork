@@ -3,28 +3,28 @@ package com.syntm.util;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class GraphPrinter {
+public class Printer {
 
-    private StringBuilder graphBuilder = new StringBuilder();
+    private StringBuilder sBuilder = new StringBuilder();
     private String filePrefix;
 
-    public GraphPrinter() {
+    public Printer() {
     }
 
-    public GraphPrinter(String filePrefix) {
+    public Printer(String filePrefix) {
         this.filePrefix = filePrefix;
     }
 
     public void addln(String line) {
-        graphBuilder.append(line).append("\n");
+        sBuilder.append(line).append("\n");
     }
 
     public void add(String text) {
-        graphBuilder.append(text);
+        sBuilder.append(text);
     }
 
     public void addnewln() {
-        graphBuilder.append("\n");
+        sBuilder.append("\n");
     }
 
     public void print() {
@@ -34,9 +34,9 @@ public class GraphPrinter {
                 filePrefix = "output";
             }
 
-            graphBuilder.insert(0, "digraph G {").append("\n");
-            graphBuilder.append("}").append("\n");
-            writeTextToFile(filePrefix + ".dot", graphBuilder.toString());
+            sBuilder.insert(0, "digraph G {").append("\n");
+            sBuilder.append("}").append("\n");
+            writeTextToFile(filePrefix + ".dot", sBuilder.toString());
 
             StringBuilder command = new StringBuilder();
             command.append("dot -Tpng "). // output type

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.syntm.util.GraphPrinter;
+import com.syntm.util.Printer;
 
 public class Mealy {
     private String name;
@@ -185,14 +185,18 @@ public class Mealy {
                     if (recent.equals(".r")) {
                         m.transitions.add(new Trans(m.getStateById(parts[1].substring(1).trim()),
                                 parts[0].trim() + "/" + parts[3].trim(), m.getStateById(parts[2].substring(1).trim())));
+                        if (m.getStateById(parts[1].substring(1).trim()).equals(m.getInitState())) {
+                            m.setInitTrans(new Trans(m.getStateById(parts[1].substring(1).trim()),
+                                parts[0].trim() + "/" + parts[3].trim(), m.getStateById(parts[2].substring(1).trim())));   
+                        }
                     }
                     break;
             }
 
         }
-
-        reader.close();
         m.toDot(m, m.getName());
+        reader.close();
+        
         return m;
     }
 
@@ -231,15 +235,14 @@ public class Mealy {
             ts.getLS().apply(st, new Listen(chans));
 
         }
-
-        ts.setInitState(m.getInitState().getId());
+        ts.setInitState(m.IdState(m.getInitTrans()));
         ts.toDot(ts, ts.getName());
         return ts;
     }
 
     public void toDot(Mealy m, String name) {
 
-        GraphPrinter gp = new GraphPrinter(name);
+        Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
         gp.addln("\"" + m.getInterface().toString());
@@ -259,9 +262,9 @@ public class Mealy {
             String source = t.getSource().getId().toString();
             String dest = t.getDestination().getId().toString();
             String action = t.getAction().toString();
-            if (!t.equals(m.getInitTrans())) {
+           // if (!t.equals(m.getInitTrans())) {
                 gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
-            }
+           // }
 
         }
 

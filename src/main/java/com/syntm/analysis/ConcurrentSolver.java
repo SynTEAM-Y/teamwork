@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
@@ -14,88 +16,6 @@ import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
 
 public class ConcurrentSolver {
-  static ConcurrentHashMap<State, Set<Set<State>>> eMap;
-  private TS ts;
-  private Set<String> channels;
-  List<Worker> wList;
-  final CyclicBarrier roundBarrier;
-  final CyclicBarrier updateBarrier;
-
-  public ConcurrentSolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, Set<String> sch) {
-    eMap = new ConcurrentHashMap<>(indexedFamily);
-    this.channels = sch;
-    this.ts = t;
-    wList = new ArrayList<Worker>();
-    int N = eMap.size() + 1;
-    roundBarrier = new CyclicBarrier(N);
-    updateBarrier = new CyclicBarrier(N);
-    int i = 0;
-    for (State s : eMap.keySet()) {
-      Worker w = new Worker(s.getId(), eMap.get(s), eMap, channels);
-      wList.add(i, w);
-      i += i;
-      new Thread(w).start();
-    }
-  }
-
-  public TS run() {
-    int counter = 0;
-    boolean fixed = false;
-    try {
-      while (!fixed) {
-        counter += 1;
-        System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
-        roundBarrier.await();
-        fixed = updateMap();
-        if (!fixed) {
-          updateBarrier.await();
-        }
-      }
-      updateBarrier.reset();
-
-      Set<Set<State>> rho_f = new HashSet<>();
-      String id = ts.getInitState().getId();
-      for (State s : eMap.keySet()) {
-        if (s.getId().equals(id)) {
-          rho_f = new HashSet<>(eMap.get(s));
-        }
-      }
-
-      CompressedTS c = new CompressedTS("s-" + this.ts.getName());
-      TS t = c.compressedTS(this.ts, rho_f);
-      return t;
-    } catch (InterruptedException | BrokenBarrierException e) {
-      e.printStackTrace();
-      return null;
-    }
-
-  }
-
-  private boolean updateMap() {
-    boolean fixedPoint = true;
-
-    for (int i = 0; i < wList.size(); i++) {
-      if (!wList.get(i).getRho_epsilon().equals(wList.get(i).getRho_temp())) {
-        wList.get(i).setRho_epsilon(wList.get(i).getRho_temp());
-        eMap.put(wList.get(i).getEpsilon(), wList.get(i).getRho_temp());
-        fixedPoint = false;
-      }
-    }
-    if (fixedPoint) {
-      System.out.println("Fixed map -> " + eMap);
-    }
-
-    for (int i = 0; i < wList.size(); i++) {
-      wList.get(i).setlMap(eMap);
-    }
-
-    return fixedPoint;
-  }
-
-  public static void seteMap(ConcurrentHashMap<State, Set<Set<State>>> eMap) {
-    ConcurrentSolver.eMap = eMap;
-  }
-
   private class Worker implements Runnable {
     State epsilon;
     Set<Set<State>> rho_epsilon;
@@ -150,6 +70,29 @@ public class ConcurrentSolver {
         return;
       } catch (BrokenBarrierException ex) {
         return;
+      }
+    }
+
+    public State getEpsilon() {
+      return epsilon;
+    }
+
+    public Set<Set<State>> getRho_epsilon() {
+      return new HashSet<>(rho_epsilon);
+    }
+
+    public void setRho_epsilon(Set<Set<State>> rho_epsilon) {
+      this.rho_epsilon = new HashSet<>(rho_epsilon);
+    }
+
+    public Set<Set<State>> getRho_temp() {
+      return new HashSet<>(rho_temp);
+    }
+
+    public void setlMap(ConcurrentHashMap<State, Set<Set<State>>> lMap) {
+      for (Trans tr_e : this.epsilon.getTrans()) {
+        Set<Set<State>> rho = new HashSet<>(lMap.get(tr_e.getDestination()));
+        this.lMap.put(tr_e.getDestination(), rho);
       }
     }
 
@@ -266,28 +209,94 @@ public class ConcurrentSolver {
       return splitP;
     }
 
-    public State getEpsilon() {
-      return epsilon;
+  }
+
+  static ConcurrentHashMap<State, Set<Set<State>>> eMap;
+
+  public static void seteMap(ConcurrentHashMap<State, Set<Set<State>>> eMap) {
+    ConcurrentSolver.eMap = eMap;
+  }
+
+  private TS ts;
+  private Set<String> channels;
+  List<Worker> wList;
+  final CyclicBarrier roundBarrier;
+  final CyclicBarrier updateBarrier;
+
+  private ExecutorService service;
+
+  public ConcurrentSolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, Set<String> sch) {
+    eMap = new ConcurrentHashMap<>(indexedFamily);
+    this.channels = sch;
+    this.ts = t;
+    wList = new ArrayList<Worker>();
+    int N = eMap.size() + 1;
+    roundBarrier = new CyclicBarrier(N);
+    updateBarrier = new CyclicBarrier(N);
+    // int corecount = Runtime.getRuntime().availableProcessors();
+    service = Executors.newFixedThreadPool(N);
+    int i = 0;
+    for (State s : eMap.keySet()) {
+      Worker w = new Worker(s.getId(), eMap.get(s), eMap, channels);
+      wList.add(i, w);
+      i += i;
+      service.execute(w);
+      // new Thread(w).start();
+    }
+  }
+
+  public TS run() {
+    int counter = 0;
+    boolean fixed = false;
+    try {
+      while (!fixed) {
+        counter += 1;
+        System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+        roundBarrier.await();
+        fixed = updateMap();
+        if (!fixed) {
+          updateBarrier.await();
+        }
+      }
+      updateBarrier.reset();
+      service.shutdown();
+
+      Set<Set<State>> rho_f = new HashSet<>();
+      String id = ts.getInitState().getId();
+      for (State s : eMap.keySet()) {
+        if (s.getId().equals(id)) {
+          rho_f = new HashSet<>(eMap.get(s));
+        }
+      }
+
+      CompressedTS c = new CompressedTS("s-" + this.ts.getName());
+      TS t = c.compressedTS(this.ts, rho_f);
+      return t;
+    } catch (InterruptedException | BrokenBarrierException e) {
+      e.printStackTrace();
+      return null;
     }
 
-    public Set<Set<State>> getRho_epsilon() {
-      return new HashSet<>(rho_epsilon);
-    }
+  }
 
-    public void setRho_epsilon(Set<Set<State>> rho_epsilon) {
-      this.rho_epsilon = new HashSet<>(rho_epsilon);
-    }
+  private boolean updateMap() {
+    boolean fixedPoint = true;
 
-    public Set<Set<State>> getRho_temp() {
-      return new HashSet<>(rho_temp);
-    }
-
-    public void setlMap(ConcurrentHashMap<State, Set<Set<State>>> lMap) {
-      for (Trans tr_e : this.epsilon.getTrans()) {
-        Set<Set<State>> rho = new HashSet<>(lMap.get(tr_e.getDestination()));
-        this.lMap.put(tr_e.getDestination(), rho);
+    for (int i = 0; i < wList.size(); i++) {
+      if (!wList.get(i).getRho_epsilon().equals(wList.get(i).getRho_temp())) {
+        wList.get(i).setRho_epsilon(wList.get(i).getRho_temp());
+        eMap.put(wList.get(i).getEpsilon(), wList.get(i).getRho_temp());
+        fixedPoint = false;
       }
     }
+    if (fixedPoint) {
+      System.out.println("Fixed map -> " + eMap);
+    }
 
+    for (int i = 0; i < wList.size(); i++) {
+      wList.get(i).setlMap(eMap);
+    }
+
+    return fixedPoint;
   }
 }

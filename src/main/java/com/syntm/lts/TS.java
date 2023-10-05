@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import com.syntm.util.GraphPrinter;
+import com.syntm.util.Printer;
 import com.syntm.util.StringUtil;
 
 public class TS {
@@ -122,7 +122,7 @@ public class TS {
 
     public void toDot(TS ts, String name) {
 
-        GraphPrinter gp = new GraphPrinter(name);
+        Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
         gp.addln("\"" + ts.getInterface().toString());
