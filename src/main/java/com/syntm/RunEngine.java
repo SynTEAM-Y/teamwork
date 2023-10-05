@@ -8,15 +8,14 @@ import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.syntm.analysis.Partitioning;
-import com.syntm.lts.*;
+import com.syntm.lts.Mealy;
+import com.syntm.lts.Spec;
+import com.syntm.lts.State;
+import com.syntm.lts.TS;
 
 public class RunEngine {
 	private TS mainTS;
@@ -26,28 +25,13 @@ public class RunEngine {
 		RunEngine parseTS = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-		// p.redirectOutput(Redirect.INHERIT);
-		// ExecutorService service = Executors.newFixedThreadPool(2);
-		// java.util.concurrent.Future<File> future = service.submit(new Task());
-
-		// File result = future.get(3, TimeUnit.SECONDS);
-
-		ProcessBuilder p = new ProcessBuilder("docker", "run", "lazkany/strix", "-f",
-				"(X G(!request_0 | !request_1) &\n" +
-						"X G(request_0 | request_1) &\n" +
-						"!request_0 &\n" +
-						"!request_1) ->  (X G ((grant_0 & G !request_0) -> (F !grant_0)) &\n" +
-						"X G ((grant_1 & G !request_1) -> (F !grant_1)) &\n" +
-						"X G ((grant_0 & X (!request_0 & !grant_0)) -> X (request_0 R !grant_0)) &\n" +
-						"X G ((grant_1 & X (!request_1 & !grant_1)) -> X (request_1 R !grant_1)) &\n" +
-						"X G (!grant_0 | !grant_1) &\n" +
-						"X (request_0 R !grant_0) &\n" +
-						"X (request_1 R !grant_1) &\n" +
-						"X G (request_0 -> F grant_0) &\n" +
-						"X G (request_1 -> F grant_1) &\n" +
-						"!grant_0 &\n" +
-						"!grant_1)",
-				"--ins=request_0,request_1", "--outs=grant_0,grant_1", "--k");
+		Spec spec = new Spec();
+		System.out.println("Enter SPEC: ");
+		String specfile = stdin.readLine();
+		spec.specReader(specfile);
+		String command = spec.toString();
+		ProcessBuilder p = new ProcessBuilder("docker", "run", "lazkany/strix", "-f", command, spec.inParam(),
+				spec.outParam(), "--k");
 
 		File Strategy = new File("Mealy");
 		p.redirectErrorStream(true);
@@ -66,11 +50,6 @@ public class RunEngine {
 		parseTS.readInput(fileP);
 		parseTS.writeOutput("Ex/TStext");
 
-	}
-
-	public void readSpec(final String spec) {
-		
-		writeOutput("Ex/Spec");
 	}
 
 	public void readInput(final String fileP) {

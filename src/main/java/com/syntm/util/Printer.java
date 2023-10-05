@@ -22,7 +22,10 @@ public class Printer {
     public void add(String text) {
         sBuilder.append(text);
     }
-
+    public String formattedString ()
+    {
+        return sBuilder.toString();
+    }
     public void addnewln() {
         sBuilder.append("\n");
     }

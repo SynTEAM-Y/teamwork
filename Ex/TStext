@@ -1,15 +1,1 @@
-Mealy [name=Strategy, 
-states=
-[ State(id=1, L=[]/[], LS=[]),  State(id=0, L=[]/[], LS=[]),  State(id=2, L=[]/[], LS=[]),  State(id=3, L=[]/[], LS=[]),  State(id=6, L=[]/[], LS=[]),  State(id=7, L=[]/[], LS=[]),  State(id=5, L=[]/[], LS=[]),  State(id=4, L=[]/[], LS=[]),  State(id=8, L=[]/[], LS=[])], 
-initState= State(id=0, L=[]/[], LS=[]), 
-initTrans=(state(0),00/00,state(1)), 
-Interface=Interface: [channels=[request_0, request_1], 
-output=[grant_0, grant_1]], 
-transitions=[
-    (state(6),10/10,state(4)), 
-    (state(2),01/10,state(5)), 
-    (state(3),01/01,state(7)), 
-    (state(8),01/10,state(5)), 
-    (state(3),10/01,state(6)), (state(2),10/10,state(4)), (state(4),01/00,state(3)), (state(0),00/00,state(1)), (state(4),10/10,state(4)), (state(7),10/00,state(2)), (state(1),01/00,state(3)), (state(6),01/00,state(8)), (state(1),10/00,state(2)), (state(5),10/01,state(6)), (state(7),01/01,state(7)), (state(5),01/01,state(7)), (state(8),10/10,state(5))]]
-No Initial?--> (state(0),00/00,state(1))
-No TS?-->  State(id=0458056791, L=[00]/[00], LS=[01, 10])
+ "(! request_0 & ! request_1 & X G (request_0 | request_1) & X (G (! request_0 | ! request_1))) -> (! grant_0 & !  grant_1 & X (G ((grant_0 & G ! request_0) -> (F ! grant_0))) & X (G ((grant_1 & G ! request_1) -> (F ! grant_1))) & X (G ((grant_0 & X (! request_0 & ! grant_0)) -> X (request_0 R ! grant_0))) & X (G ((grant_1 & X (! request_1 & !  grant_1)) -> X (request_1 R ! grant_1))) & X (G (! grant_0 | ! grant_1)) & X (request_0 R ! grant_0) & X (request_1 R ! grant_1) & X (G (request_0 -> F grant_0)) & X (G (request_1 -> F grant_1)) & X (G (request_1 -> F grant_1)))" --ins="request_0,request_1" --outs="grant_0,grant_1" --k
