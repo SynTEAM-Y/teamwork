@@ -30,6 +30,7 @@ public class RunEngine {
 		String specfile = stdin.readLine();
 		spec.specReader(specfile);
 		String command = spec.toString();
+		System.out.println(command);
 		ProcessBuilder p = new ProcessBuilder("docker", "run", "lazkany/strix", "-f", command, spec.inParam(),
 				spec.outParam(), "--k");
 

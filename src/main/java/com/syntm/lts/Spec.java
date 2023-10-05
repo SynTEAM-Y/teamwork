@@ -28,8 +28,6 @@ public class Spec {
     }
 
     public Spec() {
-        // this.command = "docker\"" + ", " + "\"run\"" + ", " + "\"lazkany/strix\"" +
-        // ", " + "\"-f\"" + ", ";
         this.aInterfaces = new HashSet<>();
         this.sInterface = new Int();
         this.assupmptions = new ArrayList<>();
@@ -129,23 +127,33 @@ public class Spec {
         if (st.endsWith(",")) {
             st = st.substring(0, st.length() - 1);
         }
+        return st;
+    }
 
+    public String interleave(String ch) {
+        String st = "X G ("+ ch +" -> ";
+        for (String c : this.sInterface.getChannels()) {
+            if (!c.equals(ch)) {
+                st += "!"+c+ " & ";
+            }
+        }
+        if (st.endsWith("& ")) {
+            st = st.substring(0, st.length() - 2);
+        }
+        st+=") &\n";
         return st;
     }
 
     public String inParam() {
-        //return "--ins=" + this.shortString(this.sInterface.getChannels()) + "\"";
         return "--ins=" + this.shortString(this.sInterface.getChannels());
     }
 
     public String outParam() {
-        // return "\"--outs=" + this.shortString(this.sInterface.getOutput()) + "\"";
         return "--outs=" + this.shortString(this.sInterface.getOutput());
     }
 
     public void specReader(final String specFile) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(specFile));
-        // specBuilder.addln(command);
         String line = "";
         String recent = "";
         String st = "";
@@ -158,7 +166,6 @@ public class Spec {
                     this.sInterface.setChannels(chan);
                     this.sInterface.setOutput(out);
                     break;
-
                 case "Assumptions":
                     recent = "Assumptions";
                     specBuilder.add("(\n");
@@ -176,6 +183,12 @@ public class Spec {
                     }
                     st += ") &\n";
                     specBuilder.add(st);
+                    st = "";
+                    for (String ch : this.sInterface.getChannels()) {
+                        st+=interleave(ch)+"\n";
+                    }
+                    specBuilder.add(st);
+                    st="";
                     break;
                 case "EndAssumptions":
                     if (st.endsWith(" &\n")) {
@@ -192,7 +205,6 @@ public class Spec {
                     for (String o : this.sInterface.getOutput()) {
                         st += " !" + o + " &\n";
                     }
-
                     specBuilder.add(st);
                     break;
                 case "ENDGuarantees":
@@ -201,16 +213,12 @@ public class Spec {
                     }
                     specBuilder.add(st);
                     specBuilder.add(")");
-                    // specBuilder.add(
-                    //         " --ins=" + "\"" + this.shortString(this.sInterface.getChannels()) + "\"" +
-                    //                 " --outs=" + "\"" + this.shortString(this.sInterface.getOutput()) + "\"" + " --k");
                     break;
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
                     Set<String> ao = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
                     aInterfaces.add(new Int(achs, ao));
                     break;
-
                 default:
                     st = "";
                     switch (recent) {
@@ -229,11 +237,9 @@ public class Spec {
                     }
                     break;
             }
-
         }
 
         reader.close();
-        // writeOutput("Ex/Spec");
     }
 
     @Override
