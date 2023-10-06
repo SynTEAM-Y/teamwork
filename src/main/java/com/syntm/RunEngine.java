@@ -41,7 +41,7 @@ public class RunEngine {
 		proc.waitFor();
 
 		Mealy m = new Mealy("");
-		m = m.kissToMealy("Mealy");
+		m = m.kissToMealy("Mealy", spec.getcCode(),spec.getoCode());
 		TS TM = m.toTS(m, m.getName());
 		Strategy.delete();
 

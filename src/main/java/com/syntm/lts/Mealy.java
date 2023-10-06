@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.lang.Math;
 import com.syntm.util.Printer;
 
 public class Mealy {
@@ -125,11 +125,22 @@ public class Mealy {
     }
 
     public String IdState(Trans tr) {
-        String s = tr.getSource().getId() + tr.getAction().hashCode() + tr.getDestination().getId();
+        String s = tr.getSource().getId() + Math.abs(tr.getAction().hashCode()) + tr.getDestination().getId();
         return s;
     }
 
-    public Mealy kissToMealy(final String filePath) throws IOException {
+    public String CodeResolve(String alphabet, String code) // This only works for one signal at a time
+    {
+        String[] alpha = alphabet.split(",");
+        for (int i = 0; i < code.length(); i++) {
+            if (code.substring(i, i + 1).equals("1")) {
+                return alpha[i];
+            }
+        }
+        return " ";
+    }
+
+    public Mealy kissToMealy(final String filePath, String cCode, String oCode) throws IOException {
         Mealy m = new Mealy("Strategy");
         Int mInt = new Int();
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -184,10 +195,14 @@ public class Mealy {
                 default:
                     if (recent.equals(".r")) {
                         m.transitions.add(new Trans(m.getStateById(parts[1].substring(1).trim()),
-                                parts[0].trim() + "/" + parts[3].trim(), m.getStateById(parts[2].substring(1).trim())));
+                                this.CodeResolve(cCode, parts[0].trim()) + "/"
+                                        + this.CodeResolve(oCode, parts[3].trim()),
+                                m.getStateById(parts[2].substring(1).trim())));
                         if (m.getStateById(parts[1].substring(1).trim()).equals(m.getInitState())) {
                             m.setInitTrans(new Trans(m.getStateById(parts[1].substring(1).trim()),
-                                parts[0].trim() + "/" + parts[3].trim(), m.getStateById(parts[2].substring(1).trim())));   
+                                    this.CodeResolve(cCode, parts[0].trim()) + "/"
+                                            + this.CodeResolve(oCode, parts[3].trim()),
+                                    m.getStateById(parts[2].substring(1).trim())));
                         }
                     }
                     break;
@@ -196,7 +211,7 @@ public class Mealy {
         }
         m.toDot(m, m.getName());
         reader.close();
-        
+
         return m;
     }
 
@@ -262,9 +277,9 @@ public class Mealy {
             String source = t.getSource().getId().toString();
             String dest = t.getDestination().getId().toString();
             String action = t.getAction().toString();
-           // if (!t.equals(m.getInitTrans())) {
-                gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
-           // }
+            // if (!t.equals(m.getInitTrans())) {
+            gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
+            // }
 
         }
 

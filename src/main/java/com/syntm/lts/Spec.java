@@ -17,7 +17,33 @@ public class Spec {
     private List<String> assupmptions;
     private List<String> guarantees;
     private Set<Int> aInterfaces;
+    private String cCode;
+    private String oCode;
+
     Printer specBuilder = new Printer();
+
+    public Spec() {
+        this.aInterfaces = new HashSet<>();
+        this.sInterface = new Int();
+        this.assupmptions = new ArrayList<>();
+        this.guarantees = new ArrayList<>();
+    }
+
+    public String getoCode() {
+        return oCode;
+    }
+
+    public void setoCode(String oCode) {
+        this.oCode = oCode;
+    }
+
+    public String getcCode() {
+        return cCode;
+    }
+
+    public void setcCode(String cCode) {
+        this.cCode = cCode;
+    }
 
     public Printer getSpecBuilder() {
         return specBuilder;
@@ -25,13 +51,6 @@ public class Spec {
 
     public void setSpecBuilder(Printer specBuilder) {
         this.specBuilder = specBuilder;
-    }
-
-    public Spec() {
-        this.aInterfaces = new HashSet<>();
-        this.sInterface = new Int();
-        this.assupmptions = new ArrayList<>();
-        this.guarantees = new ArrayList<>();
     }
 
     public String getCommand() {
@@ -161,8 +180,8 @@ public class Spec {
             String[] parts = line.split(":");
             switch (parts[0].trim()) {
                 case "Interface":
-                    System.out.println(parts[1]);
-                    System.out.println(parts[2]);
+                    this.cCode = parts[1];
+                    this.oCode = parts[2];
                     Set<String> chan = new HashSet<>(Arrays.asList(parts[1].trim().split(",")));
                     Set<String> out = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
                     this.sInterface.setChannels(chan);
@@ -178,10 +197,10 @@ public class Spec {
                     specBuilder.add(" X G (");
                     st = "";
                     for (String ch : this.sInterface.getChannels()) {
-                    st += ch + " | ";
+                        st += ch + " | ";
                     }
                     if (st.endsWith(" | ")) {
-                    st = st.substring(0, st.length() - 2);
+                        st = st.substring(0, st.length() - 2);
                     }
                     st += ") &\n";
                     specBuilder.add(st);
