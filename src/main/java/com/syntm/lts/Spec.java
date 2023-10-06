@@ -161,6 +161,8 @@ public class Spec {
             String[] parts = line.split(":");
             switch (parts[0].trim()) {
                 case "Interface":
+                    System.out.println(parts[1]);
+                    System.out.println(parts[2]);
                     Set<String> chan = new HashSet<>(Arrays.asList(parts[1].trim().split(",")));
                     Set<String> out = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
                     this.sInterface.setChannels(chan);
