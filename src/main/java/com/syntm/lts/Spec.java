@@ -164,11 +164,11 @@ public class Spec {
     }
 
     public String inParam() {
-        return "--ins=" + this.shortString(this.sInterface.getChannels());
+        return "--ins=" + this.cCode;
     }
 
     public String outParam() {
-        return "--outs=" + this.shortString(this.sInterface.getOutput());
+        return "--outs=" + this.oCode;
     }
 
     public void specReader(final String specFile) throws IOException {

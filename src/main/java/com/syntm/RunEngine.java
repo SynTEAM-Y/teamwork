@@ -7,11 +7,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import com.syntm.analysis.Partitioning;
+import com.syntm.lts.Int;
 import com.syntm.lts.Mealy;
 import com.syntm.lts.Spec;
 import com.syntm.lts.State;
@@ -22,12 +24,13 @@ public class RunEngine {
 
 	public static void main(final String[] args)
 			throws IOException, InterruptedException, ExecutionException, TimeoutException {
-		RunEngine parseTS = new RunEngine();
+		RunEngine parse = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
 		Spec spec = new Spec();
 		System.out.println("Enter SPEC: ");
 		String specfile = stdin.readLine();
+		specfile = parse.checkFileName(specfile);
 		spec.specReader(specfile);
 		String command = spec.toString();
 		System.out.println(command);
@@ -41,50 +44,38 @@ public class RunEngine {
 		proc.waitFor();
 
 		Mealy m = new Mealy("");
-		m = m.kissToMealy("Mealy", spec.getcCode(),spec.getoCode());
-		TS TM = m.toTS(m, m.getName());
+		m = m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());
+		TS ts = m.toTS(m, m.getName());
 		Strategy.delete();
-
-		System.out.println("Enter a TS for decomposition: ");
-		String fileP = stdin.readLine();
-		fileP = parseTS.checkFileName(fileP);
-		parseTS.readInput(fileP);
-		parseTS.writeOutput("Ex/TStext");
+		parse.processInput(ts, spec);
 
 	}
 
-	public void readInput(final String fileP) {
-		try {
-			this.mainTS = TS.parse(fileP);
-
-			mainTS.toDot(mainTS, "Main TS");
-			for (TS a : this.mainTS.getAgents()) {
-				a.toDot(a, a.getName());
-			}
-
-			Set<TS> sTS = new HashSet<TS>();
-
-			for (TS p : this.mainTS.getParameters()) {
-				Partitioning lp = new Partitioning(p, mainTS.getAgentById(p.getName()));
-				sTS.add(lp.computeCompressedTS());
-			}
-			// Create Dummy TS for compostion (The Id of ||)
-			TS t = new TS("");
-			State s = new State("in");
-			t.addState(s);
-			t.setInitState("in");
-
-			for (TS ts : sTS) {
-
-				t = t.openParallelCompTS(t, ts);
-			}
-			t.toDot(t, t.getName());
-			t = t.prunedTS(t);
-			t.toDot(t, t.getName());
-
-		} catch (IOException e) {
-			e.printStackTrace();
+	public void processInput(TS ts, Spec spec) {
+		Random rand = new Random();
+		for (Int aInt : spec.getaInterfaces()) {
+			ts.initialDecomposition(ts, ts.getName() + rand.nextInt(10), aInt.getChannels(), aInt.getOutput());
 		}
+
+		Set<TS> sTS = new HashSet<TS>();
+
+		for (TS pa : ts.getParameters()) {
+			Partitioning lp = new Partitioning(pa, ts.getAgentById(pa.getName()));
+			sTS.add(lp.computeCompressedTS());
+		}
+		// Create Dummy TS for compostion (The Id of ||)
+		TS t = new TS("");
+		State s = new State("in");
+		t.addState(s);
+		t.setInitState("in");
+
+		for (TS tss : sTS) {
+
+			t = t.openParallelCompTS(t, tss);
+		}
+		t.toDot(t, t.getName());
+		t = t.prunedTS(t);
+		t.toDot(t, t.getName());
 	}
 
 	private String checkFileName(String fileName) {

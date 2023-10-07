@@ -129,15 +129,15 @@ public class Mealy {
         return s;
     }
 
-    public String CodeResolve(String alphabet, String code) // This only works for one signal at a time
-    {
+    public String CodeResolve(String alphabet, String code) {
         String[] alpha = alphabet.split(",");
+        String s = "";
         for (int i = 0; i < code.length(); i++) {
             if (code.substring(i, i + 1).equals("1")) {
-                return alpha[i];
+                s += alpha[i];
             }
         }
-        return " ";
+        return s;
     }
 
     public Mealy kissToMealy(final String filePath, String cCode, String oCode) throws IOException {
@@ -203,6 +203,7 @@ public class Mealy {
                                     this.CodeResolve(cCode, parts[0].trim()) + "/"
                                             + this.CodeResolve(oCode, parts[3].trim()),
                                     m.getStateById(parts[2].substring(1).trim())));
+                            // System.out.println();
                         }
                     }
                     break;
@@ -219,11 +220,40 @@ public class Mealy {
         TS ts = new TS("T[" + name + "]");
         ts.setInterface(m.getInterface());
         for (Trans tr : m.getTransitions()) {
-            String[] parts = tr.getAction().split("/");
-            State st = new State(IdState(tr),
-                    new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
-                            new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
-            ts.addState(st);
+            if (tr.getAction().split("/").length > 1) {
+                System.out.println(tr.getAction());
+                System.out.println(tr.getAction().split("/").length);
+
+                String[] parts = tr.getAction().split("/");
+                State st = new State(IdState(tr),
+                        new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
+                                new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
+                ts.addState(st);
+            } else {
+                if (tr.getAction().equals("/")) {
+                    State st = new State(IdState(tr),
+                            new Label(new HashSet<>(Arrays.asList(" ")),
+                                    new HashSet<>(Arrays.asList(" "))));
+                    ts.addState(st);
+                } else {
+                    if (tr.getAction().startsWith("/")) {
+                        String[] parts = tr.getAction().split("/");
+                        State st = new State(IdState(tr),
+                                new Label(new HashSet<>(Arrays.asList(" ")),
+                                        new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
+                        ts.addState(st);
+                    }
+                    if (tr.getAction().endsWith("/")) {
+                        String[] parts = tr.getAction().split("/");
+                        State st = new State(IdState(tr),
+                                new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
+                                        new HashSet<>(Arrays.asList(" "))));
+                        ts.addState(st);
+                    }
+                }
+
+            }
+
         }
         for (Trans tr_1 : m.getTransitions()) {
             for (Trans tr_2 : m.getTransitions()) {
