@@ -239,7 +239,7 @@ public class CompressedTS {
             t.getLS().apply(s, ls);
         }
         TS convT = t.convetToTS(t);
-        ts.toDot(convT, convT.getName());
+        convT.toDot();
         return convT;
 
     }

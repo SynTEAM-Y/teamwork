@@ -17,11 +17,7 @@ public class Mealy {
     private Int Interface;
     private Set<Trans> transitions;
 
-    private enum Implementabillty {
-        REALIZABLE, UNREALIZABLE;
-    }
-
-    private Implementabillty status;
+    private String status;
 
     public Mealy(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
@@ -29,6 +25,7 @@ public class Mealy {
         this.initState = initState;
         Interface = interface1;
         this.transitions = transitions;
+        this.status = "";
     }
 
     public Mealy(String name) {
@@ -38,6 +35,7 @@ public class Mealy {
         this.Interface = new Int(new HashSet<>(), new HashSet<>());
         this.transitions = new HashSet<>();
         this.initTrans = new Trans();
+        this.status = "";
     }
 
     public String getName() {
@@ -99,11 +97,11 @@ public class Mealy {
         return null;
     }
 
-    public Implementabillty getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Implementabillty status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -140,8 +138,8 @@ public class Mealy {
         return s;
     }
 
-    public Mealy kissToMealy(final String filePath, String cCode, String oCode) throws IOException {
-        Mealy m = new Mealy("Strategy");
+    public void kissToMealy(final String filePath, String cCode, String oCode) throws IOException {
+        // Mealy m = new Mealy("Strategy");
         Int mInt = new Int();
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
@@ -155,14 +153,16 @@ public class Mealy {
             }
             switch (parts[0].trim()) {
                 case "REALIZABLE":
-                    status = Implementabillty.REALIZABLE;
+
                     System.out.println(
                             "\n\n Specification is REALIZABLE\n\n You will get a distributed Implementation :)\n\n");
+                    this.setStatus("REALIZABLE");
+                    this.setName("Strategy");
                     break;
                 case "UNREALIZABLE":
-                    status = Implementabillty.UNREALIZABLE;
-                    m.setName("Counter Strategy");
-                    System.out.println("\n\n Specification is UNREALIZABLE\n\n You will get a counter strategy :(\n\n");
+                    this.setName("Counter Strategy");
+                    System.out.println("\n\n Specification is UNREALIZABLE :(\n\n");
+                    this.setStatus("UNREALIZABLE");
                     break;
 
                 case ".inputs":
@@ -179,40 +179,39 @@ public class Mealy {
                         out.add(o);
                     }
                     mInt.setOutput(out);
-                    m.setInterface(mInt);
+                    this.setInterface(mInt);
                     break;
                 case ".s":
                     int n = Integer.parseInt(mParts[0].trim());
                     for (int i = 0; i < n; i++) {
-                        m.states.add(new State(i + ""));
+                        this.states.add(new State(i + ""));
                     }
                     break;
                 case ".r":
                     recent = ".r";
-                    m.setInitState(m.getStateById(parts[1].substring(1).trim()));
+                    this.setInitState(this.getStateById(parts[1].substring(1).trim()));
                     break;
 
                 default:
                     if (recent.equals(".r")) {
-                        m.transitions.add(new Trans(m.getStateById(parts[1].substring(1).trim()),
+                        this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                 this.CodeResolve(cCode, parts[0].trim()) + "/"
                                         + this.CodeResolve(oCode, parts[3].trim()),
-                                m.getStateById(parts[2].substring(1).trim())));
-                        if (m.getStateById(parts[1].substring(1).trim()).equals(m.getInitState())) {
-                            m.setInitTrans(new Trans(m.getStateById(parts[1].substring(1).trim()),
+                                this.getStateById(parts[2].substring(1).trim())));
+                        if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                            this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                     this.CodeResolve(cCode, parts[0].trim()) + "/"
                                             + this.CodeResolve(oCode, parts[3].trim()),
-                                    m.getStateById(parts[2].substring(1).trim())));
+                                    this.getStateById(parts[2].substring(1).trim())));
                         }
                     }
                     break;
             }
 
         }
-        m.toDot(m, m.getName());
-        reader.close();
 
-        return m;
+        reader.close();
+        // return m;
     }
 
     public TS toTS(Mealy m, String name) {
@@ -277,7 +276,7 @@ public class Mealy {
 
         }
         ts.setInitState(m.IdState(m.getInitTrans()));
-        ts.toDot(ts, ts.getName());
+        ts.toDot();
         return ts;
     }
 

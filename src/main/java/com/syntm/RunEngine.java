@@ -26,7 +26,6 @@ public class RunEngine {
 			throws IOException, InterruptedException, ExecutionException, TimeoutException {
 		RunEngine parse = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-
 		Spec spec = new Spec();
 		System.out.println("Enter SPEC: ");
 		String specfile = stdin.readLine();
@@ -44,17 +43,20 @@ public class RunEngine {
 		proc.waitFor();
 
 		Mealy m = new Mealy("");
-		m = m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());
-		TS ts = m.toTS(m, m.getName());
+		m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());		
+		if (m.getStatus().equals("REALIZABLE")) {
+			m.toDot(m, m.getName());
+			TS ts = m.toTS(m, m.getName());
+			parse.processInput(ts, spec);
+		}
 		Strategy.delete();
-		parse.processInput(ts, spec);
 
 	}
 
 	public void processInput(TS ts, Spec spec) {
 		Random rand = new Random();
 		for (Int aInt : spec.getaInterfaces()) {
-			ts.initialDecomposition(ts, ts.getName() + rand.nextInt(10), aInt.getChannels(), aInt.getOutput());
+			ts.initialDecomposition(ts.getName() + rand.nextInt(10), aInt.getChannels(), aInt.getOutput());
 		}
 
 		Set<TS> sTS = new HashSet<TS>();
@@ -71,11 +73,11 @@ public class RunEngine {
 
 		for (TS tss : sTS) {
 
-			t = t.openParallelCompTS(t, tss);
+			t = t.openParallelCompTS(tss);
 		}
-		t.toDot(t, t.getName());
+		t.toDot();
 		t = t.prunedTS(t);
-		t.toDot(t, t.getName());
+		t.toDot();
 	}
 
 	private String checkFileName(String fileName) {

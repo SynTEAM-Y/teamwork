@@ -120,27 +120,27 @@ public class TS {
         return st;
     }
 
-    public void toDot(TS ts, String name) {
+    public void toDot() {
 
         Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
-        gp.addln("\"" + ts.getInterface().toString());
+        gp.addln("\"" + this.getInterface().toString());
         gp.addln(
                 "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
         gp.addln("\n\n\n\n");
         gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
 
         gp.addln("init [shape=point,style=invis];");
-        for (State state : ts.states) {
+        for (State state : this.states) {
             gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                     + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                     + this.shortString(state.getLabel().getOutput()) + "\n\n\n" + "\"]" + "\n");
         }
 
-        gp.addln("\t" + " init -> " + ts.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+        gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
                 + ";\n");
-        for (Trans t : ts.getTransitions()) {
+        for (Trans t : this.getTransitions()) {
             String source = t.getSource().getId().toString();
             String dest = t.getDestination().getId().toString();
             String action = t.getAction().toString();
@@ -194,7 +194,7 @@ public class TS {
         L = l;
     }
 
-    public static TS parse(final String filePath) throws IOException {
+    public  TS parse(final String filePath) throws IOException {
         TS ts = new TS("T");
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
@@ -238,7 +238,7 @@ public class TS {
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
                     Set<String> ao = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
-                    ts.initialDecomposition(ts, parts[1].trim(), achs, ao);
+                    this.initialDecomposition(parts[1].trim(), achs, ao);
                     break;
                 default:
                     break;
@@ -259,24 +259,24 @@ public class TS {
         return null;
     }
 
-    public TS openParallelCompTS(TS T1, TS T2) {
+    public TS openParallelCompTS(TS T2) {
 
-        TS t = new TS(T1.getName() + " || " + T2.getName());
-        if (T1.getName().equals("")) {
+        TS t = new TS(this.getName() + " || " + T2.getName());
+        if (this.getName().equals("")) {
             t.setName(T2.getName());
         }
         if (T2.getName().equals("")) {
-            t.setName(T1.getName());
+            t.setName(this.getName());
         }
 
-        Set<String> chan = new HashSet<>(T1.getInterface().getChannels());
-        Set<String> output = new HashSet<>(T1.getInterface().getOutput());
+        Set<String> chan = new HashSet<>(this.getInterface().getChannels());
+        Set<String> output = new HashSet<>(this.getInterface().getOutput());
 
         chan.addAll(T2.getInterface().getChannels());
         output.addAll(T2.getInterface().getOutput());
         Int i = new Int(chan, output);
         t.setInterface(i);
-        for (State s_1 : T1.getStates()) {
+        for (State s_1 : this.getStates()) {
             for (State s_2 : T2.getStates()) {
                 State sc = new State(s_1.getId() + "" + s_2.getId());
                 sc.setComStates(new HashSet<>(Arrays.asList(s_1, s_2)));
@@ -690,18 +690,18 @@ public class TS {
         return trSet;
     }
 
-    public void initialDecomposition(TS ts, String name, Set<String> channels, Set<String> outputs) {
+    public void initialDecomposition(String name, Set<String> channels, Set<String> outputs) {
         TS t = new TS(name);
         TS p = new TS("P-" + name);
         Int i = new Int(channels, outputs);
-        Set<String> pCh = new HashSet<>(ts.getInterface().getChannels());
+        Set<String> pCh = new HashSet<>(this.getInterface().getChannels());
         pCh.removeAll(channels);
-        Set<String> pOut = new HashSet<>(ts.getInterface().getOutput());
+        Set<String> pOut = new HashSet<>(this.getInterface().getOutput());
         pOut.removeAll(outputs);
         Int pInt = new Int(pCh, pOut);
         t.setInterface(i);
         p.setInterface(pInt);
-        for (State s : ts.getStates()) {
+        for (State s : this.getStates()) {
             Set<String> chan = new HashSet<>(i.getChannels());
             Set<String> pChan = new HashSet<>(pInt.getChannels());
             chan.retainAll(s.getLabel().getChannel());
@@ -719,9 +719,9 @@ public class TS {
 
         }
 
-        t.setInitState(ts.getInitState().getId());
-        p.setInitState(ts.getInitState().getId());
-        for (Trans tr : ts.getTransitions()) {
+        t.setInitState(this.getInitState().getId());
+        p.setInitState(this.getInitState().getId());
+        for (Trans tr : this.getTransitions()) {
             t.addTransition(t, t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId()));
 
             p.addTransition(p, p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId()));
@@ -731,8 +731,8 @@ public class TS {
             p.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
         }
-        ts.agents.add(t);
-        ts.parameters.add(p);
+        this.agents.add(t);
+        this.parameters.add(p);
     }
 
     public void addTransition(TS ts, State src, String action, State des) {
