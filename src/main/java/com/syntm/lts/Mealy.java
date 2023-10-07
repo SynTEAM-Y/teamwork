@@ -203,7 +203,6 @@ public class Mealy {
                                     this.CodeResolve(cCode, parts[0].trim()) + "/"
                                             + this.CodeResolve(oCode, parts[3].trim()),
                                     m.getStateById(parts[2].substring(1).trim())));
-                            // System.out.println();
                         }
                     }
                     break;
@@ -221,9 +220,6 @@ public class Mealy {
         ts.setInterface(m.getInterface());
         for (Trans tr : m.getTransitions()) {
             if (tr.getAction().split("/").length > 1) {
-                System.out.println(tr.getAction());
-                System.out.println(tr.getAction().split("/").length);
-
                 String[] parts = tr.getAction().split("/");
                 State st = new State(IdState(tr),
                         new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
