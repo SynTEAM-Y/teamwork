@@ -8,7 +8,7 @@ Assumptions
 true
 EndAssumptions
 Guarantees
-G ((!s -> (!g0 & !g1 & !g2) | !g0 & !g1 & !g3 | !g0 & !g3 & !g2 | (!g3 & !g1 & !g2)) & (s -> (!g0 & !g1 & !g2& !g3))) 
+G (!s -> ((!g0 & !g1 & !g2) | !g0 & !g1 & !g3 | !g0 & !g3 & !g2 | (!g3 & !g1 & !g2)) & (s -> (!g0 & !g1 & !g2& !g3))) 
 G (r0 -> F g0)
 G (r1 -> F g1)
 G (r2 -> F g2)
