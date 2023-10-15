@@ -232,7 +232,7 @@ public class Spec {
                     }
                     specBuilder.add(st);
                     break;
-                case "ENDGuarantees":
+                case "EndGuarantees":
                     if (st.endsWith(" &\n")) {
                         st = st.substring(0, st.length() - 2);
                     }

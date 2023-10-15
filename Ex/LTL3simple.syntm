@@ -1,0 +1,14 @@
+SPEC
+Interface:r0,r1,r2:g0,g1,g2 
+A:A1:r0:g0
+A:A2:r1:g1
+A:A3:r2:g2
+Assumptions
+true
+EndAssumptions
+Guarantees
+G ((!g0 & !g1) | ((!g0 | !g1) & !g2))
+G (r0 -> F g0)
+G (r1 -> F g1)
+G (r2 -> F g2)
+EndGuarantees
