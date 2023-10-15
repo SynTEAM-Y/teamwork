@@ -1,10 +1,13 @@
 SPEC
 Interface:r0,r1:g0,g1 
+
 A:A1:r0:g0
 A:A2:r1:g1
+
 Assumptions
 true
 EndAssumptions
+
 Guarantees
 G ((g0 & G !r0) -> (F !g0))
 G ((g1 & G !r1) -> (F !g1))
