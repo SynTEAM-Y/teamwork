@@ -1,12 +1,14 @@
-SPEC
-Interface:r0,r1,r2:g0,g1,g2 
-A:A1:r0:g0
-A:A2:r1:g1
-A:A3:r2:g2
-Assumptions
+SPEC LTL3Arb
+In(r0,r1,r2), Out(g0,g1,g2) 
+
+Agent A1 -> In(r0) , Out(g0)
+Agent A2 -> In(r1) , Out(g1)
+Agent A3 -> In(r2) , Out(g2)
+
+Assume Env
 true
-EndAssumptions
-Guarantees
+
+Guarantee Sys
 G ((g0 & G !r0) -> (F !g0))
 G ((g1 & G !r1) -> (F !g1))
 G ((g2 & G !r2) -> (F !g2))
@@ -20,4 +22,3 @@ r2 R !g2
 G (r0 -> F g0)
 G (r1 -> F g1)
 G (r2 -> F g2)
-ENDGuarantees

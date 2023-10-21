@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ public class Spec {
     private List<String> assupmptions;
     private List<String> guarantees;
     private Set<Int> aInterfaces;
+    private HashMap<String, Int> agents;
     private String cCode;
     private String oCode;
 
@@ -27,6 +29,15 @@ public class Spec {
         this.sInterface = new Int();
         this.assupmptions = new ArrayList<>();
         this.guarantees = new ArrayList<>();
+        this.agents = new HashMap<>();
+    }
+
+    public HashMap<String, Int> getAgents() {
+        return agents;
+    }
+
+    public void setAgents(HashMap<String, Int> agents) {
+        this.agents = agents;
     }
 
     public String getoCode() {
@@ -169,6 +180,83 @@ public class Spec {
 
     public String outParam() {
         return "--outs=" + this.oCode;
+    }
+
+    public void assumptionBuilder(String[] assumptions) {
+        String st = "";
+        specBuilder.add("(\n");
+        for (String ch : this.sInterface.getChannels()) {
+            st += " !" + ch + " &\n";
+        }
+        specBuilder.add(st);
+        specBuilder.add(" X G (");
+        st = "";
+        for (String ch : this.sInterface.getChannels()) {
+            st += ch + " | ";
+        }
+        if (st.endsWith(" | ")) {
+            st = st.substring(0, st.length() - 2);
+        }
+        st += ") &\n";
+        specBuilder.add(st);
+        st = "";
+        specBuilder.add(" X G (");
+        for (String ch : this.sInterface.getChannels()) {
+            st += interleave(ch);
+        }
+        if (st.endsWith("| ")) {
+            st = st.substring(0, st.length() - 2);
+        }
+        specBuilder.add(st + " ) &\n");
+        st = "";
+        for (String aphi : assumptions) {
+            st += " X (" + aphi + ")" + " &\n";
+        }
+        if (st.endsWith(" &\n")) {
+            st = st.substring(0, st.length() - 2);
+        }
+        specBuilder.add(st);
+    }
+
+    public void guaranteeBuilder(String[] guarantees) {
+        String st = "";
+        String fs = specBuilder.formattedString();
+        if (fs.endsWith(" &\n")) {
+            fs = fs.substring(0, st.length() - 2);
+        }
+        Printer sb = new Printer();
+        sb.add(fs);
+        this.setSpecBuilder(sb);
+        ;
+        specBuilder.add(") ");
+        specBuilder.add("-> ");
+        specBuilder.add("(");
+        for (String o : this.sInterface.getOutput()) {
+            st += " !" + o + " &\n";
+        }
+        specBuilder.add(st);
+
+        st = "";
+        for (String phi : guarantees) {
+            st += " X (" + phi + ")" + " &\n";
+        }
+        if (st.endsWith(" &\n")) {
+            st = st.substring(0, st.length() - 2);
+        }
+        specBuilder.add(st);
+         specBuilder.add(")");
+    }
+
+    public void agentBuilder(String agentString) {
+        String[] agents = agentString.split(";");
+
+        for (String agent : agents) {
+            String[] parts = agent.split(":");
+            Set<String> achs = new HashSet<String>(Arrays.asList(parts[1].split(",")));
+            Set<String> ao = new HashSet<>(Arrays.asList(parts[2].split(",")));
+            this.agents.put(parts[0], new Int(achs, ao));
+        }
+        System.out.println(this.agents);
     }
 
     public void specReader(final String specFile) throws IOException {

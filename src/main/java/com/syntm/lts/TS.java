@@ -194,8 +194,7 @@ public class TS {
         L = l;
     }
 
-    public  TS parse(final String filePath) throws IOException {
-        TS ts = new TS("T");
+    public  void parse(final String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
         String line;
@@ -203,37 +202,37 @@ public class TS {
             String[] parts = line.split(":");
             switch (parts[0].trim()) {
                 case "Init":
-                    ts.setInitState(parts[1].trim());
+                    this.setInitState(parts[1].trim());
                     break;
                 case "Int":
                     Set<String> chan = new HashSet<>(Arrays.asList(parts[1].trim().split(",")));
                     Set<String> out = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
-                    ts.setInterface(new Int(chan, out));
+                    this.setInterface(new Int(chan, out));
                     break;
                 case "LS":
                     State st = new State(parts[1].trim());
                     Set<String> sch = new HashSet<>(Arrays.asList(parts[2].trim().split(",")));
                     Listen ls = new Listen(sch);
-                    if (ts.getStateById(parts[1].trim()) != null) {
-                        ts.getLS().apply(ts.getStateById(parts[1].trim()), ls);
+                    if (this.getStateById(parts[1].trim()) != null) {
+                        this.getLS().apply(this.getStateById(parts[1].trim()), ls);
                     } else {
-                        ts.addState(st);
-                        ts.getLS().apply(st, ls);
+                        this.addState(st);
+                        this.getLS().apply(st, ls);
                     }
                     break;
                 case "L":
                     Set<String> chs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
                     Set<String> o = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
                     Label l = new Label(chs, o);
-                    ts.applyLabel(parts[1].trim(), l);
+                    this.applyLabel(parts[1].trim(), l);
 
                     break;
                 case "T":
                     String[] t = parts[1].trim().split(",");
-                    ts.getTransitions()
-                            .add(new Trans(ts.getStateById(t[0].trim()), t[1].trim(), ts.getStateById(t[2].trim())));
-                    ts.getStateById(t[0].trim()).getTrans()
-                            .add(new Trans(ts.getStateById(t[0].trim()), t[1].trim(), ts.getStateById(t[2].trim())));
+                    this.getTransitions()
+                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(), this.getStateById(t[2].trim())));
+                    this.getStateById(t[0].trim()).getTrans()
+                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(), this.getStateById(t[2].trim())));
                     break;
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
@@ -247,7 +246,7 @@ public class TS {
         }
 
         reader.close();
-        return ts;
+       
     }
 
     public State getStateByComposiStates(TS t, State s_1, State s_2) {

@@ -58,7 +58,7 @@ public class Printer {
     }
 
     private void writeTextToFile(String fileName, String text) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream("output/"+fileName);
+        FileOutputStream outputStream = new FileOutputStream("./generated/output/"+fileName);
         outputStream.write(text.getBytes());
         outputStream.close();
     }

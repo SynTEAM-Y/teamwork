@@ -1,0 +1,18 @@
+SPEC LTL4reset
+
+In(r0,r1,r2,r3,rs) , Out(g0,g1,g2,g3)
+
+Agent A1 -> In(r0,rs) , Out(g0)
+Agent A2 -> In(r1) , Out(g1)
+Agent A3 -> In(r2) , Out(g2)
+Agent A4 -> In(r3) , Out(g3)
+
+Assume Env
+true
+
+Guarantee Sys
+G (!rs -> ((!g0 & !g1 & !g2) | !g0 & !g1 & !g3 | !g0 & !g3 & !g2 | (!g3 & !g1 & !g2)) & (rs -> (!g0 & !g1 & !g2& !g3))) 
+G (r0 -> F g0)
+G (r1 -> F g1)
+G (r2 -> F g2)
+G (r3 -> F g3)

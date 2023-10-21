@@ -87,7 +87,7 @@ public class RunEngine {
 				break;
 			}
 
-			System.out.println("File \"" + fileName + "\" not found, try again: ");
+			System.out.println("File \"" + new File(fileName).getAbsolutePath()+ "\" not found, try again: ");
 
 			try {
 				fileName = stdin.readLine();
