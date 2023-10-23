@@ -3,8 +3,10 @@ package com.syntm.lts;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.lang.Math;
 import com.syntm.util.Printer;
@@ -138,6 +140,81 @@ public class Mealy {
         return s;
     }
 
+    public List<String> CodeWildCard(String act, String cCode, String oCode) {
+        String[] Alphal = act.split(":");
+        List<String> olst = new ArrayList<>();
+        List<String> inlst = new ArrayList<>();
+        if (Alphal[0].contains("-")) {
+            inlst = Generate(Alphal[0], cCode);
+        } else {
+            olst.add(CodeResolve(cCode, Alphal[0]));
+        }
+        if (Alphal[1].contains("+")) {
+            Alphal[1] = Alphal[1].replace("+", ",");
+            String[] s = Alphal[1].split(",");
+            for (String o : s) {
+                olst.add(CodeResolve(oCode, o));
+            }
+        } else {
+            if (Alphal[1].contains("-")) {
+                olst = Generate(Alphal[1], oCode);
+            } else {
+
+                olst.add(CodeResolve(oCode, Alphal[1]));
+            }
+        }
+
+        List<String> letters = new ArrayList<>();
+        for (String il : inlst) {
+            for (String ol : olst) {
+
+                letters.add(il + "/" + ol);
+            }
+        }
+        return letters;
+    }
+
+    public List<String> Generate(String letter, String code) {
+        String[] c = code.split(",");
+        String cO = "";
+        String cw = "";
+        for (int i = 0; i < letter.length(); i++) {
+            if (letter.substring(i, i + 1).equals("-")) {
+                cw += c[i] + ",";
+            }
+            if (letter.substring(i, i + 1).equals("1")) {
+                cO += c[i];
+            }
+        }
+        String[] set = cw.split(",");
+        List<String> ls = PowerSet(set);
+        List<String> mlist = new ArrayList<>();
+        for (String l : ls) {
+            l += cO;
+            mlist.add(l);
+        }
+        return mlist;
+    }
+
+    public List<String> PowerSet(String[] set) {
+        String s = "";
+        List<String> list = new ArrayList<>();
+        long pow_set_size = (long) Math.pow(2, set.length);
+        int counter, j;
+
+        for (counter = 0; counter < pow_set_size; counter++) {
+            for (j = 0; j < set.length; j++) {
+
+                if ((counter & (1 << j)) > 0) {
+                    s += set[j];
+                }
+            }
+            list.add(s);
+            s = "";
+        }
+        return list;
+    }
+
     public void kissToMealy(final String filePath, String cCode, String oCode) throws IOException {
         // Mealy m = new Mealy("Strategy");
         Int mInt = new Int();
@@ -147,6 +224,13 @@ public class Mealy {
         String recent = "";
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(" ");
+            String plus = "";
+            if (parts.length > 4) {
+                for (int i = 3; i < parts.length; i++) {
+                    plus += parts[i].trim();
+                }
+                parts[3] = plus;
+            }
             String[] mParts = new String[parts.length - 1];
             for (int i = 1; i < parts.length; i++) {
                 mParts[i - 1] = parts[i];
@@ -194,15 +278,59 @@ public class Mealy {
 
                 default:
                     if (recent.equals(".r")) {
-                        this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
-                                this.CodeResolve(cCode, parts[0].trim()) + "/"
-                                        + this.CodeResolve(oCode, parts[3].trim()),
-                                this.getStateById(parts[2].substring(1).trim())));
-                        if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
-                            this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
-                                    this.CodeResolve(cCode, parts[0].trim()) + "/"
-                                            + this.CodeResolve(oCode, parts[3].trim()),
-                                    this.getStateById(parts[2].substring(1).trim())));
+                        String form = parts[0] + ":" + parts[3];
+                        Boolean decision = form.contains("-");
+                        if (decision) {
+                            if (this.status.equals("REALIZABLE")) {
+                                for (String act : this.CodeWildCard(form, cCode, oCode)) {
+                                    this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                            act,
+                                            this.getStateById(parts[2].substring(1).trim())));
+                                    if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                        this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                                act,
+                                                this.getStateById(parts[2].substring(1).trim())));
+                                    }
+                                }
+
+                            } else {
+                                for (String act : this.CodeWildCard(form, oCode, cCode)) {
+                                    this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                            act,
+                                            this.getStateById(parts[2].substring(1).trim())));
+                                    if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                        this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                                act,
+                                                this.getStateById(parts[2].substring(1).trim())));
+                                    }
+                                }
+
+                            }
+
+                        } else {
+                            if (this.status.equals("REALIZABLE")) {
+                                this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                        this.CodeResolve(cCode, parts[0]) + "/"
+                                                + this.CodeResolve(oCode, parts[3]),
+                                        this.getStateById(parts[2].substring(1).trim())));
+                                if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                    this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                            this.CodeResolve(cCode, parts[0]) + "/"
+                                                    + this.CodeResolve(oCode, parts[3]),
+                                            this.getStateById(parts[2].substring(1).trim())));
+                                }
+                            } else {
+                                this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                        this.CodeResolve(oCode, parts[3]) + "/"
+                                                + this.CodeResolve(cCode, parts[0]),
+                                        this.getStateById(parts[2].substring(1).trim())));
+                                if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                    this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
+                                            this.CodeResolve(oCode, parts[3]) + "/"
+                                                    + this.CodeResolve(cCode, parts[0]),
+                                            this.getStateById(parts[2].substring(1).trim())));
+                                }
+                            }
                         }
                     }
                     break;

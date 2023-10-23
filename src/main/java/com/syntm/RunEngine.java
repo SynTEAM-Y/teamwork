@@ -44,8 +44,9 @@ public class RunEngine {
 
 		Mealy m = new Mealy("");
 		m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());		
+		
+		m.toDot(m, m.getName());
 		if (m.getStatus().equals("REALIZABLE")) {
-			m.toDot(m, m.getName());
 			TS ts = m.toTS(m, m.getName());
 			parse.processInput(ts, spec);
 		}
