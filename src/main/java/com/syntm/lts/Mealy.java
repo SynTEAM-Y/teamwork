@@ -144,10 +144,18 @@ public class Mealy {
         String[] Alphal = act.split(":");
         List<String> olst = new ArrayList<>();
         List<String> inlst = new ArrayList<>();
-        if (Alphal[0].contains("-")) {
-            inlst = Generate(Alphal[0], cCode);
+        if (Alphal[0].contains("+")) {
+            Alphal[0] = Alphal[0].replace("+", ",");
+            String[] s = Alphal[0].split(",");
+            for (String c : s) {
+                olst.add(CodeResolve(cCode, c));
+            }
         } else {
-            olst.add(CodeResolve(cCode, Alphal[0]));
+            if (Alphal[0].contains("-")) {
+                inlst = Generate(Alphal[0], cCode);
+            } else {
+                olst.add(CodeResolve(cCode, Alphal[0]));
+            }
         }
         if (Alphal[1].contains("+")) {
             Alphal[1] = Alphal[1].replace("+", ",");
@@ -224,13 +232,6 @@ public class Mealy {
         String recent = "";
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(" ");
-            String plus = "";
-            if (parts.length > 4) {
-                for (int i = 3; i < parts.length; i++) {
-                    plus += parts[i].trim();
-                }
-                parts[3] = plus;
-            }
             String[] mParts = new String[parts.length - 1];
             for (int i = 1; i < parts.length; i++) {
                 mParts[i - 1] = parts[i];
@@ -245,7 +246,7 @@ public class Mealy {
                     break;
                 case "UNREALIZABLE":
                     this.setName("Counter Strategy");
-                    System.out.println("\n\n Specification is UNREALIZABLE :(\n\n");
+                    System.out.println("\n\n Specification is UNREALIZABLE\n\n You will get a counter strategy :(\n\n");
                     this.setStatus("UNREALIZABLE");
                     break;
 
@@ -278,8 +279,12 @@ public class Mealy {
 
                 default:
                     if (recent.equals(".r")) {
+                        if (parts.length > 4) {
+                            parts = processLine(line);
+                        }
+
                         String form = parts[0] + ":" + parts[3];
-                        Boolean decision = form.contains("-");
+                        Boolean decision = form.contains("-") | form.contains("+");
                         if (decision) {
                             if (this.status.equals("REALIZABLE")) {
                                 for (String act : this.CodeWildCard(form, cCode, oCode)) {
@@ -340,6 +345,30 @@ public class Mealy {
 
         reader.close();
         // return m;
+    }
+
+    public String[] processLine(String line) {
+        String[] act = line.split(" ");
+        Boolean reached = false;
+        String st = "";
+
+        for (String s : act) {
+            if (s.contains("S")) {
+                reached = true;
+            }
+            if (reached) {
+                if (s.contains("S")) {
+                    st += s + ":";
+                } else {
+                    st += s;
+                }
+
+            }
+        }
+        st = st.substring(0, st.length() - 1);
+        line = line.substring(0, line.indexOf("S")).replace(" ", "") + ":" + st;
+        String[] parts = line.split(":");
+        return parts;
     }
 
     public TS toTS(Mealy m, String name) {
