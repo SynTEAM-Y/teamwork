@@ -144,24 +144,41 @@ public class Mealy {
         String[] Alphal = act.split(":");
         List<String> olst = new ArrayList<>();
         List<String> inlst = new ArrayList<>();
+        // List<String> dash = new ArrayList<>();
         if (Alphal[0].contains("+")) {
             Alphal[0] = Alphal[0].replace("+", ",");
             String[] s = Alphal[0].split(",");
+            for (int i = 0; i < s.length; i++) {
+                if (s[i].contains("-")) {
+                    inlst = Generate(s[i], cCode);
+                }
+            }
+
             for (String c : s) {
-                olst.add(CodeResolve(cCode, c));
+                if (!c.contains("-")) {
+                    inlst.add(CodeResolve(cCode, c));
+                }
+
             }
         } else {
             if (Alphal[0].contains("-")) {
                 inlst = Generate(Alphal[0], cCode);
             } else {
-                olst.add(CodeResolve(cCode, Alphal[0]));
+                inlst.add(CodeResolve(cCode, Alphal[0]));
             }
         }
         if (Alphal[1].contains("+")) {
             Alphal[1] = Alphal[1].replace("+", ",");
             String[] s = Alphal[1].split(",");
+            for (int i = 0; i < s.length; i++) {
+                if (s[i].contains("-")) {
+                    olst = Generate(s[i], oCode);
+                }
+            }
             for (String o : s) {
-                olst.add(CodeResolve(oCode, o));
+                if (!o.contains("-")) {
+                    olst.add(CodeResolve(oCode, o));
+                }
             }
         } else {
             if (Alphal[1].contains("-")) {
@@ -291,7 +308,8 @@ public class Mealy {
                                     this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                             act,
                                             this.getStateById(parts[2].substring(1).trim())));
-                                    if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                    if (this.getStateById(parts[1].substring(1).trim())
+                                            .equals(this.getInitState())) {
                                         this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                                 act,
                                                 this.getStateById(parts[2].substring(1).trim())));
@@ -303,7 +321,8 @@ public class Mealy {
                                     this.transitions.add(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                             act,
                                             this.getStateById(parts[2].substring(1).trim())));
-                                    if (this.getStateById(parts[1].substring(1).trim()).equals(this.getInitState())) {
+                                    if (this.getStateById(parts[1].substring(1).trim())
+                                            .equals(this.getInitState())) {
                                         this.setInitTrans(new Trans(this.getStateById(parts[1].substring(1).trim()),
                                                 act,
                                                 this.getStateById(parts[2].substring(1).trim())));
@@ -344,7 +363,6 @@ public class Mealy {
         }
 
         reader.close();
-        // return m;
     }
 
     public String[] processLine(String line) {
@@ -365,8 +383,9 @@ public class Mealy {
 
             }
         }
-        st = st.substring(0, st.length() - 1);
+
         line = line.substring(0, line.indexOf("S")).replace(" ", "") + ":" + st;
+
         String[] parts = line.split(":");
         return parts;
     }
@@ -459,9 +478,7 @@ public class Mealy {
             String source = t.getSource().getId().toString();
             String dest = t.getDestination().getId().toString();
             String action = t.getAction().toString();
-            // if (!t.equals(m.getInitTrans())) {
             gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
-            // }
 
         }
 

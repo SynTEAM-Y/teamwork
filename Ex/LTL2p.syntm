@@ -1,0 +1,16 @@
+Interface:r0,rm:g0,gm
+
+A:A1:r0:g0
+A:A2:rm:gm
+
+
+Assumptions
+G F !rm
+EndAssumptions
+
+
+Guarantees
+G (!gm | !g0)
+G (rm -> X (!g0 U gm))
+G (r0 -> F g0)
+EndGuarantees

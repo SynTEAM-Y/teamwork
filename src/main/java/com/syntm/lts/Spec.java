@@ -256,7 +256,6 @@ public class Spec {
             Set<String> ao = new HashSet<>(Arrays.asList(parts[2].split(",")));
             this.agents.put(parts[0], new Int(achs, ao));
         }
-        System.out.println(this.agents);
     }
 
     public void specReader(final String specFile) throws IOException {
