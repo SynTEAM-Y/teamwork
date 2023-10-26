@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 
 import com.syntm.util.Printer;
@@ -34,7 +35,7 @@ public class TS {
         this.agents = new HashSet<TS>();
         this.parameters = new HashSet<TS>();
         LS = (s, ls) -> s.setListen(ls);
-        this.status="";
+        this.status = "";
         L = (s, l) -> s.setLabel(l);
 
     }
@@ -49,7 +50,7 @@ public class TS {
         this.parameters = new HashSet<TS>();
         LS = (s, ls) -> s.setListen(ls);
         L = (s, l) -> s.setLabel(l);
-        this.status="";
+        this.status = "";
     }
 
     public void setInterface(Int interface1) {
@@ -131,7 +132,7 @@ public class TS {
     }
 
     public void toDot() {
-
+        System.out.println("# of states of " + this.name + "-> " + this.getStates().size());
         Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
@@ -204,7 +205,7 @@ public class TS {
         L = l;
     }
 
-    public  void parse(final String filePath) throws IOException {
+    public void parse(final String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
         String line;
@@ -240,9 +241,11 @@ public class TS {
                 case "T":
                     String[] t = parts[1].trim().split(",");
                     this.getTransitions()
-                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(), this.getStateById(t[2].trim())));
+                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(),
+                                    this.getStateById(t[2].trim())));
                     this.getStateById(t[0].trim()).getTrans()
-                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(), this.getStateById(t[2].trim())));
+                            .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(),
+                                    this.getStateById(t[2].trim())));
                     break;
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
@@ -256,7 +259,7 @@ public class TS {
         }
 
         reader.close();
-       
+
     }
 
     public State getStateByComposiStates(TS t, State s_1, State s_2) {
@@ -482,7 +485,7 @@ public class TS {
 
     public TS prunedTS(TS t) { // This is the outcome of closed composition as in the paper
         // REMEMBER TO FIX FOR MERGED ACTIONS. THE TRANSFORMATION HERE IS NOT CORRECT.
-        TS ts = new TS("C[" + t.getName()+"]");
+        TS ts = new TS("C[" + t.getName() + "]");
         ts.setInterface(t.getInterface());
         for (State pState : t.getStates()) {
             ts.addState(pState);
@@ -828,6 +831,99 @@ public class TS {
         }
 
         return trSet;
+    }
+
+    public TS reduce() {
+
+        Set<Set<State>> rhoinit = new HashSet<Set<State>>();
+        rhoinit.add(this.getStates());
+
+        Set<String> sigma = new TreeSet<String>();
+        sigma.addAll(this.Interface.getChannels());
+
+        Set<Set<State>> rho = new HashSet<Set<State>>(rhoinit);
+        Set<Set<State>> waiting = new HashSet<Set<State>>(rhoinit);
+        Set<Label> labs = new HashSet<Label>();
+        for (State s : this.getStates()) {
+            labs.add(s.getLabel());
+        }
+
+        while (true) {
+            Set<State> pprime = this.popStates(waiting);
+            for (Label l : labs) {
+                for (String action : sigma) {
+                    Set<Set<State>> matchP = new HashSet<Set<State>>();
+
+                    for (Set<State> partition : rho) {
+                        Set<State> tap = this.t(partition, pprime, action, l);
+
+                        if (!tap.isEmpty() && !tap.equals(partition)) {
+                            matchP.add(partition);
+                        }
+                    }
+
+                    for (Set<State> partition : matchP) {
+                        Set<Set<State>> splitP = this.splitP(partition, pprime, action, l);
+
+                        rho.remove(partition);
+                        rho.addAll(splitP);
+
+                        waiting.remove(partition);
+                        waiting.addAll(splitP);
+                    }
+                }
+            }
+
+            if (waiting.isEmpty()) {
+                break;
+            }
+        }
+        if (rho.size() == 1) {
+            return this;
+        }
+        CompressedTS c = new CompressedTS("r-" + this.getName());
+        TS t = c.compressedTS(this, rho);
+        return t;
+    }
+
+    private Set<State> popStates(final Set<Set<State>> stateSets) {
+        Set<State> states = stateSets.iterator().next();
+        stateSets.remove(states);
+        return states;
+    }
+
+    private Set<Set<State>> splitP(final Set<State> partition, final Set<State> pprime, final String action,
+            final Label l) {
+        Set<Set<State>> splitP = new HashSet<Set<State>>();
+
+        Set<State> tap = this.t(partition, pprime, action, l);
+        Set<State> nottap = new HashSet<State>(partition);
+        nottap.removeAll(tap);
+
+        splitP.add(tap);
+        splitP.add(nottap);
+
+        return splitP;
+    }
+
+    private Set<State> t(final Set<State> partition, final Set<State> pprime, final String action, final Label l) {
+        Set<State> acc = new HashSet<State>();
+
+        for (State s : partition) {
+            for (State d : pprime) {
+                if (s.getLabel().equals(l)) {
+                    for (Trans tr : s.getTrans()) {
+                        if (tr.getSource().equals(s)&& tr.getDestination().equals(d) && tr.getAction().equals(action)) {
+                            acc.add(s);
+                            break;
+                        }
+                    }
+                    
+                }
+            }
+        }
+
+        return acc;
     }
 
 }

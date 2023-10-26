@@ -1,25 +1,22 @@
-Interface:r0,r1,r2:g0,g1,g2
+Interface:r0,r1:g0,g1
 
 A:A1:r0:g0
 A:A2:r1:g1
-A:A3:r2:g2
+
 
 Assumptions
-G ((r0 & !g0) -> X r0)
-G ((r1 & !g1) -> X r1)
-G ((r2 & !g2) -> X r2)
-G ((!r0 & g0) -> X !r0)
-G ((!r1 & g1) -> X !r1)
-G ((!r2 & g1) -> X !r2)
-G F (!r0 | !g0)
-G F (!r1 | !g1)
-G F (!r2 | !g2)
+true
 EndAssumptions
 
 
 Guarantees
-G ((!g0 & !g1) | ((!g0 | !g1) & !g2))
+G ((g0 & G !r0) -> (F !g0))
+G ((g1 & G !r1) -> (F !g1))
+G ((g0 & X (!r0 & !g0)) -> X (r0 R !g0))
+G ((g1 & X (!r1 & !g1)) -> X (r1 R !g1))
+G (!g0 | !g1)
+r0 R !g0
+r1 R !g1
 G (r0 -> F g0)
 G (r1 -> F g1)
-G (r2 -> F g2)
 EndGuarantees

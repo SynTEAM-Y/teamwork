@@ -380,7 +380,6 @@ public class Mealy {
             this.code.put(this.IdState(tr), i);
             i+=1;
         }
-        System.out.println(this.code.toString());
     }
 
     public String[] processLine(String line) {
@@ -481,12 +480,13 @@ public class Mealy {
                 }
             }
         }
-        ts.toDot();
-        return ts;
+        TS t= ts.reduce();
+        //t.toDot();
+        return t;
     }
 
     public void toDot(Mealy m, String name) {
-
+        System.out.println("# of states of "+ m.name+"-> "+m.getStates().size());
         Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");

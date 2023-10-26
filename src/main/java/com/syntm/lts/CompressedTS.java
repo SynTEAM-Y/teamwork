@@ -27,7 +27,7 @@ public class CompressedTS {
         LS = (s, ls) -> s.setListen(ls);
 
         L = (s, l) -> s.setLabel(l);
-        this.index =0;
+        this.index = 0;
 
     }
 
@@ -39,19 +39,20 @@ public class CompressedTS {
         this.PartitionTransitions = new HashSet<PartitionTrans>();
         LS = (s, ls) -> s.setListen(ls);
         L = (s, l) -> s.setLabel(l);
-        this.index =0;
+        this.index = 0;
     }
+
     public CompressedTS(CompressedTS TS) {
-        this.name = TS.getName()+"copy";
+        this.name = TS.getName() + "copy";
         this.states = TS.getStates();
         this.Interface = TS.getInterface();
         this.initState = TS.getInitState();
         this.PartitionTransitions = TS.PartitionTransitions;
         LS = TS.getLS();
         L = TS.getL();
-        this.index =0;
+        this.index = 0;
     }
-    
+
     public Integer getIndex() {
         return index;
     }
@@ -91,7 +92,7 @@ public class CompressedTS {
     public void addPartitionState(PartitionState partitionState) {
         partitionState.setOwner(this);
         this.states.add(partitionState);
-        
+
     }
 
     public void setInitState(String id) {
@@ -191,7 +192,12 @@ public class CompressedTS {
     }
 
     public TS compressedTS(TS ts, Set<Set<State>> rho) {
-        CompressedTS t = new CompressedTS("[" + ts.getName()+"]~");
+        CompressedTS t = new CompressedTS("");
+        if (ts.getName().contains("T[")) {
+            t.setName(ts.getName());
+        } else {
+            t.setName("[" + ts.getName() + "]~");
+        }
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);
 
@@ -245,35 +251,31 @@ public class CompressedTS {
     }
 
     private TS convetToTS(CompressedTS t) {
-        TS ts =new TS(t.getName());
+        TS ts = new TS(t.getName());
         ts.setInterface(t.getInterface());
         for (PartitionState pState : t.getStates()) {
             State st = new State("");
-            st= pState.toState();
+            st = pState.toState();
             ts.addState(st);
         }
-         ts.setInitState(t.getInitState().getId());
+        ts.setInitState(t.getInitState().getId());
 
         for (PartitionTrans tr : t.getPartitionTransitions()) {
-            
+
             ts.getTransitions().add(tr.toTrans());
-            ts.getStateById(tr.getSource().getId()).addTrans(tr.toTrans(),ts);
+            ts.getStateById(tr.getSource().getId()).addTrans(tr.toTrans(), ts);
         }
-     
+
         return ts;
 
     }
 
- 
-
     public void addTransition(CompressedTS ts, PartitionState src, String action, PartitionState des) {
-         src.setOwner(ts);
+        src.setOwner(ts);
         des.setOwner(ts);
         ts.PartitionTransitions.add(new PartitionTrans(src, action, des));
-       
-    }
 
-   
+    }
 
     public PartitionState getStateByComposiStates(CompressedTS t, PartitionState s_1, PartitionState s_2) {
         for (PartitionState s : t.getStates()) {
@@ -289,7 +291,7 @@ public class CompressedTS {
         pState.setOwner(t);
         dState.setOwner(t);
         t.getPartitionTransitions().add(new PartitionTrans(pState, action, dState));
-        
+
     }
 
     private PartitionState getPstateByMembership(State state) {
@@ -368,8 +370,8 @@ public class CompressedTS {
         return "CompressedTS [name=" + name + ", states=" + states + ", initState=" + initState + ", Interface="
                 + Interface + ", PartitionTransitions=" + PartitionTransitions + ", LS=" + LS + ", L=" + L + "]";
     }
-    public Object clone() throws CloneNotSupportedException
-    {
+
+    public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 

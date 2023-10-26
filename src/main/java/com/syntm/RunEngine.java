@@ -54,7 +54,7 @@ public class RunEngine {
 			TS ts = m.toTS(m, m.getName());
 			if (!ts.getStatus().equals("ND")) {
 				System.out.println(
-                            "\n\n Specification is REALIZABLE for a multi-agent\n\n You may get a distributed Implementation :)\n\n");
+                            "\n\n Specification is REALIZABLE for a multi-agent\n\n You will get a distributed Implementation :)\n\n");
 				parse.processInput(ts, spec);
 			}
 			else
