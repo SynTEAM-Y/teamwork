@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,15 @@ public class Mealy {
     private Trans initTrans;
     private Int Interface;
     private Set<Trans> transitions;
+    public HashMap<String, Integer> getCode() {
+        return code;
+    }
+
+    public void setCode(HashMap<String, Integer> code) {
+        this.code = code;
+    }
+
+    private HashMap<String,Integer> code;
 
     private String status;
 
@@ -28,6 +38,7 @@ public class Mealy {
         Interface = interface1;
         this.transitions = transitions;
         this.status = "";
+        this.code=new HashMap<>();
     }
 
     public Mealy(String name) {
@@ -38,6 +49,7 @@ public class Mealy {
         this.transitions = new HashSet<>();
         this.initTrans = new Trans();
         this.status = "";
+        this.code=new HashMap<>();
     }
 
     public String getName() {
@@ -363,6 +375,12 @@ public class Mealy {
         }
 
         reader.close();
+        int i=0;
+        for (Trans tr : this.getTransitions()) {
+            this.code.put(this.IdState(tr), i);
+            i+=1;
+        }
+        System.out.println(this.code.toString());
     }
 
     public String[] processLine(String line) {
@@ -396,27 +414,27 @@ public class Mealy {
         for (Trans tr : m.getTransitions()) {
             if (tr.getAction().split("/").length > 1) {
                 String[] parts = tr.getAction().split("/");
-                State st = new State(IdState(tr),
+                State st = new State(this.code.get(IdState(tr)).toString(),
                         new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
                                 new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
                 ts.addState(st);
             } else {
                 if (tr.getAction().equals("/")) {
-                    State st = new State(IdState(tr),
+                    State st = new State(this.code.get(IdState(tr)).toString(),
                             new Label(new HashSet<>(Arrays.asList(" ")),
                                     new HashSet<>(Arrays.asList(" "))));
                     ts.addState(st);
                 } else {
                     if (tr.getAction().startsWith("/")) {
                         String[] parts = tr.getAction().split("/");
-                        State st = new State(IdState(tr),
+                        State st = new State(this.code.get(IdState(tr)).toString(),
                                 new Label(new HashSet<>(Arrays.asList(" ")),
                                         new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
                         ts.addState(st);
                     }
                     if (tr.getAction().endsWith("/")) {
                         String[] parts = tr.getAction().split("/");
-                        State st = new State(IdState(tr),
+                        State st = new State(this.code.get(IdState(tr)).toString(),
                                 new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
                                         new HashSet<>(Arrays.asList(" "))));
                         ts.addState(st);
@@ -430,14 +448,14 @@ public class Mealy {
             for (Trans tr_2 : m.getTransitions()) {
                 if (tr_1.getDestination().equals(tr_2.getSource())) {
                     ts.addTransition(ts,
-                            ts.getStateById(IdState(tr_1)),
-                            formatChannel(ts.getStateById(IdState(tr_2)).getLabel().getChannel()),
-                            ts.getStateById(IdState(tr_2)));
+                            ts.getStateById(this.code.get(IdState(tr_1)).toString()),
+                            formatChannel(ts.getStateById(this.code.get(IdState(tr_2)).toString()).getLabel().getChannel()),
+                            ts.getStateById(this.code.get(IdState(tr_2)).toString()));
 
-                    ts.getStateById(IdState(tr_1))
-                            .addTrans(new Trans(ts.getStateById(IdState(tr_1)),
-                                    formatChannel(ts.getStateById(IdState(tr_2)).getLabel().getChannel()),
-                                    ts.getStateById(IdState(tr_2))), ts);
+                    ts.getStateById(this.code.get(IdState(tr_1)).toString())
+                            .addTrans(new Trans(ts.getStateById(this.code.get(IdState(tr_1)).toString()),
+                                    formatChannel(ts.getStateById(this.code.get(IdState(tr_2)).toString()).getLabel().getChannel()),
+                                    ts.getStateById(this.code.get(IdState(tr_2)).toString())), ts);
 
                 }
             }
@@ -451,7 +469,7 @@ public class Mealy {
             ts.getLS().apply(st, new Listen(chans));
 
         }
-        ts.setInitState(m.IdState(m.getInitTrans()));
+        ts.setInitState(m.code.get(IdState(m.getInitTrans())).toString());
 
         for (State state : ts.getStates()) {
 
