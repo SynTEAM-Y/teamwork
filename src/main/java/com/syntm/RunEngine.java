@@ -2,6 +2,7 @@ package com.syntm;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,6 +38,9 @@ public class RunEngine {
 				spec.outParam(), "--k");
 
 		File Strategy = new File("Mealy");
+		if (Strategy.exists()) {
+			FileOutputStream fos = new FileOutputStream(Strategy, false);
+		}
 		p.redirectErrorStream(true);
 		p.redirectOutput(Redirect.appendTo(Strategy));
 		Process proc = p.start();
@@ -48,9 +52,18 @@ public class RunEngine {
 		m.toDot(m, m.getName());
 		if (m.getStatus().equals("REALIZABLE")) {
 			TS ts = m.toTS(m, m.getName());
-			parse.processInput(ts, spec);
+			if (!ts.getStatus().equals("ND")) {
+				System.out.println(
+                            "\n\n Specification is REALIZABLE for a multi-agent\n\n You may get a distributed Implementation :)\n\n");
+				parse.processInput(ts, spec);
+			}
+			else
+			{
+				System.out.println("Despite the realizablity of the specification on a single machine\n\n it cannot be realized in our distributed model\n\n The translation to TS resulted in a non-determinstic TS.");
+			}
+			
 		}
-		Strategy.delete();
+		//Strategy.delete();
 
 	}
 

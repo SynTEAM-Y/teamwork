@@ -257,7 +257,7 @@ public class Mealy {
                 case "REALIZABLE":
 
                     System.out.println(
-                            "\n\n Specification is REALIZABLE\n\n You will get a distributed Implementation :)\n\n");
+                            "\n\n Specification is REALIZABLE for a single agent\n\n You may get a distributed Implementation!\n\n");
                     this.setStatus("REALIZABLE");
                     this.setName("Strategy");
                     break;
@@ -452,6 +452,17 @@ public class Mealy {
 
         }
         ts.setInitState(m.IdState(m.getInitTrans()));
+
+        for (State state : ts.getStates()) {
+
+            for (Trans tr1 : state.getTrans()) {
+                for (Trans tr2 : state.getTrans()) {
+                    if (!tr1.equals(tr2) && tr1.action.equals(tr2.getAction())) {
+                        ts.setStatus("ND");
+                    }
+                }
+            }
+        }
         ts.toDot();
         return ts;
     }

@@ -57,7 +57,10 @@ public class Partitioning {
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.Parameter.getInterface().getChannels());
 
-        ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
+        // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
+        // return d.run();
+
+        ESolver d= new ESolver(sMap, this.T,c);
         return d.run();
     }
 

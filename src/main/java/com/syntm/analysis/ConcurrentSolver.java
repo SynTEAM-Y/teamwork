@@ -251,7 +251,7 @@ public class ConcurrentSolver {
     try {
       while (!fixed) {
         counter += 1;
-        System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+       // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
         roundBarrier.await();
         fixed = updateMap();
         if (!fixed) {
@@ -289,9 +289,9 @@ public class ConcurrentSolver {
         fixedPoint = false;
       }
     }
-    if (fixedPoint) {
-      System.out.println("Fixed map -> " + eMap);
-    }
+    // if (fixedPoint) {
+    //   System.out.println("Fixed map -> " + eMap);
+    // }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);

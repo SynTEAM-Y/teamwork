@@ -23,6 +23,7 @@ public class TS {
     private BiFunction<State, Label, Label> L;
     private Set<TS> agents;
     private Set<TS> parameters;
+    private String status;
 
     public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
@@ -33,7 +34,7 @@ public class TS {
         this.agents = new HashSet<TS>();
         this.parameters = new HashSet<TS>();
         LS = (s, ls) -> s.setListen(ls);
-
+        this.status="";
         L = (s, l) -> s.setLabel(l);
 
     }
@@ -48,10 +49,19 @@ public class TS {
         this.parameters = new HashSet<TS>();
         LS = (s, ls) -> s.setListen(ls);
         L = (s, l) -> s.setLabel(l);
+        this.status="";
     }
 
     public void setInterface(Int interface1) {
         Interface = interface1;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getName() {
@@ -672,23 +682,6 @@ public class TS {
         return reach;
     }
 
-    private Set<Trans> hasTransitions(TS ts, State s) {
-        Set<Trans> trSet = new HashSet<>();
-
-        for (Trans tr : ts.getTransitions()) {
-            try {
-                if (tr.getSource().equals(s)) {
-                    trSet.add(tr);
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
-        }
-
-        return trSet;
-    }
-
     public void initialDecomposition(String name, Set<String> channels, Set<String> outputs) {
         TS t = new TS(name);
         TS p = new TS("P-" + name);
@@ -818,6 +811,23 @@ public class TS {
 
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    private Set<Trans> hasTransitions(TS ts, State s) {
+        Set<Trans> trSet = new HashSet<>();
+
+        for (Trans tr : ts.getTransitions()) {
+            try {
+                if (tr.getSource().equals(s)) {
+                    trSet.add(tr);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+
+        return trSet;
     }
 
 }
