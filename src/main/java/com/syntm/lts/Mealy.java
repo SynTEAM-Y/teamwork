@@ -470,17 +470,19 @@ public class Mealy {
         }
         ts.setInitState(m.code.get(IdState(m.getInitTrans())).toString());
 
-        for (State state : ts.getStates()) {
+        
+        TS t= ts.reduce();
+        for (State state : t.getStates()) {
 
             for (Trans tr1 : state.getTrans()) {
                 for (Trans tr2 : state.getTrans()) {
                     if (!tr1.equals(tr2) && tr1.action.equals(tr2.getAction())) {
-                        ts.setStatus("ND");
+                        t.setStatus("ND");
+                        break;
                     }
                 }
             }
         }
-        TS t= ts.reduce();
         //t.toDot();
         return t;
     }
