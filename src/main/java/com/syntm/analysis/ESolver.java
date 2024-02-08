@@ -44,8 +44,7 @@ public class ESolver {
 
   public TS run() {
     //int counter = 0;
-    boolean fixed = false;
-    while (!fixed) {
+    do {
      // counter += 1;
        //System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
       // Execute all tasks and get reference to Future objects
@@ -63,8 +62,7 @@ public class ESolver {
           e.printStackTrace();
         }
       }
-      fixed = updateMap();
-    }
+    } while (!updateMap());
     service.shutdown();
 
     Set<Set<State>> rho_f = new HashSet<>();
