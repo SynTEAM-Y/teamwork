@@ -57,7 +57,7 @@ public class ESolver {
       for (int i = 0; i < resultList.size(); i++) {
         Future<Set<Set<State>>> future = resultList.get(i);
         try {
-          Set<Set<State>> result = future.get();
+          Set<Set<State>> result = future.get(); // Why is the result never used?
         } catch (InterruptedException | ExecutionException e) {
           e.printStackTrace();
         }

@@ -60,9 +60,10 @@ public class Partitioning {
         // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
         // return d.run();
 
-        ESolver d= new ESolver(sMap, this.T,c);
+        // ESolver d= new ESolver(sMap, this.T,c);
+        // SeqSolver d = new SeqSolver(sMap, this.T,c);
         
-        // Smolka d = new Smolka(sMap, this.T,c);
+        Smolka d = new Smolka(sMap, this.T,c);
         return d.run();
     }
 

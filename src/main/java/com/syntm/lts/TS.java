@@ -930,7 +930,7 @@ public class TS {
      * A method for comparing a state's label with the 
      * transition system's initial state's label.
      * @param state The state to compare labels with.
-     * @return      True if the labels are equal, otherwise false.
+     * @return      <code>true</code> if the labels are equal, otherwise <code>false</code>.
      */
     public boolean initStateEqLabel(State state) {
         String id = getInitState().getId();
