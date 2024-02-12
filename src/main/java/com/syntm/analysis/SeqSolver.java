@@ -76,7 +76,7 @@ public class SeqSolver {
 
         Set<Set<State>> rho_final = new HashSet<>();
         for (State s : epsilonMap.keySet()) {
-            // What actually happens here?
+            // Gets the partition from the initial state.
             if (this.transSystem.initStateEqLabel(s)) {
                 if (epsilonMap.get(s).size() == 1) return this.transSystem;
                 rho_final.addAll(epsilonMap.get(s));
@@ -89,20 +89,20 @@ public class SeqSolver {
     }
 
     /**
-     * We have no idea what happens here
-     * @param p         a block?
-     * @param trEpsilon A transition (from where to where?)
-     * @param ePrime    Another block?
+     * Def 5.4 in the paper
+     * @param p         The starting block
+     * @param trEpsilon A transition (from p to ePrime)
+     * @param ePrime    The block where the transition ends up.
      * @param channel   A channel name
      * @param epsilon   A state (our addition)
-     * @return          A block?
+     * @return          A possible splitter for the block.
      */
     private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, 
                                    Set<State> ePrime, String channel, 
                                    State epsilon) {
         Set<State> out = new HashSet<State>();
     
-        if (epsilon.enable(epsilon, channel)
+        if (epsilon.enable(epsilon, channel) // activating a channel
                 && trEpsilon.getAction().equals(channel)) {
             for (State s : p) {
                 for (State sPrime : p) {
@@ -196,7 +196,7 @@ public class SeqSolver {
         }
 
         return out;
-      }
+    }
     
     /**
      * A splitter function
