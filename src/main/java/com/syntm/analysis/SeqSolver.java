@@ -3,7 +3,7 @@ package com.syntm.analysis;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
@@ -22,7 +22,7 @@ public class SeqSolver {
      * @param channels      A set of the available channels.
      * @return              An object callable with <code>run()</code> to reduce the transition system.
      */
-    public SeqSolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, 
+    public SeqSolver(ConcurrentMap<State, Set<Set<State>>> indexedFamily, 
                   TS transSystem, Set<String> channels) {
         this.epsilonMap = new HashMap<>(indexedFamily);
         this.transSystem = transSystem;
@@ -39,10 +39,10 @@ public class SeqSolver {
         boolean fixedPoint = false;
 
         while (!fixedPoint) {
-            HashMap<State, Set<Set<State>>> rho_results = new HashMap<>();
+            HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
             
             for (State epsilon : epsilonMap.keySet()) {
-                Set<Set<State>> rho_temp = new HashSet<>(epsilonMap.get(epsilon));
+                Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
                 for (String ch : channels) {
                     for (Trans trEpsilon : epsilon.getTrans()) {
                         Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
@@ -50,42 +50,42 @@ public class SeqSolver {
                             for (Set<State> partition : this.epsilonMap.get(epsilon)) {
                                 Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon);
                                 if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                                    Set<Set<State>> splitP = new HashSet<>();
+                                    Set<Set<State>> splitP;
                                     splitP = split(partition, splitter);
-                                    rho_temp.remove(partition);
-                                    rho_temp.addAll(splitP);
+                                    rhoTemp.remove(partition);
+                                    rhoTemp.addAll(splitP);
                                 }
                             }
                         }
                     }
                 }
-                rho_results.put(epsilon, rho_temp);
+                rhoResults.put(epsilon, rhoTemp);
     
             }
 
             // update epsilonmap with the new partitions
             fixedPoint = true;
-            for (State e : rho_results.keySet()) {
-                if (!epsilonMap.get(e).equals(rho_results.get(e))) {
+            for (State e : rhoResults.keySet()) {
+                if (!epsilonMap.get(e).equals(rhoResults.get(e))) {
                     // not a fixed point, repeat
                     fixedPoint = false;
-                    epsilonMap.put(e, rho_results.get(e));
+                    epsilonMap.put(e, rhoResults.get(e));
                 }
             }
         }
 
-        Set<Set<State>> rho_final = new HashSet<>();
+        Set<Set<State>> rhoFinal = new HashSet<>();
         for (State s : epsilonMap.keySet()) {
             // Gets the partition from the initial state.
             if (this.transSystem.initStateEqLabel(s)) {
                 if (epsilonMap.get(s).size() == 1) return this.transSystem;
-                rho_final.addAll(epsilonMap.get(s));
+                rhoFinal.addAll(epsilonMap.get(s));
                 break;
             } 
         }
 
         CompressedTS c = new CompressedTS("s-" + this.transSystem.getName());
-        return c.compressedTS(this.transSystem, rho_final);
+        return c.compressedTS(this.transSystem, rhoFinal);
     }
 
     /**
@@ -100,7 +100,7 @@ public class SeqSolver {
     private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, 
                                    Set<State> ePrime, String channel, 
                                    State epsilon) {
-        Set<State> out = new HashSet<State>();
+        Set<State> out = new HashSet<>();
     
         if (epsilon.enable(epsilon, channel) // activating a channel
                 && trEpsilon.getAction().equals(channel)) {
@@ -205,8 +205,8 @@ public class SeqSolver {
      * @return          The resulting blocks
      */
     private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
-        Set<Set<State>> splitP = new HashSet<Set<State>>();
-        Set<State> notsplitter = new HashSet<State>(p);
+        Set<Set<State>> splitP = new HashSet<>();
+        Set<State> notsplitter = new HashSet<>(p);
 
         notsplitter.removeAll(splitter);
         splitP.add(splitter);

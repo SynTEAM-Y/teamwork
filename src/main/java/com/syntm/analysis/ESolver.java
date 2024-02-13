@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +15,6 @@ import com.syntm.lts.State;
 import com.syntm.lts.TS;
 
 public class ESolver {
-  private Task task;
   private ConcurrentHashMap<State, Set<Set<State>>> eMap;
   private TS ts;
   private Set<String> channels;

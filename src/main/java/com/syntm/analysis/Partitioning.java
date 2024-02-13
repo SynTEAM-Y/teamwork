@@ -11,11 +11,11 @@ import com.syntm.lts.TS;
 
 public class Partitioning {
     private TS T;
-    private TS Parameter;
+    private TS parameter;
     private ConcurrentHashMap<State, Set<Set<State>>> sMap;
 
-    public Partitioning(TS Parameter, TS T) {
-        this.Parameter = Parameter;
+    public Partitioning(TS parameter, TS T) {
+        this.parameter = parameter;
         this.T = T;
         sMap = new ConcurrentHashMap<>();
     }
@@ -24,15 +24,15 @@ public class Partitioning {
 
         // Partition Locally Based On Label;
 
-        Set<Set<State>> rho = new HashSet<Set<State>>();
+        Set<Set<State>> rho = new HashSet<>();
         rho.add(this.T.getStates());
 
-        Set<Label> labs = new HashSet<Label>();
+        Set<Label> labs = new HashSet<>();
         for (State s : T.getStates()) {
             labs.add(s.getLabel());
         }
         for (Label l : labs) {
-            Set<Set<State>> nonStablePartitions = new HashSet<Set<State>>();
+            Set<Set<State>> nonStablePartitions = new HashSet<>();
 
             for (Set<State> partition : rho) {
                 Set<State> splitter = findSplit(partition, l);
@@ -48,14 +48,14 @@ public class Partitioning {
             }
 
         }
-        Set<Set<State>> rhoInit = new HashSet<Set<State>>();
+        Set<Set<State>> rhoInit = new HashSet<>();
         rhoInit.addAll(rho);
-        for (State epsilon : this.Parameter.getStates()) {
+        for (State epsilon : this.parameter.getStates()) {
             sMap.put(epsilon, rhoInit);
 
         }
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
-        c.addAll(this.Parameter.getInterface().getChannels());
+        c.addAll(this.parameter.getInterface().getChannels());
 
         // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
         // return d.run();
@@ -68,7 +68,7 @@ public class Partitioning {
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {
-        Set<State> out = new HashSet<State>();
+        Set<State> out = new HashSet<>();
         for (State s : p) {
             if (s.getLabel().equals(label)) {
                 out.add(s);
@@ -78,9 +78,9 @@ public class Partitioning {
     }
 
     private Set<Set<State>> split(Set<State> p, Label label) {
-        Set<Set<State>> splitP = new HashSet<Set<State>>();
+        Set<Set<State>> splitP = new HashSet<>();
         Set<State> splitter = findSplit(p, label);
-        Set<State> notsplitter = new HashSet<State>(p);
+        Set<State> notsplitter = new HashSet<>(p);
         notsplitter.removeAll(splitter);
         splitP.add(splitter);
         splitP.add(notsplitter);

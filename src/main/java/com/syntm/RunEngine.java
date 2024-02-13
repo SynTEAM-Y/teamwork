@@ -40,6 +40,7 @@ public class RunEngine {
 		File Strategy = new File("Mealy");
 		if (Strategy.exists()) {
 			FileOutputStream fos = new FileOutputStream(Strategy, false);
+			// Resource leak here, fos is never closed
 		}
 		p.redirectErrorStream(true);
 		p.redirectOutput(Redirect.appendTo(Strategy));
