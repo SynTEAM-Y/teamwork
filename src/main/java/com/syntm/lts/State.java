@@ -12,6 +12,7 @@ public class State{
 	private Set<Trans> trans;
 	private Set<State> comStates;
 	private TS owner;
+    private int partitionId;
 
 	public State() {
 		this.id = "";
@@ -151,6 +152,14 @@ public class State{
 	public void setOwner(TS owner) {
 		this.owner = owner;
 	}
+
+    public int getPartitionId() {
+        return this.partitionId;
+    }
+
+    public void setPartitionId(int id) {
+        this.partitionId = id;
+    }
 
     public void addTrans(Trans tr, TS ts) {
 		tr.getSource().setOwner(ts);
