@@ -12,7 +12,7 @@ public class State{
 	private Set<Trans> trans;
 	private Set<State> comStates;
 	private TS owner;
-    private int partitionId;
+    private int blockId;
 
 	public State() {
 		this.id = "";
@@ -153,12 +153,19 @@ public class State{
 		this.owner = owner;
 	}
 
-    public int getPartitionId() {
-        return this.partitionId;
+    /**
+     * @return The id of the block containing the state in the partition.
+     */
+    public int getBlockId() {
+        return this.blockId;
     }
 
-    public void setPartitionId(int id) {
-        this.partitionId = id;
+    /**
+     * Sets a new block id
+     * @param id A new id of the block containing the state in the partition.
+     */
+    public void setBlockId(int id) {
+        this.blockId = id;
     }
 
     public void addTrans(Trans tr, TS ts) {
