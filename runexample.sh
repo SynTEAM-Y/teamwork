@@ -1,4 +1,5 @@
 # Script for running an example LTL without having to go to another repo
+# Valgrind is necessary to run the memory checks
 
 if [ -z "$1" ]; then
     echo "Example file not supplied"
@@ -29,6 +30,7 @@ if [[ -e "Ex/${FILE}" ]]; then
     FILENOEXT="$(echo ${FILE} | sed -r "s/(\w+)\.\w+/\1/")"
     javac -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
     time java -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
+    valgrind --tool=massif java -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
     rm -rf "../teamwork/output/examples/"
     cp -r "./generated/output/" "../teamwork/output/examples/"
     cd - &> /dev/null

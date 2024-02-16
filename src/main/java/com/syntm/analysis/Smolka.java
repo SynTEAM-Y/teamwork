@@ -38,9 +38,9 @@ public class Smolka {
      * @return An object callable with <code>run()</code> to reduce the transition
      *         system using the Kannelakis-Smolka algorithm.
      */
-    public Smolka(ConcurrentMap<State, Set<Set<State>>> indexedFamily,
+    public Smolka(Set<Set<State>> initPartition,
             TS transSystem, Set<String> channels) {
-        this.initPartition = indexedFamily.values().iterator().next(); // space complexity O(m+n)?
+        this.initPartition = initPartition;
         this.lastId = 0;
         for (Set<State> b : initPartition) {
             for (State t : b) { 

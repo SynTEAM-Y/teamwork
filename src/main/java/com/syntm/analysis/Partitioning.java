@@ -50,20 +50,20 @@ public class Partitioning {
         }
         Set<Set<State>> rhoInit = new HashSet<>();
         rhoInit.addAll(rho);
-        for (State epsilon : this.parameter.getStates()) {
-            sMap.put(epsilon, rhoInit);
+        // for (State epsilon : this.parameter.getStates()) {
+        //     sMap.put(epsilon, rhoInit);
 
-        }
+        // }
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.parameter.getInterface().getChannels());
 
-        // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
+        // ConcurrentSolver d = new ConcurrentSolver(sMap, this.T, c);
         // return d.run();
 
-        // ESolver d= new ESolver(sMap, this.T,c);
-        // SeqSolver d = new SeqSolver(sMap, this.T,c);
+        // ESolver d = new ESolver(sMap, this.T, c);
+        // SeqSolver d = new SeqSolver(sMap, this.T, c);
         
-        Smolka d = new Smolka(sMap, this.T,c);
+        Smolka d = new Smolka(rhoInit, this.T, c);
         return d.run();
     }
 
