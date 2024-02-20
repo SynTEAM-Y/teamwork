@@ -3,7 +3,7 @@ package com.syntm.lts;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Int {
+public class Int implements java.io.Serializable {
     private Set<String> channels;
     private Set<String> output;
 

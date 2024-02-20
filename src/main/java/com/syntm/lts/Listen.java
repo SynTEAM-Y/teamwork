@@ -3,7 +3,7 @@ package com.syntm.lts;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Listen {
+public class Listen implements java.io.Serializable {
     private Set<String> channels;
 
     public Listen(Set<String> channels) {
@@ -11,7 +11,7 @@ public class Listen {
     }
 
     public Listen() {
-        this.channels = new HashSet<String>();
+        this.channels = new HashSet<>();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Listen {
     }
 
     public void setChannels(Set<String> channels) {
-        this.channels = new HashSet<String>(channels);
+        this.channels = new HashSet<>(channels);
     }
 
     @Override

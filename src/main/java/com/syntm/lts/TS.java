@@ -1,8 +1,10 @@
 package com.syntm.lts;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,14 +16,14 @@ import java.util.function.BiFunction;
 import com.syntm.util.Printer;
 import com.syntm.util.StringUtil;
 
-public class TS {
+public class TS implements java.io.Serializable {
     private String name;
     private Set<State> states;
     private State initState;
     private Int Interface;
     private Set<Trans> transitions;
-    private BiFunction<State, Listen, Listen> LS;
-    private BiFunction<State, Label, Label> L;
+    private final transient BiFunction<State, Listen, Listen> LS = State::setListen;
+    private final transient BiFunction<State, Label, Label> L = State::setLabel;
     private Set<TS> agents;
     private Set<TS> parameters;
     private String status;
@@ -32,24 +34,24 @@ public class TS {
         this.initState = initState;
         Interface = interface1;
         this.transitions = transitions;
-        this.agents = new HashSet<TS>();
-        this.parameters = new HashSet<TS>();
-        LS = (s, ls) -> s.setListen(ls);
+        this.agents = new HashSet<>();
+        this.parameters = new HashSet<>();
+        // LS = (s, ls) -> s.setListen(ls);
         this.status = "";
-        L = (s, l) -> s.setLabel(l);
+        // L = (s, l) -> s.setLabel(l);
 
     }
 
     public TS(String name) {
         this.name = name;
-        this.states = new HashSet<State>();
+        this.states = new HashSet<>();
         this.Interface = new Int(new HashSet<>(), new HashSet<>());
         this.initState = new State();
-        this.transitions = new HashSet<Trans>();
-        this.agents = new HashSet<TS>();
-        this.parameters = new HashSet<TS>();
-        LS = (s, ls) -> s.setListen(ls);
-        L = (s, l) -> s.setLabel(l);
+        this.transitions = new HashSet<>();
+        this.agents = new HashSet<>();
+        this.parameters = new HashSet<>();
+        // LS = (s, ls) -> s.setListen(ls);
+        // L = (s, l) -> s.setLabel(l);
         this.status = "";
     }
 
@@ -193,17 +195,17 @@ public class TS {
         return LS;
     }
 
-    public void setLS(BiFunction<State, Listen, Listen> lS) {
-        LS = lS;
-    }
+    // public void setLS(BiFunction<State, Listen, Listen> lS) {
+    //     LS = lS;
+    // }
 
     public BiFunction<State, Label, Label> getL() {
         return L;
     }
 
-    public void setL(BiFunction<State, Label, Label> l) {
-        L = l;
-    }
+    // public void setL(BiFunction<State, Label, Label> l) {
+    //     L = l;
+    // }
 
     public void parse(final String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));

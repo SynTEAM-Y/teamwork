@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-public class State{
+public class State implements java.io.Serializable {
 	private String id;
 	private Label label;
 	private Listen listen;
@@ -18,32 +18,32 @@ public class State{
 		this.id = "";
 		this.label = new Label();
 		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();		
+		this.trans=new HashSet<>();
+		this.comStates=new HashSet<>();		
 	}
 
 	public State(String id) {
 		this.id = id;
 		this.label = new Label();
 		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();		
+		this.trans=new HashSet<>();
+		this.comStates=new HashSet<>();		
 	}
 
 	public State(String id, Label label, Listen listen) {
 		this.id = id;
 		this.label = label;
 		this.listen = listen;
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();
+		this.trans=new HashSet<>();
+		this.comStates=new HashSet<>();
 	}
 
     public State(String id, Label label) {
 		this.id = id;
 		this.label = label;
 		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();
+		this.trans=new HashSet<>();
+		this.comStates=new HashSet<>();
 	}
 
 	public State(String id, Label label, Listen listen, Set<Trans> trans) {
@@ -51,7 +51,7 @@ public class State{
 		this.label = label;
 		this.listen = listen;
 		this.trans=trans;
-		this.comStates=new HashSet<State>();
+		this.comStates=new HashSet<>();
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class State{
 		this.trans.add(tr);
     }
 
-	 public boolean canExactSilent(TS t, State s, String ch) {
+	 public boolean canExactSilent(TS t, State s, String ch) { // O(m)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -189,7 +189,7 @@ public class State{
         return flag;
     }
 
-    public Trans takeExactSilent(TS t, State s, String ch) {
+    public Trans takeExactSilent(TS t, State s, String ch) { // O(m)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
                     && !t.getInterface().getChannels().contains(ch)
@@ -200,7 +200,7 @@ public class State{
         return null;
     }
 
-    public boolean canAnotherSilent(TS t, State s, String ch) {
+    public boolean canAnotherSilent(TS t, State s, String ch) { // O(m)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -215,7 +215,7 @@ public class State{
         return flag;
     }
 
-    public Trans takeAnotherSilent(TS t, State s, String ch) {
+    public Trans takeAnotherSilent(TS t, State s, String ch) { // O(m)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
                     && !t.getInterface().getChannels().contains(ch)
@@ -226,7 +226,7 @@ public class State{
         return null;
     }
 
-    public Set<Trans> weakSilent(TS t, State s, String ch) {
+    public Set<Trans> weakSilent(TS t, State s, String ch) { // O(m)
         Set<Trans> tSet = new HashSet<Trans>();
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {
@@ -242,27 +242,25 @@ public class State{
         return tSet;
     }
 
-    public Set<State> weakBFS(TS ts, State s, String ch) {
+    public Set<State> weakBFS(TS ts, State s, String ch) { // O(mn)
         HashMap<State, Boolean> visited = new HashMap<>();
-        for (State st : ts.getStates()) {
+        for (State st : ts.getStates()) { // O(n)
             visited.put(st, false);
         }
-        LinkedList<State> queue = new LinkedList<State>();
+        LinkedList<State> queue = new LinkedList<>();
         Set<Trans> transitiveC = new HashSet<>();
         Set<State> reach = new HashSet<>();
         visited.put(s, false);
         queue.add(s);
-        while (queue.size() != 0) {
+        while (!queue.isEmpty()) { // O(nm)
             s = queue.poll();
             reach.add(s);
             transitiveC = weakSilent(ts, s, ch);
-            if (transitiveC != null) {
-                if (transitiveC.size() != 0) {
-                    for (Trans tr : transitiveC) {
-                        if (!visited.get(tr.getDestination())) {
-                            visited.put(tr.getDestination(), true);
-                            queue.add(tr.getDestination());
-                        }
+            if (transitiveC != null && !transitiveC.isEmpty()) {
+                for (Trans tr : transitiveC) { // O(m)
+                    if (!visited.get(tr.getDestination())) {
+                        visited.put(tr.getDestination(), true);
+                        queue.add(tr.getDestination());
                     }
                 }
             }

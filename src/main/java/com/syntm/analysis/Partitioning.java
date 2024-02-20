@@ -1,5 +1,6 @@
 package com.syntm.analysis;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,7 +65,16 @@ public class Partitioning {
         // SeqSolver d = new SeqSolver(sMap, this.T, c);
         
         Smolka d = new Smolka(rhoInit, this.T, c);
-        return d.run();
+        d.saveToFile("smolka.d");
+
+        // Split here
+        try {
+            Smolka d2 = Smolka.readFromFile("smolka.d");
+            return d2.run();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {

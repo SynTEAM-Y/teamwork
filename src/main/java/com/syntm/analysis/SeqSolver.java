@@ -24,7 +24,7 @@ public class SeqSolver {
      */
     public SeqSolver(ConcurrentMap<State, Set<Set<State>>> indexedFamily, 
                   TS transSystem, Set<String> channels) {
-        this.epsilonMap = new HashMap<>(indexedFamily);
+        this.epsilonMap = new HashMap<>(indexedFamily); // O(n^2 + mn)
         this.transSystem = transSystem;
         this.channels = channels;
 
@@ -38,17 +38,18 @@ public class SeqSolver {
         // -- Code from Task.java adapted to be sequential -- //
         boolean fixedPoint = false;
 
-        while (!fixedPoint) {
+        // O(c m^2 n^6)?
+        while (!fixedPoint) { // O(n)
             HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
             
-            for (State epsilon : epsilonMap.keySet()) {
+            for (State epsilon : epsilonMap.keySet()) { // O(n)
                 Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
-                for (String ch : channels) {
-                    for (Trans trEpsilon : epsilon.getTrans()) {
+                for (String ch : channels) { // O(c)
+                    for (Trans trEpsilon : epsilon.getTrans()) { // O(m)
                         Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
-                        for (Set<State> ePrime : ePartitions) {
-                            for (Set<State> partition : this.epsilonMap.get(epsilon)) {
-                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon);
+                        for (Set<State> ePrime : ePartitions) { // O(n)
+                            for (Set<State> partition : this.epsilonMap.get(epsilon)) { // O(n), still O(mn^3) in total
+                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon); // O(mn^3)
                                 if (!splitter.isEmpty() && !splitter.equals(partition)) {
                                     Set<Set<State>> splitP;
                                     splitP = split(partition, splitter);
@@ -97,15 +98,15 @@ public class SeqSolver {
      * @param epsilon   A state (our addition)
      * @return          A possible splitter for the block.
      */
-    private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, 
+    private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, // O(mn^3)
                                    Set<State> ePrime, String channel, 
                                    State epsilon) {
         Set<State> out = new HashSet<>();
     
         if (epsilon.enable(epsilon, channel) // activating a channel
                 && trEpsilon.getAction().equals(channel)) {
-            for (State s : p) {
-                for (State sPrime : p) {
+            for (State s : p) { // *O(n) but combines with the partition for loop outside the function
+                for (State sPrime : p) { // *O(n)
 
                     if (s.canExactSilent(s.getOwner(), s, channel)
                             && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
@@ -148,10 +149,10 @@ public class SeqSolver {
                                 out.add(sPrime);
                             }
                         } else {
-                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel);
-                            if (reach.size() != 1) {
-                                for (State sReach : reach) {
-                                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel); // O(mn)
+                            if (reach.size() != 1) { // O(mn)
+                                for (State sReach : reach) { // O(n)
+                                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) { // O(m)
                                         if (ePrime
                                                 .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
                                                         channel).getDestination())

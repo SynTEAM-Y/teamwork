@@ -1,6 +1,6 @@
 package com.syntm.lts;
 
-public class Trans implements Comparable<Trans> {
+public class Trans implements Comparable<Trans>, java.io.Serializable {
     public State source;
     public String action;
     public State destination;

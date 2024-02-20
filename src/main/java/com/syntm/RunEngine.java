@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.Int;
@@ -24,7 +23,7 @@ public class RunEngine {
 	private TS mainTS;
 
 	public static void main(final String[] args)
-			throws IOException, InterruptedException, ExecutionException, TimeoutException {
+			throws IOException, InterruptedException, ExecutionException {
 		RunEngine parse = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Spec spec = new Spec();
@@ -48,8 +47,7 @@ public class RunEngine {
 		proc.waitFor();
 
 		Mealy m = new Mealy("");
-		m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());		
-		
+		m.kissToMealy("Mealy", spec.getcCode(), spec.getoCode());
 		m.toDot(m, m.getName());
 		if (m.getStatus().equals("REALIZABLE")) {
 			TS ts = m.toTS(m, m.getName());
@@ -57,6 +55,7 @@ public class RunEngine {
 				System.out.println(
                             "\n\n Specification is REALIZABLE for a multi-agent\n\n You will get a distributed Implementation :)\n\n");
 				parse.processInput(ts, spec);
+				
 			}
 			else
 			{
@@ -74,7 +73,7 @@ public class RunEngine {
 			ts.initialDecomposition(ts.getName() + rand.nextInt(10), aInt.getChannels(), aInt.getOutput());
 		}
 
-		Set<TS> sTS = new HashSet<TS>();
+		Set<TS> sTS = new HashSet<>();
 
 		for (TS pa : ts.getParameters()) {
 			Partitioning lp = new Partitioning(pa, ts.getAgentById(pa.getName()));

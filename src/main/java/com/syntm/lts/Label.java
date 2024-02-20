@@ -3,7 +3,7 @@ package com.syntm.lts;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Label {
+public class Label implements java.io.Serializable {
     private Set<String> channel;
     private Set<String> output;
 
@@ -13,8 +13,8 @@ public class Label {
     }
 
     public Label() {
-        channel = new HashSet<String>();
-        output = new HashSet<String>();
+        channel = new HashSet<>();
+        output = new HashSet<>();
     }
 
     public Set<String> getChannel() {
