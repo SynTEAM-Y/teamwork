@@ -51,10 +51,10 @@ public class Partitioning {
         }
         Set<Set<State>> rhoInit = new HashSet<>();
         rhoInit.addAll(rho);
-        // for (State epsilon : this.parameter.getStates()) {
-        //     sMap.put(epsilon, rhoInit);
+        for (State epsilon : this.parameter.getStates()) {
+            sMap.put(epsilon, rhoInit);
 
-        // }
+        }
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.parameter.getInterface().getChannels());
 
@@ -63,18 +63,20 @@ public class Partitioning {
 
         // ESolver d = new ESolver(sMap, this.T, c);
         // SeqSolver d = new SeqSolver(sMap, this.T, c);
+        // return d.run();
         
-        Smolka d = new Smolka(rhoInit, this.T, c);
-        d.saveToFile("smolka.d");
+        Smolka d = new Smolka(sMap, this.T, c);
+        return d.run();
+        // d.saveToFile("smolka.d");
 
-        // Split here
-        try {
-            Smolka d2 = Smolka.readFromFile("smolka.d");
-            return d2.run();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        // // Split here
+        // try {
+        //     Smolka d2 = Smolka.readFromFile("smolka.d");
+        //     return d2.run();
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        //     return null;
+        // }
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {

@@ -3,6 +3,7 @@ package com.syntm.lts;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 public class State implements java.io.Serializable {
@@ -12,7 +13,7 @@ public class State implements java.io.Serializable {
 	private Set<Trans> trans;
 	private Set<State> comStates;
 	private TS owner;
-    private int blockId;
+    public Map<State, Integer> blockId;
 
 	public State() {
 		this.id = "";
@@ -20,38 +21,43 @@ public class State implements java.io.Serializable {
 		this.listen = new Listen();
 		this.trans=new HashSet<>();
 		this.comStates=new HashSet<>();		
+        this.blockId = new HashMap<>();
 	}
-
+    
 	public State(String id) {
-		this.id = id;
+        this.id = id;
 		this.label = new Label();
 		this.listen = new Listen();
 		this.trans=new HashSet<>();
 		this.comStates=new HashSet<>();		
+        this.blockId = new HashMap<>();
 	}
-
+    
 	public State(String id, Label label, Listen listen) {
-		this.id = id;
+        this.id = id;
 		this.label = label;
 		this.listen = listen;
 		this.trans=new HashSet<>();
 		this.comStates=new HashSet<>();
+        this.blockId = new HashMap<>();
 	}
-
+    
     public State(String id, Label label) {
-		this.id = id;
+        this.id = id;
 		this.label = label;
 		this.listen = new Listen();
 		this.trans=new HashSet<>();
 		this.comStates=new HashSet<>();
+        this.blockId = new HashMap<>();
 	}
-
+    
 	public State(String id, Label label, Listen listen, Set<Trans> trans) {
-		this.id = id;
+        this.id = id;
 		this.label = label;
 		this.listen = listen;
 		this.trans=trans;
 		this.comStates=new HashSet<>();
+        this.blockId = new HashMap<>();
 	}
 
 	@Override
@@ -100,81 +106,147 @@ public class State implements java.io.Serializable {
 
 	@Override
 	public String toString() {
-		return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
+		return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ") -->" + blockId + "<--";
 	}
 
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public String getId() {
 		return id;
 	}
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public Label getLabel() {
 		return label;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param label
+     * @return
+     */
 	public Label setLabel(Label label) {
 		this.label = label;
 		return label;
 	}
 
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public Listen getListen() {
 		return listen;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param listen
+     * @return
+     */
 	public Listen setListen(Listen listen) {
 		this.listen = listen;
 		return listen;
 	}
 	
-
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public Set<Trans> getTrans() {
 		return trans;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param trans
+     */
 	public void setTrans(Set<Trans> trans) {
 		this.trans = trans;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param id
+     */
 	public void setId(String id) {
 		this.id = id;
 	}
 
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public Set<State> getComStates() {
 		return comStates;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param comStates
+     */
 	public void setComStates(Set<State> comStates) {
 		this.comStates = comStates;
 	}
 
+    /**
+     * Complexity O(1)
+     * @return
+     */
 	public TS getOwner() {
 		return owner;
 	}
 
+    /**
+     * Complexity O(1)
+     * @param owner
+     */
 	public void setOwner(TS owner) {
 		this.owner = owner;
 	}
 
     /**
+     * Complexity O(1)
+     * @param s The state mapped to the partition.
      * @return The id of the block containing the state in the partition.
      */
-    public int getBlockId() {
-        return this.blockId;
+    public int getBlockId(State s) {
+        System.out.println(this.blockId);
+        return this.blockId.get(s);
     }
 
     /**
-     * Sets a new block id
+     * Sets a new block id <p>
+     * Complexity O(1)
+     * @param s The state mapped to the partition.
      * @param id A new id of the block containing the state in the partition.
      */
-    public void setBlockId(int id) {
-        this.blockId = id;
+    public void setBlockId(State s, int id) {
+        this.blockId.put(s, id);
     }
 
+    /**
+     * Complexity O(1)
+     * @param tr
+     * @param ts
+     */
     public void addTrans(Trans tr, TS ts) {
 		tr.getSource().setOwner(ts);
 		tr.getDestination().setOwner(ts);
 		this.trans.add(tr);
     }
 
-	 public boolean canExactSilent(TS t, State s, String ch) { // O(m)
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
+    public boolean canExactSilent(TS t, State s, String ch) { // O(m)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -189,6 +261,13 @@ public class State implements java.io.Serializable {
         return flag;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public Trans takeExactSilent(TS t, State s, String ch) { // O(m)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
@@ -200,6 +279,13 @@ public class State implements java.io.Serializable {
         return null;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public boolean canAnotherSilent(TS t, State s, String ch) { // O(m)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
@@ -215,6 +301,13 @@ public class State implements java.io.Serializable {
         return flag;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public Trans takeAnotherSilent(TS t, State s, String ch) { // O(m)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
@@ -226,8 +319,15 @@ public class State implements java.io.Serializable {
         return null;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public Set<Trans> weakSilent(TS t, State s, String ch) { // O(m)
-        Set<Trans> tSet = new HashSet<Trans>();
+        Set<Trans> tSet = new HashSet<>();
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {
                 return null;
@@ -242,7 +342,15 @@ public class State implements java.io.Serializable {
         return tSet;
     }
 
-    public Set<State> weakBFS(TS ts, State s, String ch) { // O(mn)
+    /**
+     * Breadth first search 
+     * <p> Complexity O(m + n)
+     * @param ts
+     * @param s
+     * @param ch
+     * @return
+     */
+    public Set<State> weakBFS(TS ts, State s, String ch) { // O(m+n)
         HashMap<State, Boolean> visited = new HashMap<>();
         for (State st : ts.getStates()) { // O(n)
             visited.put(st, false);
@@ -252,10 +360,10 @@ public class State implements java.io.Serializable {
         Set<State> reach = new HashSet<>();
         visited.put(s, false);
         queue.add(s);
-        while (!queue.isEmpty()) { // O(nm)
+        while (!queue.isEmpty()) { // O(n+m)
             s = queue.poll();
             reach.add(s);
-            transitiveC = weakSilent(ts, s, ch);
+            transitiveC = weakSilent(ts, s, ch); // O(m)
             if (transitiveC != null && !transitiveC.isEmpty()) {
                 for (Trans tr : transitiveC) { // O(m)
                     if (!visited.get(tr.getDestination())) {
@@ -268,6 +376,13 @@ public class State implements java.io.Serializable {
         return reach;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public boolean canDirectReaction(TS t, State s, String ch) {
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
@@ -283,6 +398,13 @@ public class State implements java.io.Serializable {
         return flag;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public Trans takeDirectReaction(TS t, State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (!tr.getDestination().getLabel().equals(s.getLabel())
@@ -294,6 +416,13 @@ public class State implements java.io.Serializable {
         return null;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public boolean canTakeInitiative(TS t, State s, String ch) {
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
@@ -307,6 +436,13 @@ public class State implements java.io.Serializable {
         return false;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param t
+     * @param s
+     * @param ch
+     * @return
+     */
     public Trans takeInitiative(TS t, State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (t.getInterface().getChannels().contains(ch)
@@ -317,6 +453,12 @@ public class State implements java.io.Serializable {
         return null;
     }
 
+    /**
+     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * @param s
+     * @param ch
+     * @return
+     */
     public Boolean enable(State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {

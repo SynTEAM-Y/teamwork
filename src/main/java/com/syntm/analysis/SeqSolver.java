@@ -50,6 +50,7 @@ public class SeqSolver {
                         for (Set<State> ePrime : ePartitions) { // O(n)
                             for (Set<State> partition : this.epsilonMap.get(epsilon)) { // O(n), still O(mn^3) in total
                                 Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon); // O(mn^3)
+                                System.out.println("Splitter size: " + splitter.size());
                                 if (!splitter.isEmpty() && !splitter.equals(partition)) {
                                     Set<Set<State>> splitP;
                                     splitP = split(partition, splitter);
