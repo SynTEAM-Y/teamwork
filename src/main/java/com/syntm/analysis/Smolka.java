@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -18,6 +19,8 @@ import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
+
+import ch.qos.logback.core.util.SystemInfo;
 
 /**
  * An object for reducing a transition system using the Kanellakis-Smolka
@@ -53,7 +56,7 @@ public class Smolka implements java.io.Serializable {
                   //Set<State> parameterStates, Set<Set<State>> initPartition,
             TS transSystem, Set<String> channels) {
         // this.initPartition = initPartition;
-        this.epsilonMap = epsilonMap;
+        this.epsilonMap = new HashMap<>(epsilonMap);
         // this.parameterStates = parameterStates;
         // this.lastId = new HashMap<>();
         // for (State s : parameterStates) {
@@ -82,47 +85,46 @@ public class Smolka implements java.io.Serializable {
      * 
      * @return The reduced transition system.
      */
-    public TS run() { // O(m+n) space // O(cmn^4) with applyBisim
+    public TS run() {
         Map<State, Queue<Set<State>>> piWaiting = new HashMap<>();
-        // for (State st : epsilonMap.keySet()) {
-        //     piWaiting.put(st, new LinkedList<>(this.initPartition));
-        // }
-        Map<State, Set<Set<State>>> piBlocks = new HashMap<>(); // HashSet<>(this.epsilonMap.values().iterator().next());
+        Map<State, Set<Set<State>>> piBlocks = new HashMap<>(); 
         for (Entry<State, Set<Set<State>>> entry : this.epsilonMap.entrySet()) {
             piWaiting.put(entry.getKey(), new LinkedList<>(entry.getValue()));
             piBlocks.put(entry.getKey(), new HashSet<>(entry.getValue()));
         }
-        
-        
-        while (!piWaiting.values().stream().allMatch(s -> s.isEmpty())) { // Max n -> O(cmn^5 + cm^2n^4)
-            System.out.println(piWaiting.values().stream().map(s -> s.size()).toList().toString());
-            for (State epsilon : this.epsilonMap.keySet()) { // O(cmn^4 + cm^2n^3)
 
-                Set<State> block = piWaiting.get(epsilon).remove();
-                for (String channel : this.channels) { // O(cmn^3 + cm^2n^2)
-                    for (Trans tr : epsilon.getTrans()) { // (mn^3 + m^2n^2)
+        while (!piWaiting.values().stream().allMatch(s -> s.isEmpty())) {
+            for (State epsilon : this.epsilonMap.keySet()) {
+                Set<Set<State>> piWaitingTemp = new HashSet<>();
+                Set<Set<State>> blocks = new HashSet<>();                
+                while(!piWaiting.get(epsilon).isEmpty()){
+                    Set<State> tempBlock;
+                    tempBlock = piWaiting.get(epsilon).remove();
+                    blocks.add(tempBlock);
+                }
+                
+                for (String channel : this.channels) { 
+                    for (Trans tr : epsilon.getTrans()) {
                         Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(tr.getDestination()));
                         for (Set<State> ePrime : ePartitions) {
-                            Set<State> splitter = applyEBisim(block, epsilon, ePrime, tr, channel); // O(n^3 + mn^2)
-                            // System.out.println("Splitter size: " + splitter.size());
-                            // Set<Set<State>> splitP = smolkaSplit(epsilon, splitter, channel); // O(m)
-                            Set<Set<State>> splitP = split(block, splitter); // O(m)
-    
-                            if (splitP.size() > 1) {
-                                for (Set<State> b : splitP) {
-                                    if (!piWaiting.get(epsilon).contains(b)) {
-                                        piWaiting.get(epsilon).add(b);
-                                    }
+                            for (Set<State> block : blocks){
+                                Set<State> splitter = applyEBisim(block, tr,ePrime, channel,epsilon);
+
+                                if (!splitter.isEmpty() && !splitter.equals(block)) {                                    
+                                    List<Set<State>> splitP; 
+                                    splitP = split(block, splitter);
+                                    piBlocks.get(epsilon).remove(block);
+                                    piBlocks.get(epsilon).addAll(splitP);
+                                    piWaitingTemp.addAll(splitP);
                                 }
-                                // Replace the block with its subpartition.
-                                piBlocks.get(epsilon).remove(block);
-                                piBlocks.get(epsilon).addAll(splitP);
-                            }
+                            }     
                         }
                     }
                 }
+                if(!piWaiting.isEmpty()){
+                    piWaiting.get(epsilon).addAll(piWaitingTemp);
+                }
             }
-
             for (Entry<State, Set<Set<State>>> entry : piBlocks.entrySet()) {
                 this.epsilonMap.put(entry.getKey(), entry.getValue());
             }
@@ -190,13 +192,15 @@ public class Smolka implements java.io.Serializable {
         return output;
     }
 
-    private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
-        Set<Set<State>> splitP = new HashSet<>();
+    private List<Set<State>> split(Set<State> p, Set<State> splitter) {
+        List<Set<State>> splitP = new LinkedList<>();
         Set<State> notsplitter = new HashSet<>(p);
 
-        notsplitter.removeAll(splitter); // O(n) confirmed by the internet
+        notsplitter.removeAll(splitter);
+        //System.out.println(splitter.size() + "," + notsplitter.size());
+
         splitP.add(splitter);
-        splitP.add(notsplitter);
+        if (!notsplitter.isEmpty()) splitP.add(notsplitter);
 
         return splitP;
     }
@@ -242,37 +246,28 @@ public class Smolka implements java.io.Serializable {
      * @param channel   A channel name
      * @return          A possible splitter for the block.
      */
-    private Set<State> applyEBisim(Set<State> p, State epsilon, Set<State> ePrime, // O(mn^3)
-                                   Trans trEpsilon, String channel) {
+    private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, // O(mn^3)
+                                   Set<State> ePrime, String channel, 
+                                   State epsilon) {
         Set<State> out = new HashSet<>();
-        // State ePrime = trEpsilon.getDestination();
-        // int ePrimeID = ePrime.getBlockId(ePrime);
     
-        if (epsilon.enable(epsilon, channel) // CAN activate a channel
+        if (epsilon.enable(epsilon, channel) // activating a channel
                 && trEpsilon.getAction().equals(channel)) {
             for (State s : p) { // *O(n) but combines with the partition for loop outside the function
                 for (State sPrime : p) { // *O(n)
 
-                    // This is (3c)
                     if (s.canExactSilent(s.getOwner(), s, channel)
                             && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
                         if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
                             if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                                channel).getDestination())
-                            // if (ePrimeID == s.takeExactSilent(s.getOwner(), s,
-                                    // channel).getDestination().getBlockId(ePrime)
+                                    channel).getDestination())
                                     && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime,
                                             channel).getDestination())) {
-                                    // && ePrimeID == sPrime.takeExactSilent(sPrime.getOwner(), sPrime,
-                                    //         channel).getDestination().getBlockId(ePrime)) {
                                 out.add(s);
                                 out.add(sPrime);
                             }
                         } else {
                             if (!sPrime.getListen().getChannels().contains(channel)) {
-                                // if (ePrimeID == s.takeExactSilent(s.getOwner(), s,
-                                //         channel).getDestination().getBlockId(ePrime)
-                                //         && ePrimeID == sPrime.getBlockId(ePrime)) {
                                 if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
                                         channel).getDestination())
                                         && ePrime.contains(sPrime)) {
@@ -283,37 +278,34 @@ public class Smolka implements java.io.Serializable {
                         }
                     }
 
-                    // This is (3b)
                     if (!s.getListen().getChannels().contains(channel) &&
                             !sPrime.getListen().getChannels().contains(channel)) {
-                        // if (ePrimeID == s.getBlockId(ePrime) && ePrimeID == sPrime.getBlockId(ePrime)) {
                         if (ePrime.contains(s) && ePrime.contains(sPrime)) {
                             out.add(s);
                             out.add(sPrime);
                         }
                     }
-                    
-                    // This is (3d)
+
                     if (s.canDirectReaction(s.getOwner(), s, channel)
                             && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
                         if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-                            // if (ePrimeID == s.takeDirectReaction(s.getOwner(), s, channel).getDestination().getBlockId(ePrime)
-                            //         && ePrimeID == sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel)
-                            //                         .getDestination().getBlockId(ePrime)) {
                             if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
-                                    && ePrime.contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel)
+                                    && ePrime
+                                            .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel)
                                                     .getDestination())) {
                                 out.add(s);
                                 out.add(sPrime);
                             }
                         } else {
-                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel); // O(m+n)
+                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel); // O(mn)
                             if (reach.size() != 1) { // O(mn)
                                 for (State sReach : reach) { // O(n)
                                     if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) { // O(m)
-                                        if (ePrime.contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
+                                        if (ePrime
+                                                .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
                                                         channel).getDestination())
-                                                && ePrime.contains( s.takeDirectReaction(s.getOwner(), s,
+                                                &&
+                                                ePrime.contains(s.takeDirectReaction(s.getOwner(), s,
                                                         channel).getDestination())) {
                                             out.add(s);
                                             out.add(sPrime);
@@ -325,23 +317,19 @@ public class Smolka implements java.io.Serializable {
                     }
                 }
             }
-
-            // Case 3a
-            if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
-                && epsilon.getListen().getChannels().contains(channel)) {
-                for (State s : p) {
-                    if (s.canTakeInitiative(s.getOwner(), s, channel)) {
-                        if (ePrime.contains( s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
-                            out.add(s);
-                        }
+        }
+    
+        if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
+            && epsilon.getListen().getChannels().contains(channel)) {
+            for (State s : p) {
+                if (s.canTakeInitiative(s.getOwner(), s, channel)) {
+                    if (ePrime.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
+                        out.add(s);
                     }
                 }
             }
         }
-
     
-        // Case 2
-        // Map<State, Set<Set<State>>> epsilonMap = new  ConcurrentHashMap<>(); // defined outside the method
         if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
             for (Set<State> partition : epsilonMap.get(epsilon)) {
                 for (State s : p) {
