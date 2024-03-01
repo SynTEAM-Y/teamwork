@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Script for running an example LTL without having to go to another repo
 # Valgrind is necessary to run the memory checks
 

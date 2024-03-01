@@ -214,7 +214,6 @@ public class State implements java.io.Serializable {
      * @return The id of the block containing the state in the partition.
      */
     public int getBlockId(State s) {
-        System.out.println(this.blockId);
         return this.blockId.get(s);
     }
 
@@ -240,13 +239,13 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
      * @return
      */
-    public boolean canExactSilent(TS t, State s, String ch) { // O(m)
+    public boolean canExactSilent(TS t, State s, String ch) { // O(c)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -262,13 +261,13 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
      * @return
      */
-    public Trans takeExactSilent(TS t, State s, String ch) { // O(m)
+    public Trans takeExactSilent(TS t, State s, String ch) { // O(c)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
                     && !t.getInterface().getChannels().contains(ch)
@@ -280,13 +279,13 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
      * @return
      */
-    public boolean canAnotherSilent(TS t, State s, String ch) { // O(m)
+    public boolean canAnotherSilent(TS t, State s, String ch) { // O(c)
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -302,13 +301,13 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
      * @return
      */
-    public Trans takeAnotherSilent(TS t, State s, String ch) { // O(m)
+    public Trans takeAnotherSilent(TS t, State s, String ch) { // O(c)
         for (Trans tr : s.getTrans()) {
             if (tr.getDestination().getLabel().equals(s.getLabel())
                     && !t.getInterface().getChannels().contains(ch)
@@ -320,13 +319,13 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
      * @return
      */
-    public Set<Trans> weakSilent(TS t, State s, String ch) { // O(m)
+    public Set<Trans> weakSilent(TS t, State s, String ch) { // O(c)
         Set<Trans> tSet = new HashSet<>();
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {
@@ -339,7 +338,7 @@ public class State implements java.io.Serializable {
             }
 
         }
-        return tSet;
+        return tSet; // Max size O(c)
     }
 
     /**
@@ -360,12 +359,12 @@ public class State implements java.io.Serializable {
         Set<State> reach = new HashSet<>();
         visited.put(s, false);
         queue.add(s);
-        while (!queue.isEmpty()) { // O(n+m)
+        while (!queue.isEmpty()) { // O(n+m) because logic
             s = queue.poll();
             reach.add(s);
-            transitiveC = weakSilent(ts, s, ch); // O(m)
+            transitiveC = weakSilent(ts, s, ch); // O(c)
             if (transitiveC != null && !transitiveC.isEmpty()) {
-                for (Trans tr : transitiveC) { // O(m)
+                for (Trans tr : transitiveC) { // O(c)
                     if (!visited.get(tr.getDestination())) {
                         visited.put(tr.getDestination(), true);
                         queue.add(tr.getDestination());
@@ -377,7 +376,7 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m) because a transition is never checked twice
      * @param t
      * @param s
      * @param ch
@@ -399,7 +398,7 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m)
      * @param t
      * @param s
      * @param ch
@@ -417,7 +416,7 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m+n)
      * @param t
      * @param s
      * @param ch
@@ -437,7 +436,7 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m+n)
      * @param t
      * @param s
      * @param ch
@@ -454,12 +453,12 @@ public class State implements java.io.Serializable {
     }
 
     /**
-     * Complexity O(m), combined with an outer <code>for every state</code> becomes O(m+n)
+     * Complexity O(c), combined with an outer <code>for every state</code> becomes O(m+n)
      * @param s
      * @param ch
      * @return
      */
-    public Boolean enable(State s, String ch) {
+    public boolean enable(State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (tr.getAction().equals(ch)) {
                 return true;

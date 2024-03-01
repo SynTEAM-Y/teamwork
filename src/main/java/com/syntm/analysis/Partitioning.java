@@ -62,10 +62,10 @@ public class Partitioning {
         // return d.run();
 
         // ESolver d = new ESolver(sMap, this.T, c);
-        // SeqSolver d = new SeqSolver(sMap, this.T, c);
+        SeqSolver d = new SeqSolver(sMap, this.T, c);
         // return d.run();
         
-        Smolka d = new Smolka(sMap, this.T, c);
+        // Smolka d = new Smolka(sMap, this.T, c);
         return d.run();
         // d.saveToFile("smolka.d");
 

@@ -17,6 +17,7 @@ public class SeqSolver {
 
     /**
      * A sequential version of the parallel algorithm in ESolver.java
+     * <p> Time complexity O(c^2 * m * n^4)
      * @param indexedFamily A concurrent hashmap with an initial partition mapped to each state.
      * @param transSystem   The transition system to be reduced.
      * @param channels      A set of the available channels.
@@ -24,7 +25,7 @@ public class SeqSolver {
      */
     public SeqSolver(ConcurrentMap<State, Set<Set<State>>> indexedFamily, 
                   TS transSystem, Set<String> channels) {
-        this.epsilonMap = new HashMap<>(indexedFamily); // O(n^2 + mn)
+        this.epsilonMap = new HashMap<>(indexedFamily); // O(n^2 + mn) space
         this.transSystem = transSystem;
         this.channels = channels;
 
@@ -38,22 +39,21 @@ public class SeqSolver {
         // -- Code from Task.java adapted to be sequential -- //
         boolean fixedPoint = false;
 
-        // O(c m^2 n^6)?
-        while (!fixedPoint) { // O(n)
+        // O(c^2 m n^4)?
+        while (!fixedPoint) { // O(c^2mn^4)
             HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
             
-            for (State epsilon : epsilonMap.keySet()) { // O(n)
+            for (State epsilon : epsilonMap.keySet()) { // O(c^2mn^3)
                 Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
-                for (String ch : channels) { // O(c)
-                    for (Trans trEpsilon : epsilon.getTrans()) { // O(m)
+                for (String ch : channels) { // O(c^2mn^2)
+                    for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
                         Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
-                        for (Set<State> ePrime : ePartitions) { // O(n)
-                            for (Set<State> partition : this.epsilonMap.get(epsilon)) { // O(n), still O(mn^3) in total
-                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon); // O(mn^3)
-                                System.out.println("Splitter size: " + splitter.size());
+                        for (Set<State> ePrime : ePartitions) { // O(mn^2)
+                            for (Set<State> partition : this.epsilonMap.get(epsilon)) { // O(n), still O(mn) in total
+                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon); // O(mn)
                                 if (!splitter.isEmpty() && !splitter.equals(partition)) {
                                     Set<Set<State>> splitP;
-                                    splitP = split(partition, splitter);
+                                    splitP = split(partition, splitter); // O(n)
                                     rhoTemp.remove(partition);
                                     rhoTemp.addAll(splitP);
                                 }
@@ -92,6 +92,7 @@ public class SeqSolver {
 
     /**
      * Def 5.4 in the paper
+     * <p> Complexity O(mn)
      * @param p         The starting block
      * @param trEpsilon A transition (from p to ePrime)
      * @param ePrime    The block where the transition ends up.
@@ -99,19 +100,19 @@ public class SeqSolver {
      * @param epsilon   A state (our addition)
      * @return          A possible splitter for the block.
      */
-    private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, // O(mn^3)
+    private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, // O(c+mn)=O(mn) or O(cn+mn+n^2)=O(mn)
                                    Set<State> ePrime, String channel, 
                                    State epsilon) {
         Set<State> out = new HashSet<>();
     
-        if (epsilon.enable(epsilon, channel) // activating a channel
+        if (epsilon.enable(epsilon, channel) // activating a channel, adds O(c)
                 && trEpsilon.getAction().equals(channel)) {
-            for (State s : p) { // *O(n) but combines with the partition for loop outside the function
-                for (State sPrime : p) { // *O(n)
+            for (State s : p) { // *O(mn) or O(cn + n*max(c, m+n)) = O(max(cn, cn+mn+n^2))=O(cn+mn+n^2)=O(mn+n^2)=O(mn) but combines with the partition for loop outside the function
+                for (State sPrime : p) { // O(c + max(c, m+n)), c+m+n <= 3m -> O(m)
 
-                    if (s.canExactSilent(s.getOwner(), s, channel)
+                    if (s.canExactSilent(s.getOwner(), s, channel) // O(c)
                             && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-                        if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
+                        if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) { // O(c)
                             if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
                                     channel).getDestination())
                                     && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime,
@@ -119,7 +120,7 @@ public class SeqSolver {
                                 out.add(s);
                                 out.add(sPrime);
                             }
-                        } else {
+                        } else { // O(c)
                             if (!sPrime.getListen().getChannels().contains(channel)) {
                                 if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
                                         channel).getDestination())
@@ -131,7 +132,7 @@ public class SeqSolver {
                         }
                     }
 
-                    if (!s.getListen().getChannels().contains(channel) &&
+                    if (!s.getListen().getChannels().contains(channel) && // O(1)
                             !sPrime.getListen().getChannels().contains(channel)) {
                         if (ePrime.contains(s) && ePrime.contains(sPrime)) {
                             out.add(s);
@@ -139,9 +140,9 @@ public class SeqSolver {
                         }
                     }
 
-                    if (s.canDirectReaction(s.getOwner(), s, channel)
+                    if (s.canDirectReaction(s.getOwner(), s, channel) // O(m+n) -- it is O(max(c, m+n)) = O(m+n) because c<=m
                             && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
-                        if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
+                        if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) { // O(c)
                             if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
                                     && ePrime
                                             .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel)
@@ -149,11 +150,11 @@ public class SeqSolver {
                                 out.add(s);
                                 out.add(sPrime);
                             }
-                        } else {
-                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel); // O(mn)
-                            if (reach.size() != 1) { // O(mn)
-                                for (State sReach : reach) { // O(n)
-                                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) { // O(m)
+                        } else {  // O(m+n)
+                            Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel); // O(m+n)
+                            if (reach.size() != 1) { // O(m)
+                                for (State sReach : reach) { // O(m) It should be O(cn) but it's bounded by the number of transitions. It never checks a transition twice so it becomes O(m).
+                                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) { // O(c)
                                         if (ePrime
                                                 .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
                                                         channel).getDestination())
@@ -172,9 +173,9 @@ public class SeqSolver {
             }
         }
     
-        if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
+        if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel) // O(cn)
             && epsilon.getListen().getChannels().contains(channel)) {
-            for (State s : p) {
+            for (State s : p) { // O(cn)
                 if (s.canTakeInitiative(s.getOwner(), s, channel)) {
                     if (ePrime.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
                         out.add(s);
@@ -182,10 +183,10 @@ public class SeqSolver {
                 }
             }
         }
-    
-        if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
-            for (Set<State> partition : epsilonMap.get(epsilon)) {
-                for (State s : p) {
+
+        if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) { // O(cn)
+            for (Set<State> partition : epsilonMap.get(epsilon)) { // Still O(cn)
+                for (State s : p) { // O(cn)
                     if (s.canTakeInitiative(s.getOwner(), s, channel)) {
                         if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
                             out.add(s);
@@ -199,9 +200,10 @@ public class SeqSolver {
 
         return out;
     }
-    
+
     /**
      * A splitter function
+     * <p> Time complexity O(n)
      * @param p         The block to split
      * @param splitter  The block to split with
      * @return          The resulting blocks

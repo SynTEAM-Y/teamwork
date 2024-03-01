@@ -16,7 +16,7 @@ public class Task implements Callable<Set<Set<State>>> {
   Set<String> channels;
   ConcurrentHashMap<State, Set<Set<State>>> lMap;
 
-  Task(String e, Set<Set<State>> rhoSet, ConcurrentMap<State, Set<Set<State>>> eMap, // O(m + n)
+  Task(String e, Set<Set<State>> rhoSet, ConcurrentMap<State, Set<Set<State>>> eMap, // O(c + n)
       Set<String> channels) {
     this.channels = new HashSet<>(channels);
     for (State state : eMap.keySet()) { // O(n)
@@ -29,22 +29,22 @@ public class Task implements Callable<Set<Set<State>>> {
 
     this.rhoTemp = new HashSet<>(rhoSet);
     this.lMap = new ConcurrentHashMap<>();
-    for (Trans tr_e : epsilon.getTrans()) { // O(m)
+    for (Trans tr_e : epsilon.getTrans()) { // O(c)
       Set<Set<State>> rho = new HashSet<>(eMap.get(tr_e.getDestination()));
       this.lMap.put(tr_e.getDestination(), rho);
     }
 
   }
 
-  // Complexity O(cmn^4 + cm^2n^3)
+  // Complexity O(c^2mn^2)
   @Override
   public Set<Set<State>> call() throws Exception {
-    for (String ch : channels) { // O(cmn^4 + cm^2n^3)
-      for (Trans trEpsilon : epsilon.getTrans()) { // O(mn^4 + m^2n^3)
+    for (String ch : channels) { // O(c^2mn^2)
+      for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
         Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
-        for (Set<State> ePrime : ePartitions) { // O(n^4 + mn^3)
-          for (Set<State> partition : this.rhoEpsilon) { // O(n^3 + mn^2)
-            Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
+        for (Set<State> ePrime : ePartitions) { // O(mn^2)
+          for (Set<State> partition : this.rhoEpsilon) { // O(mn)
+            Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch); // O(mn)
             if (!splitter.isEmpty() && !splitter.equals(partition)) {
               Set<Set<State>> splitP; // = new HashSet<>();
               splitP = split(partition, splitter); // O(n) confirmed
@@ -83,7 +83,7 @@ public class Task implements Callable<Set<Set<State>>> {
   }
 
   /**
-   * Complexity O(n^3 + mn^2) but can be combined with an outer
+   * Complexity O(mn^2) but can be combined with an outer
    * <code>for each block in partition</code> to not add another O(n)
    * 
    * @param p
@@ -98,7 +98,7 @@ public class Task implements Callable<Set<Set<State>>> {
     if (epsilon.enable(epsilon, channel)
         && trEpsilon.getAction().equals(channel)) {
       for (State s : p) { // Does not add any complexity because of the outer loop
-        for (State sPrime : p) { // O(n^2 + mn)
+        for (State sPrime : p) { // O(n^2 + mn) -> O(mn) because m >= n
           // O(m+n)
 
           // 3c

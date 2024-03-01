@@ -47,7 +47,7 @@ public class ESolver {
   }
 
   /**
-   * Complexity O(n^2 + cmn^4 + cm^2n^3) perhaps?
+   * Complexity O(n^2 + cmn^4 + cm^2n^3) perhaps? no
    * @return
    */
   public TS run() {
@@ -58,7 +58,7 @@ public class ESolver {
       // Execute all tasks and get reference to Future objects
       List<Future<Set<Set<State>>>> resultList = null;
       try {
-        resultList = service.invokeAll(wList); // <---- does the things (in parallel)
+        resultList = service.invokeAll(wList); // <---- does the things (in parallel), O(c^2mn^2) per task
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -75,7 +75,7 @@ public class ESolver {
 
     Set<Set<State>> rhoFinal = new HashSet<>();
     String id = ts.getInitState().getId();
-    for (State s : eMap.keySet()) {
+    for (State s : eMap.keySet()) { // O(n)
       if (s.getId().equals(id)) {
         rhoFinal = new HashSet<>(eMap.get(s));
       }
