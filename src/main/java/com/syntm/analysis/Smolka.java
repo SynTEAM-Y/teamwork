@@ -13,14 +13,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
-
-import ch.qos.logback.core.util.SystemInfo;
 
 /**
  * An object for reducing a transition system using the Kanellakis-Smolka
@@ -34,10 +30,7 @@ import ch.qos.logback.core.util.SystemInfo;
  */
 public class Smolka implements java.io.Serializable {
     private Set<String> channels;
-    // private Set<Set<State>> initPartition;
     private TS transSystem;
-    // private Map<State, Integer> lastId;
-    // private Set<State> parameterStates;
     private Map<State, Set<Set<State>>> epsilonMap;
 
     /**
@@ -53,22 +46,8 @@ public class Smolka implements java.io.Serializable {
      *         system using the Kannelakis-Smolka algorithm.
      */
     public Smolka(Map<State, Set<Set<State>>> epsilonMap, 
-                  //Set<State> parameterStates, Set<Set<State>> initPartition,
             TS transSystem, Set<String> channels) {
-        // this.initPartition = initPartition;
         this.epsilonMap = new HashMap<>(epsilonMap);
-        // this.parameterStates = parameterStates;
-        // this.lastId = new HashMap<>();
-        // for (State s : parameterStates) {
-        //     this.lastId.put(s, 0);
-        //     for (Set<State> b : this.initPartition) {
-        //         for (State t : b) { // Becomes O(n^2)
-        //             t.setBlockId(s, this.lastId.get(s));
-        //             // System.out.println(t.blockId);
-        //         }
-        //         this.lastId.compute(s, (k,x) -> x+1);
-        //     }
-        // }
         this.transSystem = transSystem;
         this.channels = channels; // Space complexity O(c)
 
@@ -146,97 +125,16 @@ public class Smolka implements java.io.Serializable {
         return c.compressedTS(this.transSystem, rhoFinal);
     }
 
-    /**
-     * The split function used by the Kanellakis-Smolka algorithm.
-     * <p>
-     * Time complexity: O(m)?
-     * <p>
-     * Space complexity: O(m+n)?
-     * <p>
-     * (m transitions, n states)
-     * 
-     * @param st      The state with the partition
-     * @param block   The splitter block
-     * @param channel The channel/action to split on
-     * @return The split block(s)
-     */
-    private Set<Set<State>> smolkaSplit(State st, Set<State> block, String channel) { // O(m)
-        
-        Set<State> block1 = new HashSet<>();
-        Set<State> block2 = new HashSet<>();
-        State s = block.iterator().next();
-
-        // Find the blocks with transitions from s.
-        Set<Integer> sBlocks = getDestinationBlocks(st, s, channel); // O(m)
-        // int newId = getNewId(st);
-
-        for (State t : block) { // Each transition is only checked once, so this becomes O(m)
-            Set<Integer> blockDestinationPartitions = getDestinationBlocks(st, t, channel);
-            // if s and t can reach the same set of blocks in π via a-labelled transitions
-            if (blockDestinationPartitions.equals(sBlocks)) {
-                block1.add(t);
-            } else {
-                // t.setBlockId(st, newId);
-                block2.add(t);
-            }
-        }
-
-        // if B2 is empty then return {B1} else return {B1, B2}
-        Set<Set<State>> output = new HashSet<>();
-        if (block2.isEmpty()) {
-            output.add(block1);
-        } else {
-            output.add(block1);
-            output.add(block2);
-        }
-        return output;
-    }
 
     private List<Set<State>> split(Set<State> p, Set<State> splitter) {
         List<Set<State>> splitP = new LinkedList<>();
         Set<State> notsplitter = new HashSet<>(p);
-
         notsplitter.removeAll(splitter);
-        //System.out.println(splitter.size() + "," + notsplitter.size());
-
         splitP.add(splitter);
         if (!notsplitter.isEmpty()) splitP.add(notsplitter);
 
         return splitP;
     }
-
-    /**
-     * A method for getting the blocks pointed to by transitions from a state
-     * <code>t</code>.
-     * 
-     * @param st      The state with the partition
-     * @param t       The origin state
-     * @param channel The channel/action to follow
-     * @param pi      The main partition
-     * @return The set of blocks pointed to
-     */
-    private Set<Integer> getDestinationBlocks(State st, State t, String channel) { // O(m)
-        Set<Integer> blockDestinationPartitions = new HashSet<>();
-        Set<Trans> transitions = t.getTrans();
-        for (Trans trans : transitions) { // O(m)
-            if (trans.getAction().equals(channel)) {
-                blockDestinationPartitions.add(trans.destination.getBlockId(st)); // O(1)
-            }
-        }
-        return blockDestinationPartitions;
-    }
-
-    /**
-     * Retrieves a new block id
-     * 
-     * @param s The state with the partition.
-     * @return A new, previously unused, id
-     */
-    // private int getNewId(State s) {
-    //     int id = this.lastId.get(s);
-    //     this.lastId.put(s, id+1);
-    //     return id+1;
-    // }
 
      /**
      * Def 5.4 in the paper

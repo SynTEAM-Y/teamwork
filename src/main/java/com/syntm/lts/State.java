@@ -11,53 +11,53 @@ public class State implements java.io.Serializable {
 	private Label label;
 	private Listen listen;
 	private Set<Trans> trans;
+    private Set<Trans> preTrans;
 	private Set<State> comStates;
 	private TS owner;
-    public Map<State, Integer> blockId;
 
 	public State() {
-		this.id = "";
-		this.label = new Label();
-		this.listen = new Listen();
-		this.trans=new HashSet<>();
-		this.comStates=new HashSet<>();		
-        this.blockId = new HashMap<>();
+		this.id        = "";
+		this.label     = new Label();
+		this.listen    = new Listen();
+		this.trans     = new HashSet<>();
+		this.preTrans  = new HashSet<>();
+		this.comStates = new HashSet<>();
 	}
     
 	public State(String id) {
-        this.id = id;
-		this.label = new Label();
-		this.listen = new Listen();
-		this.trans=new HashSet<>();
-		this.comStates=new HashSet<>();		
-        this.blockId = new HashMap<>();
+        this.id        = id;
+		this.label     = new Label();
+		this.listen    = new Listen();
+		this.trans     = new HashSet<>();
+		this.preTrans  = new HashSet<>();
+		this.comStates = new HashSet<>();
 	}
     
 	public State(String id, Label label, Listen listen) {
-        this.id = id;
-		this.label = label;
-		this.listen = listen;
-		this.trans=new HashSet<>();
-		this.comStates=new HashSet<>();
-        this.blockId = new HashMap<>();
+        this.id        = id;
+		this.label     = label;
+		this.listen    = listen;
+		this.trans     = new HashSet<>();
+		this.preTrans  = new HashSet<>();
+		this.comStates = new HashSet<>();
 	}
     
     public State(String id, Label label) {
-        this.id = id;
-		this.label = label;
-		this.listen = new Listen();
-		this.trans=new HashSet<>();
-		this.comStates=new HashSet<>();
-        this.blockId = new HashMap<>();
+        this.id        = id;
+		this.label     = label;
+		this.listen    = new Listen();
+		this.trans     = new HashSet<>();
+		this.preTrans  = new HashSet<>();
+		this.comStates = new HashSet<>();
 	}
     
-	public State(String id, Label label, Listen listen, Set<Trans> trans) {
-        this.id = id;
-		this.label = label;
-		this.listen = listen;
-		this.trans=trans;
-		this.comStates=new HashSet<>();
-        this.blockId = new HashMap<>();
+	public State(String id, Label label, Listen listen, Set<Trans> trans, Set<Trans> preTrans) {
+        this.id        = id;
+		this.label     = label;
+		this.listen    = listen;
+		this.trans     = trans;
+		this.preTrans  = preTrans;
+		this.comStates = new HashSet<>();
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class State implements java.io.Serializable {
 
 	@Override
 	public String toString() {
-		return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ") -->" + blockId + "<--";
+		return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
 	}
 
     /**
@@ -170,6 +170,22 @@ public class State implements java.io.Serializable {
 
     /**
      * Complexity O(1)
+     * @return a set of the incoming transitions
+     */
+    public Set<Trans> getPreTrans() {
+        return this.preTrans;
+    }
+
+    /**
+     * Sets the incoming transitions
+     * <p> Complexity O(1)
+     */
+    public void setPreTrans(Set<Trans> trans) {
+        this.preTrans = trans;
+    }
+
+    /**
+     * Complexity O(1)
      * @param id
      */
 	public void setId(String id) {
@@ -207,25 +223,6 @@ public class State implements java.io.Serializable {
 	public void setOwner(TS owner) {
 		this.owner = owner;
 	}
-
-    /**
-     * Complexity O(1)
-     * @param s The state mapped to the partition.
-     * @return The id of the block containing the state in the partition.
-     */
-    public int getBlockId(State s) {
-        return this.blockId.get(s);
-    }
-
-    /**
-     * Sets a new block id <p>
-     * Complexity O(1)
-     * @param s The state mapped to the partition.
-     * @param id A new id of the block containing the state in the partition.
-     */
-    public void setBlockId(State s, int id) {
-        this.blockId.put(s, id);
-    }
 
     /**
      * Complexity O(1)
