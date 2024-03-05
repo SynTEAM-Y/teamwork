@@ -65,76 +65,70 @@ public class Smolka implements java.io.Serializable {
      * @return The reduced transition system.
      */
     public TS run() {
-        Map<State, Queue<Set<State>>> piWaiting = new HashMap<>();
-        Map<State, Set<Set<State>>> piBlocks = new HashMap<>(); 
-        for (Entry<State, Set<Set<State>>> entry : this.epsilonMap.entrySet()) {
-            piWaiting.put(entry.getKey(), new LinkedList<>(entry.getValue()));
-            piBlocks.put(entry.getKey(), new HashSet<>(entry.getValue()));
-        }
 
-        while (!piWaiting.values().stream().allMatch(s -> s.isEmpty())) {
+        boolean changed = true;
+        while (changed) {
+            HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
             for (State epsilon : this.epsilonMap.keySet()) {
-                Set<Set<State>> piWaitingTemp = new HashSet<>();
-                Set<Set<State>> blocks = new HashSet<>();                
-                while(!piWaiting.get(epsilon).isEmpty()){
-                    Set<State> tempBlock;
-                    tempBlock = piWaiting.get(epsilon).remove();
-                    blocks.add(tempBlock);
-                }
-                
-                for (String channel : this.channels) { 
-                    for (Trans tr : epsilon.getTrans()) {
-                        Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(tr.getDestination()));
-                        for (Set<State> ePrime : ePartitions) {
-                            for (Set<State> block : blocks){
-                                Set<State> splitter = applyEBisim(block, tr,ePrime, channel,epsilon);
-
-                                if (!splitter.isEmpty() && !splitter.equals(block)) {                                    
-                                    List<Set<State>> splitP; 
-                                    splitP = split(block, splitter);
-                                    piBlocks.get(epsilon).remove(block);
-                                    piBlocks.get(epsilon).addAll(splitP);
-                                    piWaitingTemp.addAll(splitP);
+                Queue<Set<State>> rhoWaiting = new LinkedList<>(epsilonMap.get(epsilon));
+                Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
+                while(!rhoWaiting.isEmpty()){
+                    Set<State> partition = rhoWaiting.remove();
+                    for (String ch : channels) { // O(c^2mn^2)
+                        for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
+                            Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
+                            for (Set<State> ePrime : ePartitions) { // O(mn^2)
+                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch,epsilon); // O(mn)
+                                if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                                Set<Set<State>> splitP; // = new HashSet<>();
+                                splitP = split(partition, splitter); // O(n) confirmed
+                                rhoTemp.remove(partition);
+                                rhoTemp.addAll(splitP);
+                                rhoWaiting.addAll(splitP);
                                 }
-                            }     
+                            }
                         }
                     }
                 }
-                if(!piWaiting.isEmpty()){
-                    piWaiting.get(epsilon).addAll(piWaitingTemp);
+                
+                rhoResults.put(epsilon, rhoTemp);
+                
+            }
+            changed = false;
+            for (State e : rhoResults.keySet()) {
+                if (!epsilonMap.get(e).equals(rhoResults.get(e))) {
+                    // not a fixed point, repeat
+                    changed = true;
+                    epsilonMap.put(e, rhoResults.get(e));
                 }
             }
-            for (Entry<State, Set<Set<State>>> entry : piBlocks.entrySet()) {
-                this.epsilonMap.put(entry.getKey(), entry.getValue());
-            }
         }
 
-        String initID = this.transSystem.getInitState().getId();
         Set<Set<State>> rhoFinal = new HashSet<>();
-
-        for (Entry<State, Set<Set<State>>> entry : this.epsilonMap.entrySet()) {
-            if (entry.getKey().getId().equals(initID)) {
-                rhoFinal.addAll(entry.getValue());
+        for (State s : epsilonMap.keySet()) {
+            // Gets the partition from the initial state.
+            if (this.transSystem.initStateEqLabel(s)) {
+                if (epsilonMap.get(s).size() == 1) return this.transSystem;
+                rhoFinal.addAll(epsilonMap.get(s));
                 break;
-            }
+            } 
         }
-
-        if (rhoFinal.size() == 1) return this.transSystem;
 
         CompressedTS c = new CompressedTS("s-" + this.transSystem.getName());
         return c.compressedTS(this.transSystem, rhoFinal);
     }
 
 
-    private List<Set<State>> split(Set<State> p, Set<State> splitter) {
-        List<Set<State>> splitP = new LinkedList<>();
+    private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
+        Set<Set<State>> splitP = new HashSet<>();
         Set<State> notsplitter = new HashSet<>(p);
-        notsplitter.removeAll(splitter);
+    
+        notsplitter.removeAll(splitter); // O(n) confirmed by the internet
         splitP.add(splitter);
-        if (!notsplitter.isEmpty()) splitP.add(notsplitter);
-
+        splitP.add(notsplitter);
+    
         return splitP;
-    }
+      }
 
      /**
      * Def 5.4 in the paper
