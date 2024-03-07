@@ -65,9 +65,11 @@ public class Partitioning {
         // SeqSolver d = new SeqSolver(sMap, this.T, c);
         // return d.run();
         
-        Smolka d = new Smolka(sMap, this.T, c);
+        // Smolka d = new Smolka(sMap, this.T, c);
 
         // ParSmolka d = new ParSmolka(sMap, T, c);
+
+        Paige d = new Paige(sMap, T, c);
         return d.run();
         // d.saveToFile("smolka.d");
 

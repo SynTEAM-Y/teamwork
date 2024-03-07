@@ -48,33 +48,73 @@ public class Paige implements java.io.Serializable {
      */
     public TS run() {
         boolean fixedPoint = false;
-
-        // O(c^2 m n^4)?
         while (!fixedPoint) { // O(c^2mn^4)
             HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
 
-            for (State epsilon : epsilonMap.keySet()) { // O(c^2mn^3)
+            for (State epsilon : epsilonMap.keySet()) {
                 Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
-                for (String ch : channels) { // O(c^2mn^2)
-                    for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
-                        Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
-                        for (Set<State> ePrime : ePartitions) { // O(mn^2)
-                            for (Set<State> partition : this.epsilonMap.get(epsilon)) { // O(n), still O(mn) in total
+                Set<Set<State>> x = new HashSet<>();
+                Set<State> rhoBlockTemp; = new HashSet<>();
 
-                                // This is step 4
-                                Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch, epsilon); // O(mn)
-                                if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                                    Set<Set<State>> splitP;
-                                    splitP = split(partition, splitter); // O(n)
-                                    rhoTemp.remove(partition);
-                                    rhoTemp.addAll(splitP);
+                for(Set<State> rhoBlock : rhoTemp ){
+                    rhoBlockTemp.addAll(rhoBlock);
+                }
+                x.add(rhoBlockTemp);
+                Set<Set<State>> piInit = new HashSet<>(rhoTemp);
+                Set<Set<State>> pi = preProcessRho(piInit);
+                Set<Set<State>> piTemp =  new HashSet<>(pi);
+
+                int n = 0;
+
+                while (!pi.equals(x)) {
+
+                    
+                    // Step 1
+                    Set<Set<State>> xTemp = new HashSet<>(x);
+                    xTemp.removeAll(pi);
+                    Set<State> s = xTemp.iterator().next();
+                    Set<State> b = new HashSet<>();
+                    
+                    // Step 2
+                    for (Set<State> bTemp : pi) {
+                        if (!bTemp.isEmpty() && s.containsAll(bTemp) && (bTemp.size() < s.size() / 2)) {
+                            b = bTemp;
+                            break;
+                        }
+                    }
+
+                    if (!b.isEmpty()) {
+                        // Step 3
+                        x.remove(s);
+                        x.add(b);
+                        Set<State> sTemp = new HashSet<>(s);
+                        sTemp.removeAll(b);
+                        x.add(sTemp);
+                        System.out.println(n);
+                        n++;
+
+                        for (String channel : this.channels) {
+                            for (Trans trEpsilon : epsilon.getTrans()) {
+                                Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
+                                for (Set<State> ePrime : ePartitions) {
+
+                            // This is step 4
+                                    Set<State> splitter = applyEBisim(b, trEpsilon, ePrime, channel, epsilon); // O(mn)
+                                    if (!splitter.isEmpty() && !splitter.equals(b)) {
+                                        // Set<Set<State>> splitP = threeSplit(pi, splitter, s, channel); 
+                                        Set<Set<State>> splitP = split(b, splitter);
+                                        piTemp.remove(b);
+                                        piTemp.addAll(splitP);
+                                        rhoTemp.remove(b);
+                                        rhoTemp.addAll(splitP);
+                                    }
                                 }
                             }
                         }
                     }
+                    pi = piTemp;
                 }
                 rhoResults.put(epsilon, rhoTemp);
-
             }
 
             // update epsilonmap with the new partitions
@@ -252,15 +292,22 @@ public class Paige implements java.io.Serializable {
      * @param block   The block with incoming transitions
      * @return A set of all states with transitions to the block
      */
-    private Set<State> pre(String channel, Set<State> block) {
+    private Set<State> pre(Set<State> block) {
         Set<State> finalSet = new HashSet<>();
         for (State s : block) {
             for (Trans trans : s.getPreTrans()) {
-                if (trans.action.equals(channel)) {
-                    finalSet.add(trans.source);
+                    finalSet.add(trans.getSource());            
                 }
-            }
         }
+        return finalSet;
+    }
+
+    private Set<State> pre2(Set<Set<State>> partition) {
+        Set<State> finalSet = new HashSet<>();
+        for (Set<State> sBlock : partition) {
+            finalSet.addAll(pre(sBlock));
+        }
+
         return finalSet;
     }
 
@@ -273,8 +320,8 @@ public class Paige implements java.io.Serializable {
      * @param bBlock  Set B
      * @return <code>true</code> if the set B is stable
      */
-    private boolean isStable(String channel, Set<State> sBlock, Set<State> bBlock) {
-        Set<State> s = pre(channel, sBlock);
+    private boolean isStable(Set<State> sBlock, Set<State> bBlock) {
+        Set<State> s = pre(sBlock);
         Set<State> intersection = new HashSet<>(s);
         intersection.retainAll(bBlock);
         return (intersection.isEmpty() || s.containsAll(bBlock));
@@ -290,7 +337,7 @@ public class Paige implements java.io.Serializable {
      */
     private boolean partitionIsStable(String channel, Set<Set<State>> partition, Set<State> sBlock) {
         for (Set<State> b : partition) {
-            if (!isStable(channel, sBlock, b))
+            if (!isStable(sBlock, b))
                 return false;
         }
         return true;
@@ -324,5 +371,68 @@ public class Paige implements java.io.Serializable {
     private boolean isStableToItself(String channel, Set<Set<State>> partition) {
         return partitionIsStableToPartition(channel, partition, partition);
     }
+
+    private Set<Set<State>> preProcessRho(Set<Set<State>> x) {
+        Set<Set<State>> xTemp = new HashSet<>(x);
+
+        Set<Set<State>> rhoTemp = new HashSet<>();
+
+        for (Set<State> b : xTemp) {
+            Set<State> bTemp = new HashSet<>(b);
+            Set<State> bTemp2 = new HashSet<>(b);
+
+
+            Set<State> preTemp1 = new HashSet<>(pre2(xTemp));
+
+
+
+            bTemp.retainAll(preTemp1);
+            if(!bTemp.isEmpty()){
+                rhoTemp.add(bTemp);
+            }
+            Set<State> preTemp2 = new HashSet<>(pre(b));
+
+            bTemp2.removeAll(preTemp2);
+
+            if(!bTemp2.isEmpty()){
+                rhoTemp.add(bTemp2);
+            }
+        }
+        // System.out.println("RhoTemp: "+ rhoTemp);
+        return rhoTemp;
+    }
+
+    // Kan vara så att pre i threeSplit måste innehålla channel
+    private Set<Set<State>> threeSplit(Set<Set<State>> pi, Set<State> b, Set<State> s, String channel) {
+        Set<Set<State>> finalPartition = new HashSet<>();
+        for (Set<State> d : pi) {
+            if (!isStable(d, b)) {
+                Set<State> d1 = new HashSet<>(d);
+                Set<State> d2 = new HashSet<>(d);
+                d1.retainAll(pre(b));
+                d2.removeAll(pre(b));
+
+                s.removeAll(b);
+                finalPartition.add(d1);
+                if (!isStable(d1, s)) {
+                    Set<State> d11 = new HashSet<>(d1);
+                    Set<State> d12 = new HashSet<>(d1);
+                    d11.retainAll(s);
+                    d12.removeAll(pre(s));
+                    finalPartition.add(d11);
+                    finalPartition.add(d12);
+                } else {
+                    finalPartition.add(d2);
+                }
+
+            }
+        }
+        if (finalPartition.isEmpty()) {
+            return pi;
+        }
+        return finalPartition;
+
+    }
+
 
 }
