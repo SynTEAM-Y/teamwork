@@ -54,7 +54,7 @@ public class Paige implements java.io.Serializable {
             for (State epsilon : epsilonMap.keySet()) {
                 Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
                 Set<Set<State>> x = new HashSet<>();
-                Set<State> rhoBlockTemp; = new HashSet<>();
+                Set<State> rhoBlockTemp = new HashSet<>();
 
                 for(Set<State> rhoBlock : rhoTemp ){
                     rhoBlockTemp.addAll(rhoBlock);
