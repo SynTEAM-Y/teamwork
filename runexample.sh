@@ -34,11 +34,12 @@ if [[ -e "Ex/${FILE}" ]]; then
     cd ../teamwork
     # javac ./target/teamwork-1.0.jar
     echo "-- Generating mealy file --"
-    time java -jar "./target/teamwork-1.0.jar" gen "target/${FILENOEXT}.spec" "output/Mealy_${FILENOEXT}"
+    # time java -jar "./target/teamwork-1.0.jar" gen "target/${FILENOEXT}.spec" "output/Mealy_${FILENOEXT}"
 
     rm output/tss/*
     echo "-- Reducing the transition system --"
     time java -jar "./target/teamwork-1.0.jar" reduce "target/${FILENOEXT}.spec" "output/Mealy_${FILENOEXT}" "output/tss/"
+    valgrind --tool=massif java -jar "./target/teamwork-1.0.jar" reduce "target/${FILENOEXT}.spec" "output/Mealy_${FILENOEXT}" "output/tss/"
     echo "-- Combining the transition systems --"
     time java -jar "./target/teamwork-1.0.jar" combine "output/tss/"
     # javac -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
