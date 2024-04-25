@@ -13,7 +13,7 @@ import com.syntm.lts.State;
 import com.syntm.lts.Trans;
 
 public class SmolkaTask implements Callable<Set<Set<State>>> {
-    State epsilon;
+  State epsilon;
   Set<Set<State>> rhoEpsilon;
   Set<Set<State>> rhoTemp;
   Set<String> channels;
@@ -43,24 +43,24 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
   @Override
   public Set<Set<State>> call() throws Exception {
     Queue<Set<State>> rhoWaiting = new LinkedList<>(this.rhoEpsilon);
-    while(!rhoWaiting.isEmpty()){
-        Set<State> partition = rhoWaiting.remove();
-        for (String ch : channels) { // O(c^2mn^2)
-            for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
-                Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
-                for (Set<State> ePrime : ePartitions) { // O(mn^2)
-                    Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch); // O(mn)
-                    if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                    Set<Set<State>> splitP; // = new HashSet<>();
-                    splitP = split(partition, splitter); // O(n) confirmed
-                    rhoTemp.remove(partition);
-                    rhoTemp.addAll(splitP);
-                    rhoWaiting.addAll(splitP);
-                    }
-                }
+    while (!rhoWaiting.isEmpty()) {
+      Set<State> partition = rhoWaiting.remove();
+      for (String ch : channels) { // O(c^2mn^2)
+        for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
+          Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
+          for (Set<State> ePrime : ePartitions) { // O(mn^2)
+            Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch); // O(mn)
+            if (!splitter.isEmpty() && !splitter.equals(partition)) {
+              Set<Set<State>> splitP; // = new HashSet<>();
+              splitP = split(partition, splitter); // O(n) confirmed
+              rhoTemp.remove(partition);
+              rhoTemp.addAll(splitP);
+              rhoWaiting.addAll(splitP);
             }
+          }
         }
-    } 
+      }
+    }
     return rhoTemp;
   }
 
@@ -118,7 +118,7 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
                 out.add(sPrime);
               }
             } else {
-              if (!sPrime.getListen().getChannels().contains(channel)) {
+              if (!sPrime.getListen().getChannels().contains(channel)) { // can listen to channel
                 if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
                     channel).getDestination())
                     && ePrime.contains(sPrime)) {
@@ -216,5 +216,4 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
     return splitP;
   }
 
-    
 }

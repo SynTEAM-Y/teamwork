@@ -33,16 +33,19 @@ if [[ -e "Ex/${FILE}" ]]; then
     node ./bin/cli parseSpec "Ex/${FILE} -o ../teamwork/target/${FILENOEXT}.spec"
     cd ../teamwork
     # javac ./target/teamwork-1.0.jar
-    echo "-- Generating mealy file --"
-    time java -jar "./target/teamwork-1.0.jar" gen "target/${FILENOEXT}.spec" "Ex/mealy/Mealy_${FILENOEXT}"
+    # echo "-- Generating mealy file --"
+    # time java -jar "./target/teamwork-1.0.jar" gen "target/${FILENOEXT}.spec" "Ex/mealy/Mealy_${FILENOEXT}"
 
     rm output/tss/*
+    rm generated/output/*
     echo "-- Reducing the transition system --"
     time java -jar "./target/teamwork-1.0.jar" reduce "target/${FILENOEXT}.spec" "Ex/mealy/Mealy_${FILENOEXT}" "output/tss/"
     # rm output/tss/*
     # valgrind --tool=massif java -jar "./target/teamwork-1.0.jar" reduce "target/${FILENOEXT}.spec" "Ex/mealy/Mealy_${FILENOEXT}" "output/tss/"
     echo "-- Combining the transition systems --"
-    time java -jar "./target/teamwork-1.0.jar" combine "output/tss/"
+    java -jar "./target/teamwork-1.0.jar" combine "output/tss/"
+    # time java -jar "./target/teamwork-1.0.jar" combine "output/tss/" <-- use this
+    
     # javac -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
     # time java -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
     # valgrind --tool=massif java -classpath ./generated/teamwork-1.0.jar "./generated/${FILENOEXT}.java"
