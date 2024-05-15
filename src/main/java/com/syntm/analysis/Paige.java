@@ -50,39 +50,41 @@ public class Paige implements java.io.Serializable {
         boolean fixedPoint = false;
         while (!fixedPoint) { // O(c^2mn^4)
             HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
-
-            for (State epsilon : epsilonMap.keySet()) {
-                Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
-                Set<Set<State>> x = new HashSet<>();
-                Set<State> rhoBlockTemp = new HashSet<>();
-
-                for(Set<State> rhoBlock : rhoTemp ){
-                    rhoBlockTemp.addAll(rhoBlock);
+            for (State epsilon : epsilonMap.keySet()) {                ;
+                Set<Set<State>> x = new HashSet<>(this.epsilonMap.get(epsilon));
+                Set<Set<State>> pi = new HashSet<>(x);
+                for (String channel : this.channels) {
+                    for (Trans trEpsilon : epsilon.getTrans()) {
+                        Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
+                        for (Set<State> ePrime : ePartitions) {
+                            for(Set<State> block: x ){
+                                Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel, epsilon); // O(mn)
+                                if (!splitter.isEmpty() && !splitter.equals(block)) {
+                                    Set<Set<State>> splitP = split(block, splitter);
+                                    pi.remove(block);
+                                    pi.addAll(splitP);                                    
+                                }
+                            }
+                        }
+                    }
                 }
-                x.add(rhoBlockTemp);
-                Set<Set<State>> piInit = new HashSet<>(rhoTemp);
-                Set<Set<State>> pi = preProcessRho(piInit);
-                Set<Set<State>> piTemp =  new HashSet<>(pi);
-
-                int n = 0;
-
                 while (!pi.equals(x)) {
-
-                    
                     // Step 1
                     Set<Set<State>> xTemp = new HashSet<>(x);
                     xTemp.removeAll(pi);
+                    if(xTemp.isEmpty()){
+                        break;
+                    }
                     Set<State> s = xTemp.iterator().next();
                     Set<State> b = new HashSet<>();
                     
                     // Step 2
                     for (Set<State> bTemp : pi) {
-                        if (!bTemp.isEmpty() && s.containsAll(bTemp) && (bTemp.size() < s.size() / 2)) {
+                        if (s.containsAll(bTemp) && (bTemp.size() <= (s.size()/2))) {
                             b = bTemp;
                             break;
                         }
                     }
-
                     if (!b.isEmpty()) {
                         // Step 3
                         x.remove(s);
@@ -90,33 +92,27 @@ public class Paige implements java.io.Serializable {
                         Set<State> sTemp = new HashSet<>(s);
                         sTemp.removeAll(b);
                         x.add(sTemp);
-                        System.out.println(n);
-                        n++;
-
                         for (String channel : this.channels) {
                             for (Trans trEpsilon : epsilon.getTrans()) {
                                 Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
                                 for (Set<State> ePrime : ePartitions) {
-
                             // This is step 4
                                     Set<State> splitter = applyEBisim(b, trEpsilon, ePrime, channel, epsilon); // O(mn)
                                     if (!splitter.isEmpty() && !splitter.equals(b)) {
-                                        // Set<Set<State>> splitP = threeSplit(pi, splitter, s, channel); 
                                         Set<Set<State>> splitP = split(b, splitter);
-                                        piTemp.remove(b);
-                                        piTemp.addAll(splitP);
-                                        rhoTemp.remove(b);
-                                        rhoTemp.addAll(splitP);
+                                        pi.remove(b);
+                                        pi.addAll(splitP);
                                     }
                                 }
                             }
                         }
                     }
-                    pi = piTemp;
+                    else{
+                        break;
+                    }
                 }
-                rhoResults.put(epsilon, rhoTemp);
+                rhoResults.put(epsilon,pi);
             }
-
             // update epsilonmap with the new partitions
             fixedPoint = true;
             for (State e : rhoResults.keySet()) {
@@ -132,13 +128,11 @@ public class Paige implements java.io.Serializable {
         for (State s : epsilonMap.keySet()) {
             // Gets the partition from the initial state.
             if (this.transSystem.initStateEqLabel(s)) {
-                if (epsilonMap.get(s).size() == 1)
-                    return this.transSystem;
+                if (epsilonMap.get(s).size() == 1) return this.transSystem;
                 rhoFinal.addAll(epsilonMap.get(s));
                 break;
             }
         }
-
         CompressedTS c = new CompressedTS("s-" + this.transSystem.getName());
         return c.compressedTS(this.transSystem, rhoFinal);
     }
@@ -292,22 +286,23 @@ public class Paige implements java.io.Serializable {
      * @param block   The block with incoming transitions
      * @return A set of all states with transitions to the block
      */
-    private Set<State> pre(Set<State> block) {
+    private Set<State> pre(Set<State> block, String channel) {
         Set<State> finalSet = new HashSet<>();
         for (State s : block) {
             for (Trans trans : s.getPreTrans()) {
+                if(trans.getAction().equals(channel)){
                     finalSet.add(trans.getSource());            
                 }
+            }
         }
         return finalSet;
     }
 
-    private Set<State> pre2(Set<Set<State>> partition) {
+    private Set<State> pre2(Set<Set<State>> partition, String channel) {
         Set<State> finalSet = new HashSet<>();
         for (Set<State> sBlock : partition) {
-            finalSet.addAll(pre(sBlock));
+            finalSet.addAll(pre(sBlock,channel));
         }
-
         return finalSet;
     }
 
@@ -320,11 +315,11 @@ public class Paige implements java.io.Serializable {
      * @param bBlock  Set B
      * @return <code>true</code> if the set B is stable
      */
-    private boolean isStable(Set<State> sBlock, Set<State> bBlock) {
-        Set<State> s = pre(sBlock);
-        Set<State> intersection = new HashSet<>(s);
+    private boolean isStable(Set<State> sBlock, Set<State> bBlock, String channel) {
+        Set<State> preS = pre(sBlock, channel);
+        Set<State> intersection = new HashSet<>(preS);
         intersection.retainAll(bBlock);
-        return (intersection.isEmpty() || s.containsAll(bBlock));
+        return (intersection.isEmpty() || preS.containsAll(bBlock));
     }
 
     /**
@@ -337,7 +332,7 @@ public class Paige implements java.io.Serializable {
      */
     private boolean partitionIsStable(String channel, Set<Set<State>> partition, Set<State> sBlock) {
         for (Set<State> b : partition) {
-            if (!isStable(sBlock, b))
+            if (!isStable(sBlock, b, channel))
                 return false;
         }
         return true;
@@ -372,57 +367,55 @@ public class Paige implements java.io.Serializable {
         return partitionIsStableToPartition(channel, partition, partition);
     }
 
-    private Set<Set<State>> preProcessRho(Set<Set<State>> x) {
+    private Set<Set<State>> preProcessRho(Set<Set<State>> x, String channel) {
         Set<Set<State>> xTemp = new HashSet<>(x);
-
         Set<Set<State>> rhoTemp = new HashSet<>();
 
         for (Set<State> b : xTemp) {
-            Set<State> bTemp = new HashSet<>(b);
-            Set<State> bTemp2 = new HashSet<>(b);
+            Set<State> b1 = new HashSet<>(b);
+            Set<State> b2 = new HashSet<>(b);
+            Set<State> preX = new HashSet<>(pre2(xTemp, channel));
 
-
-            Set<State> preTemp1 = new HashSet<>(pre2(xTemp));
-
-
-
-            bTemp.retainAll(preTemp1);
-            if(!bTemp.isEmpty()){
-                rhoTemp.add(bTemp);
+            b1.retainAll(preX);
+            if(!b1.isEmpty()){
+                rhoTemp.add(b1);
+                b2.removeAll(preX);
+                if(!b2.isEmpty()){
+                    rhoTemp.add(b2);
+                }
             }
-            Set<State> preTemp2 = new HashSet<>(pre(b));
-
-            bTemp2.removeAll(preTemp2);
-
-            if(!bTemp2.isEmpty()){
-                rhoTemp.add(bTemp2);
+            else{
+                rhoTemp.add(b);
             }
         }
-        // System.out.println("RhoTemp: "+ rhoTemp);
         return rhoTemp;
     }
+    
 
     // Kan vara så att pre i threeSplit måste innehålla channel
     private Set<Set<State>> threeSplit(Set<Set<State>> pi, Set<State> b, Set<State> s, String channel) {
         Set<Set<State>> finalPartition = new HashSet<>();
         for (Set<State> d : pi) {
-            if (!isStable(d, b)) {
+            if (!isStable(d, b, channel)) {
                 Set<State> d1 = new HashSet<>(d);
                 Set<State> d2 = new HashSet<>(d);
-                d1.retainAll(pre(b));
-                d2.removeAll(pre(b));
+                Set<State> preB = pre(b, channel);
+                d1.retainAll(preB);
+                d2.removeAll(preB);
 
                 s.removeAll(b);
-                finalPartition.add(d1);
-                if (!isStable(d1, s)) {
+                finalPartition.add(d2);
+                if (!isStable(d1, s, channel)) {
                     Set<State> d11 = new HashSet<>(d1);
-                    Set<State> d12 = new HashSet<>(d1);
-                    d11.retainAll(s);
-                    d12.removeAll(pre(s));
+                    Set<State> d12 = new HashSet<>(d);
+                    Set<State> preS = pre(s, channel);
+                    d11.retainAll(preS);
+                    d12.removeAll(preS);
                     finalPartition.add(d11);
                     finalPartition.add(d12);
-                } else {
-                    finalPartition.add(d2);
+                }
+                else {
+                    finalPartition.add(d1);
                 }
 
             }
@@ -433,6 +426,4 @@ public class Paige implements java.io.Serializable {
         return finalPartition;
 
     }
-
-
 }
