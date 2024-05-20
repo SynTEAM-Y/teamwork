@@ -2,8 +2,10 @@ package com.syntm.analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.Queue;
 
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
@@ -50,68 +52,76 @@ public class Paige implements java.io.Serializable {
         boolean fixedPoint = false;
         while (!fixedPoint) { // O(c^2mn^4)
             HashMap<State, Set<Set<State>>> rhoResults = new HashMap<>();
-            for (State epsilon : epsilonMap.keySet()) {                ;
-                Set<Set<State>> x = new HashSet<>(this.epsilonMap.get(epsilon));
-                Set<Set<State>> pi = new HashSet<>(x);
-                for (String channel : this.channels) {
-                    for (Trans trEpsilon : epsilon.getTrans()) {
-                        Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
-                        for (Set<State> ePrime : ePartitions) {
-                            for(Set<State> block: x ){
-                                Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel, epsilon); // O(mn)
-                                if (!splitter.isEmpty() && !splitter.equals(block)) {
-                                    Set<Set<State>> splitP = split(block, splitter);
-                                    pi.remove(block);
-                                    pi.addAll(splitP);                                    
-                                }
-                            }
-                        }
+            for (State epsilon : epsilonMap.keySet()) {                
+                Set<Set<State>> x = new HashSet<>();
+                Set<Set<State>> rhoTemp = new HashSet<>(epsilonMap.get(epsilon));
+                Queue<Set<State>> pi = new LinkedList<>(epsilonMap.get(epsilon));
+                Set<Set<State>> partition = new HashSet<>(x);
+                // for (String channel : this.channels) {
+                //     for (Trans trEpsilon : epsilon.getTrans()) {
+                //         Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
+                //         for (Set<State> ePrime : ePartitions) {
+                //             for(Set<State> block: x ){
+                //                 Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel, epsilon); // O(mn)
+                //                 if (!splitter.isEmpty() && !splitter.equals(block)) {
+                //                     Set<Set<State>> splitP = split(block, splitter);
+                //                     pi.remove(block);
+                //                     pi.addAll(splitP);                                 
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+                while (!pi.isEmpty() ) {
+                    partition.clear();
+                    if(x.isEmpty()){
+                        x.addAll(rhoTemp); 
+                        partition.addAll(x);
                     }
-                }
-                while (!pi.equals(x)) {
-                    // Step 1
-                    Set<Set<State>> xTemp = new HashSet<>(x);
-                    xTemp.removeAll(pi);
-                    if(xTemp.isEmpty()){
-                        break;
-                    }
-                    Set<State> s = xTemp.iterator().next();
-                    Set<State> b = new HashSet<>();
-                    
-                    // Step 2
-                    for (Set<State> bTemp : pi) {
-                        if (s.containsAll(bTemp) && (bTemp.size() <= (s.size()/2))) {
-                            b = bTemp;
+                    else{
+                        // Step 1
+                        Set<Set<State>> xTemp = new HashSet<>(x);
+                        xTemp.removeAll(rhoTemp);
+                        if(xTemp.isEmpty() || pi.isEmpty()){
                             break;
                         }
-                    }
-                    if (!b.isEmpty()) {
+                        Set<State> s = xTemp.iterator().next();
+                        Set<State> b = pi.remove();
+          
+                        // Step 2
+                        if ((b.size() <= (s.size()/2) && s.containsAll(b))) {
+                            continue;
+                        }
+
+                        if (b.isEmpty()) {
+                            break;
+                        }
                         // Step 3
                         x.remove(s);
                         x.add(b);
                         Set<State> sTemp = new HashSet<>(s);
                         sTemp.removeAll(b);
                         x.add(sTemp);
-                        for (String channel : this.channels) {
-                            for (Trans trEpsilon : epsilon.getTrans()) {
-                                Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
-                                for (Set<State> ePrime : ePartitions) {
-                            // This is step 4
-                                    Set<State> splitter = applyEBisim(b, trEpsilon, ePrime, channel, epsilon); // O(mn)
-                                    if (!splitter.isEmpty() && !splitter.equals(b)) {
-                                        Set<Set<State>> splitP = split(b, splitter);
-                                        pi.remove(b);
+                        partition.add(b);
+                    }
+                    for (String channel : this.channels) {
+                        for (Trans trEpsilon : epsilon.getTrans()) {
+                            Set<Set<State>> ePartitions = new HashSet<>(this.epsilonMap.get(trEpsilon.getDestination()));
+                            for (Set<State> ePrime : ePartitions) {
+                                for(Set<State> block : partition ){
+                                    Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel, epsilon); // O(mn)
+                                    if (!splitter.isEmpty() && !splitter.equals(block)) {
+                                        Set<Set<State>> splitP = split(block, splitter);
+                                        rhoTemp.remove(block);
+                                        rhoTemp.addAll(splitP);
                                         pi.addAll(splitP);
                                     }
                                 }
                             }
                         }
                     }
-                    else{
-                        break;
-                    }
                 }
-                rhoResults.put(epsilon,pi);
+                rhoResults.put(epsilon,rhoTemp);
             }
             // update epsilonmap with the new partitions
             fixedPoint = true;
