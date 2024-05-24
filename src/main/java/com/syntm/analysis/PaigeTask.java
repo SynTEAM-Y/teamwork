@@ -94,7 +94,7 @@ public class PaigeTask implements Callable<Set<Set<State>>> {
                 List<Set<State>> splitP = split(block, splitter);
                 rhoTemp.remove(block);
                 rhoTemp.addAll(splitP);
-                q.add(splitP.get(1));
+                q.addAll(splitP);
               }
             }
           }

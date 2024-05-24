@@ -1,9 +1,12 @@
 package com.syntm.analysis;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -48,26 +51,17 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
     HashMap<String,Set<State>> hm = new HashMap<String,Set<State>>();
 
     while (!rhoWaiting.isEmpty()) {
-      Set<State> partition = rhoWaiting.remove();
+      Set<State> block = rhoWaiting.remove();
+
       for (String ch : channels) { // O(c^2mn^2)
-        Set<State> lexiPartition = new HashSet<>();
-        // Retrieving all states whos action is the same as the channel
-        for(State st : partition){
-          for(Trans tr : st.getTrans()){
-            if(Objects.equals(tr.getAction(), ch)){
-              lexiPartition.add(st);
-            }
-          }
-        }
-        
         for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
           Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
           for (Set<State> ePrime : ePartitions) { // O(mn^2)
-            Set<State> splitter = applyEBisim(lexiPartition, trEpsilon, ePrime, ch); // O(mn)
-            if (!splitter.isEmpty() && !splitter.equals(lexiPartition)) {
-              Set<Set<State>> splitP; // = new HashSet<>();
-              splitP = split(lexiPartition, splitter); // O(n) confirmed
-              rhoTemp.remove(lexiPartition);
+            Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, ch); // O(mn)
+            if (!splitter.isEmpty() && !splitter.equals(block)) {
+              Set<Set<State>> splitP;
+              splitP = split(block, splitter); // O(n) confirmed
+              rhoTemp.remove(block);
               rhoTemp.addAll(splitP);
               rhoWaiting.addAll(splitP);
             }
