@@ -1,9 +1,8 @@
 package com.syntm.analysis;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,63 +40,70 @@ public class PaigeTask implements Callable<Set<Set<State>>> {
 
   @Override
   public Set<Set<State>> call() throws Exception {
-    Set<Set<State>> x = new HashSet<>();
-    Set<Set<State>> partition = new HashSet<>();  
-    Queue<Set<State>> pi = new LinkedList<>(this.rhoTemp);
-    while (!pi.isEmpty() ) {
+    List<Set<State>> x = new ArrayList<>();
+    Set<Set<State>> partition = new HashSet<>();
+    List<Set<State>> q = new ArrayList<>(this.rhoTemp);
+    while (!q.isEmpty()) {
       partition.clear();
 
-      // This is only run 1 time, consider this as a preprocessing step
-      if(x.isEmpty()){
-        x.addAll(this.rhoEpsilon); 
+      if (x.isEmpty()) {
+        // This is only run 1 time, consider this as a preprocessing step
+        x.addAll(this.rhoEpsilon);
         partition.addAll(x);
-      }
-      else{
-          // Step 1
-          Set<Set<State>> xTemp = new HashSet<>(x);
-          xTemp.removeAll(rhoTemp);
-          if(xTemp.isEmpty() || pi.isEmpty()){
-              break;
-          }
-          Set<State> s = xTemp.iterator().next();
-          Set<State> b = pi.remove();
-          
-          // Step 2
-          if ((b.size() <= (s.size()/2) && s.containsAll(b))) {
-            continue;
-          }
-
-          if (b.isEmpty()) {
+      } else {
+        // Step 1
+        Set<State> s = null;
+        for (Set<State> b : x) {
+          if (!rhoTemp.contains(b)) {
+            s = b;
             break;
           }
-          // Step 3
-          x.remove(s);
-          x.add(b);
-          Set<State> sTemp = new HashSet<>(s);
-          sTemp.removeAll(b);
-          x.add(sTemp);
-          partition.add(b);
-      }
-      for (String channel : this.channels) {
-          for (Trans trEpsilon : epsilon.getTrans()) {
-              Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
-              for (Set<State> ePrime : ePartitions) {
-                  for(Set<State> block : partition){
-                    Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel); // O(mn)
-                    if (!splitter.isEmpty() && !splitter.equals(block)) {
-                        Set<Set<State>> splitP = split(block, splitter);
-                        rhoTemp.remove(block);
-                        rhoTemp.addAll(splitP);
-                        pi.addAll(splitP);
-                    }
-                  }
-              }
+        }
+        if (s == null) {
+          break;
+        }
+
+        // Step 2
+        Set<State> b = new HashSet<>();
+        int k = x.indexOf(s);
+        for (int j = k; j < q.size(); j++) {
+          if ((q.get(j).size() <= (s.size() / 2) && s.containsAll(q.get(j)))) {
+            b = q.remove(j);
+            break;
           }
-            
+        }
+
+        // Step 3
+        Set<State> sTemp = new HashSet<>(s);
+        sTemp.removeAll(b);
+        x.remove(k);
+        x.add(k, b);
+        x.add(k, sTemp);
+        partition.add(b);
+        partition.add(sTemp);
+      }
+
+      // Step 4
+      for (String channel : this.channels) {
+        for (Trans trEpsilon : epsilon.getTrans()) {
+          Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
+          for (Set<State> ePrime : ePartitions) {
+            for (Set<State> block : partition) { // O(1)
+              Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel); // O(mn)
+              if (!splitter.isEmpty() && !splitter.equals(block)) {
+                List<Set<State>> splitP = split(block, splitter);
+                rhoTemp.remove(block);
+                rhoTemp.addAll(splitP);
+                q.add(splitP.get(1));
+              }
+            }
+          }
+        }
+
       }
     }
     return rhoTemp;
- }
+  }
 
   public State getEpsilon() {
     return epsilon;
@@ -240,8 +246,8 @@ public class PaigeTask implements Callable<Set<Set<State>>> {
     return out;
   }
 
-  private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
-    Set<Set<State>> splitP = new HashSet<>();
+  private List<Set<State>> split(Set<State> p, Set<State> splitter) {
+    List<Set<State>> splitP = new ArrayList<>();
     Set<State> notsplitter = new HashSet<>(p);
 
     notsplitter.removeAll(splitter); // O(n) confirmed by the internet
