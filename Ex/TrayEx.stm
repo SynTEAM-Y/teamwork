@@ -1,0 +1,35 @@
+
+SPEC TrayEx
+
+In(d,p,f,a), Out(rD,rP,rF) 
+
+Agent A1 -> In(f,a) , Out(rF)
+Agent A2 -> In(p) , Out(rP)
+Agent A3 -> In(d) , Out(rD)
+
+
+Assume Env
+G (a -> X (p R !a)) 
+G (f -> X (a R !f)) 
+G (d -> X (p R !d)) 
+G (p -> X (f R !p)) 
+//G ((f & (F !p)) -> X (p R !f)) 
+//G ((p & (F !d)) -> X (d R !p)) 
+G ((p & (X a) & (X X f)) -> X (d R !p)) 
+(a R !f) 
+(f R !p) 
+(p R !d) 
+G F d
+
+ 
+
+
+Guarantee Sys
+G (a -> rF) 
+G (f -> rP) 
+G (p -> rD) 
+G ((rF & (X !f)) -> (X rF)) 
+G ((rD & (X !d)) -> (X rD)) 
+G ((rP & (X !p)) -> (X rP)) 
+G F (rD) 
+G F (!rD)

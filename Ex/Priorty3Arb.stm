@@ -1,0 +1,21 @@
+
+SPEC Priorty3Arb
+
+In(rm, r0, r1) , Out(gm, g0, g1)
+
+Agent Am -> In(rm) , Out(gm)
+Agent A0 -> In(r0) , Out(g0)
+Agent A1 -> In(r1) , Out(g1)
+
+
+Assume Env
+G F !rm
+
+Guarantee Sys
+G ((!gm & !g0) | ((!gm | !g0) & !g1))
+G (rm -> X ((!g0 & !g1) U gm))
+G (r0 -> F g0)
+G (r1 -> F g1)
+G ((g0 & X (!r0 & !g0)) -> X (r0 R !g0))
+G ((g1 & X (!r1 & !g1)) -> X (r1 R !g1))
+G ((gm & X (!rm & !gm)) -> X (rm R !gm))

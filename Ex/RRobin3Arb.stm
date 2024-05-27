@@ -1,0 +1,27 @@
+
+//unrealizable spec
+SPEC RRobin3Arb
+
+In(r0,r1,r2) , Out(g0,g1,g2)
+
+Agent A1 -> In(r0) , Out(g0)
+Agent A2 -> In(r1) , Out(g1)
+Agent A3 -> In(r2) , Out(g2)
+
+
+Assume Env
+G ((r0 & !g0) -> X r0)
+G ((r1 & !g1) -> X r1)
+G ((r2 & !g2) -> X r2)
+G ((!r0 & g0) -> X !r0)
+G ((!r1 & g1) -> X !r1)
+G ((!r2 & g1) -> X !r2)
+G F (!r0 | !g0)
+G F (!r1 | !g1)
+G F (!r2 | !g2)
+
+Guarantee Sys
+G ((!g0 & !g1) | ((!g0 | !g1) & !g2))
+G (r0 -> F g0)
+G (r1 -> F g1)
+G (r2 -> F g2)

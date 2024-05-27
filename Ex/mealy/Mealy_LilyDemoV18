@@ -1,0 +1,50 @@
+Lauching Strix with Parameters:  -f (
+ !i0 &
+ !i1 &
+ !i2 &
+ X G (i0 | i1 | i2 ) &
+ X G ((!i1 & !i2 ) | (!i0 & !i2 ) | (!i0 & !i1 )  ) &
+ X (true) ) -> ( !a1 &
+ !a2 &
+ !a3 &
+ !a0 &
+ X (G !(a0 & a1)) &
+ X (G !(a0 & a2)) &
+ X (G !(a0 & a3)) &
+ X (G !(a1 & a2)) &
+ X (G !(a1 & a3)) &
+ X (G !(a2 & a3)) &
+ X (G F i0 -> G F a0) &
+ X (G F i1 -> G F a1) &
+ X (G F i2 -> G F a2) &
+ X (G F a3) ) --ins=i0,i1,i2 --outs=a0,a1,a2,a3 --k
+REALIZABLE
+.inputs i0 i1 i2
+.outputs a0 a1 a2 a3
+.i 3
+.o 4
+.p 22
+.s 8
+.r S0
+000 S0 S1 0000
+001 S1 S2 1000
+010 S1 S2 1000
+100 S1 S2 1000
+001 S2 S3 0001
+010 S2 S3 0001
+100 S2 S3 0001
+001 S3 S4 0100
+010 S3 S4 0100
+100 S3 S4 0100
+001 S4 S5 0001
+010 S4 S5 0001
+100 S4 S5 0001
+001 S5 S6 0010
+010 S5 S6 0010
+100 S5 S6 0010
+001 S6 S7 0001
+010 S6 S7 0001
+100 S6 S7 0001
+001 S7 S2 1000
+010 S7 S2 1000
+100 S7 S2 1000
