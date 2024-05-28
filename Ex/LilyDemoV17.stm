@@ -1,0 +1,17 @@
+SPEC LilyDemoV17
+
+In(i0, i1) , Out(a0, a1, a2)
+
+Agent A1 -> In(i0) , Out(a0)
+Agent A2 -> In(i1) , Out(a1, a2)
+
+Assume Env
+true
+
+Guarantee Sys
+G !(a0 & a1)
+G !(a0 & a2)
+G !(a1 & a2)
+G F i0 -> G F a0
+G F i1 -> G F a1
+G F a2

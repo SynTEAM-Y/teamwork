@@ -1,0 +1,55 @@
+Lauching Strix with Parameters:  -f (
+ !hbusreq_1 &
+ !hbusreq_2 &
+ !allready &
+ !hbusreq_0 &
+ X G (hbusreq_1 | hbusreq_2 | allready | hbusreq_0 ) &
+ X G ((!hbusreq_2 & !allready & !hbusreq_0 ) | (!hbusreq_1 & !allready & !hbusreq_0 ) | (!hbusreq_1 & !hbusreq_2 & !hbusreq_0 ) | (!hbusreq_1 & !hbusreq_2 & !allready )  ) &
+ X (G F allready) &
+ X (allready) ) -> ( !hgrant_2 &
+ !hgrant_1 &
+ !decide &
+ !hgrant_0 &
+ !busreq &
+ X (G ((!hgrant_0 & ! hgrant_1) | ((!hgrant_0 | ! hgrant_1) & !hgrant_2))) &
+ X (G (hgrant_0 | hgrant_1 | hgrant_2)) &
+ X (G (!allready -> (X hgrant_0 <-> hgrant_0))) &
+ X (G (!allready -> (X hgrant_1 <-> hgrant_1))) &
+ X (G (!allready -> (X hgrant_2 <-> hgrant_2))) &
+ X (G (hbusreq_0 -> F (!hbusreq_0 | hgrant_0))) &
+ X (G (hbusreq_1 -> F (!hbusreq_1 | hgrant_1))) &
+ X (G (hbusreq_2 -> F (!hbusreq_2 | hgrant_2))) &
+ X (G (hgrant_0 -> (busreq <-> hbusreq_0))) &
+ X (G (hgrant_1 -> (busreq <-> hbusreq_1))) &
+ X (G (hgrant_2 -> (busreq <-> hbusreq_2))) &
+ X (G (!allready -> !decide)) &
+ X (G (decide <-> (!(X hgrant_0 <-> hgrant_0) | !(X hgrant_1 <-> (hgrant_1)) | !(X hgrant_2 <-> (hgrant_2))))) &
+ X (G ((!hbusreq_0 & !hbusreq_1 & !hbusreq_2 & decide) -> X hgrant_0)) &
+ X (! decide) &
+ X (hgrant_0) ) --ins=allready,hbusreq_0,hbusreq_1,hbusreq_2 --outs=decide,busreq,hgrant_0,hgrant_1,hgrant_2 --k
+REALIZABLE
+.inputs allready hbusreq_0 hbusreq_1 hbusreq_2
+.outputs decide busreq hgrant_0 hgrant_1 hgrant_2
+.i 4
+.o 5
+.p 18
+.s 6
+.r S0
+0000 S0 S1 00000
+1000 S1 S2 00100
+1000 S2 S2 00100
+0100 S2 S3 01100
+0010 S2 S4 00100
+0001 S2 S5 00100
+1000 S3 S2 00100
+0100 S3 S3 01100
+0010 S3 S4 00100
+0001 S3 S5 00100
+1000 S4 S2 00100
+0100 S4 S3 01100
+0010 S4 S4 00100
+0001 S4 S5 00100
+1000 S5 S2 00100
+0010 S5 S3 00100
+0100 S5 S3 01100
+0001 S5 S5 00100

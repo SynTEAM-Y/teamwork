@@ -1,0 +1,36 @@
+SPEC Comb3Arb
+
+In(ar0,ar1,ar2,rm, r0, r1), Out(ag0,ag1,ag2,gm, g0, g1) 
+
+Agent A1 -> In(ar0) , Out(ag0)
+Agent A2 -> In(ar1) , Out(ag1)
+Agent A3 -> In(ar2) , Out(ag2)
+Agent A4 -> In(rm) , Out(gm)
+Agent A5 -> In(r0) , Out(g0)
+Agent A6 -> In(r1) , Out(g1)
+
+Assume Env
+G F !rm
+
+Guarantee Sys
+G ((ag0 & G !ar0) -> (F !ag0))
+G ((ag1 & G !ar1) -> (F !ag1))
+G ((ag2 & G !ar2) -> (F !ag2))
+G ((ag0 & X (!ar0 & !ag0)) -> X (ar0 R !ag0))
+G ((ag1 & X (!ar1 & !ag1)) -> X (ar1 R !ag1))
+G ((ag2 & X (!ar2 & !ag2)) -> X (ar2 R !ag2))
+G ((!ag0 & !ag1) | ((!ag0 | !ag1) & !ag2))
+ar0 R !ag0
+ar1 R !ag1
+ar2 R !ag2
+G (ar0 -> F ag0)
+G (ar1 -> F ag1)
+G (ar2 -> F ag2)
+G ((!gm & !g0) | ((!gm | !g0) & !g1))
+G (rm -> X ((!g0 & !g1) U gm))
+G (r0 -> F g0)
+G (r1 -> F g1)
+G ((g0 & X (!r0 & !g0)) -> X (r0 R !g0))
+G ((g1 & X (!r1 & !g1)) -> X (r1 R !g1))
+G ((gm & X (!rm & !gm)) -> X (rm R !gm))
+r0 -> F !ar0
