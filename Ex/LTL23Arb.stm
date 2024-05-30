@@ -1,0 +1,36 @@
+
+SPEC LTL3Arb2
+In(r0,r1,r2, request_0, request_1), Out(g0,g1,g2, grant_0, grant_1) 
+
+Agent A1 -> In(r0) , Out(g0)
+Agent A2 -> In(r1) , Out(g1)
+Agent A3 -> In(r2) , Out(g2)
+Agent A4 -> In(request_0) , Out(grant_0)
+Agent A5 -> In(request_1) , Out(grant_1)
+
+Assume Env
+true
+
+Guarantee Sys
+G ((g0 & G !r0) -> (F !g0))
+G ((g1 & G !r1) -> (F !g1))
+G ((g2 & G !r2) -> (F !g2))
+G ((g0 & X (!r0 & !g0)) -> X (r0 R !g0))
+G ((g1 & X (!r1 & !g1)) -> X (r1 R !g1))
+G ((g2 & X (!r2 & !g2)) -> X (r2 R !g2))
+G ((!g0 & !g1) | ((!g0 | !g1) & !g2))
+r0 R !g0
+r1 R !g1
+r2 R !g2
+G (r0 -> F g0)
+G (r1 -> F g1)
+G (r2 -> F g2)
+
+G ((grant_0 & G !request_0) -> (F !grant_0))
+G ((grant_1 & G !request_1) -> (F !grant_1))
+G ((grant_0 & X (!request_0 & !grant_0)) -> X (request_0 R !grant_0))
+G ((grant_1 & X (!request_1 & !grant_1)) -> X (request_1 R !grant_1))
+G (!grant_0 | !grant_1)
+request_0 R !grant_0
+request_1 R !grant_1
+G (request_0 -> F grant_0)
