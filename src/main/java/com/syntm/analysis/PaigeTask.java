@@ -84,10 +84,14 @@ public class PaigeTask implements Callable<Set<Set<State>>> {
       }
 
       // Step 4
+      boolean gotonext = false;
       for (String channel : this.channels) {
+        if (gotonext) break;
         for (Trans trEpsilon : epsilon.getTrans()) {
+          if (gotonext) break;
           Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
           for (Set<State> ePrime : ePartitions) {
+            if (gotonext) break;
             for (Set<State> block : partition) { // O(1)
               Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, channel); // O(mn)
               if (!splitter.isEmpty() && !splitter.equals(block)) {
@@ -95,6 +99,7 @@ public class PaigeTask implements Callable<Set<Set<State>>> {
                 rhoTemp.remove(block);
                 rhoTemp.addAll(splitP);
                 q.addAll(splitP);
+                gotonext = true;
               }
             }
           }

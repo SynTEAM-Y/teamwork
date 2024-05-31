@@ -53,8 +53,11 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
     while (!rhoWaiting.isEmpty()) {
       Set<State> block = rhoWaiting.remove();
 
+      boolean gotonext = false;
       for (String ch : channels) { // O(c^2mn^2)
+        if (gotonext) break;
         for (Trans trEpsilon : epsilon.getTrans()) { // O(cmn^2)
+          if (gotonext) break;
           Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
           for (Set<State> ePrime : ePartitions) { // O(mn^2)
             Set<State> splitter = applyEBisim(block, trEpsilon, ePrime, ch); // O(mn)
@@ -64,6 +67,8 @@ public class SmolkaTask implements Callable<Set<Set<State>>> {
               rhoTemp.remove(block);
               rhoTemp.addAll(splitP);
               rhoWaiting.addAll(splitP);
+              gotonext = true;
+              break;
             }
           }
         }
