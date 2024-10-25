@@ -146,9 +146,13 @@ public class Mealy {
         String s = "";
         for (int i = 0; i < code.length(); i++) {
             if (code.substring(i, i + 1).equals("1")) {
-                s += alpha[i];
+                s += alpha[i]+",";
             }
         }
+        if (s.endsWith(",")) {
+           s=s.substring(0, s.length()-1); 
+        }
+        
         return s;
     }
 
@@ -156,10 +160,9 @@ public class Mealy {
         String[] Alphal = act.split(":");
         List<String> olst = new ArrayList<>();
         List<String> inlst = new ArrayList<>();
-        // List<String> dash = new ArrayList<>();
         if (Alphal[0].contains("+")) {
-            Alphal[0] = Alphal[0].replace("+", ",");
-            String[] s = Alphal[0].split(",");
+            Alphal[0] = Alphal[0].replace("+", ".");
+            String[] s = Alphal[0].split(".");
             for (int i = 0; i < s.length; i++) {
                 if (s[i].contains("-")) {
                     inlst = Generate(s[i], cCode);
@@ -180,8 +183,8 @@ public class Mealy {
             }
         }
         if (Alphal[1].contains("+")) {
-            Alphal[1] = Alphal[1].replace("+", ",");
-            String[] s = Alphal[1].split(",");
+            Alphal[1] = Alphal[1].replace("+", ".");
+            String[] s = Alphal[1].split(".");
             for (int i = 0; i < s.length; i++) {
                 if (s[i].contains("-")) {
                     olst = Generate(s[i], oCode);
@@ -220,9 +223,13 @@ public class Mealy {
                 cw += c[i] + ",";
             }
             if (letter.substring(i, i + 1).equals("1")) {
-                cO += c[i];
+                cO += c[i]+",";
             }
         }
+        if (cO.endsWith(",")) {
+            cO=cO.substring(0, cO.length()-1);
+        }
+        
         String[] set = cw.split(",");
         List<String> ls = PowerSet(set);
         List<String> mlist = new ArrayList<>();
@@ -243,8 +250,11 @@ public class Mealy {
             for (j = 0; j < set.length; j++) {
 
                 if ((counter & (1 << j)) > 0) {
-                    s += set[j];
+                    s += set[j]+",";
                 }
+            }
+            if (s.endsWith(",")) {
+               s= s.substring(0,s.length()-1);
             }
             list.add(s);
             s = "";
@@ -475,6 +485,7 @@ public class Mealy {
         for (State state : t.getStates()) {
 
             for (Trans tr1 : state.getTrans()) {
+                //System.out.println(tr1.getSource().getId());
                 for (Trans tr2 : state.getTrans()) {
                     if (!tr1.equals(tr2) && tr1.action.equals(tr2.getAction())) {
                         t.setStatus("ND");
@@ -483,6 +494,8 @@ public class Mealy {
                 }
             }
         }
+       // System.out.println(ts.toString());
+       // System.out.println(t.toString());
         //t.toDot();
         return t;
     }

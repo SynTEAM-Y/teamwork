@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +15,6 @@ import com.syntm.lts.State;
 import com.syntm.lts.TS;
 
 public class ESolver {
-  private Task task;
   private ConcurrentHashMap<State, Set<Set<State>>> eMap;
   private TS ts;
   private Set<String> channels;
@@ -43,11 +40,11 @@ public class ESolver {
   }
 
   public TS run() {
-    //int counter = 0;
+    int counter = 0;
     boolean fixed = false;
     while (!fixed) {
-     // counter += 1;
-       //System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+     counter += 1;
+      // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
       // Execute all tasks and get reference to Future objects
       List<Future<Set<Set<State>>>> resultList = null;
       try {
@@ -58,11 +55,13 @@ public class ESolver {
       for (int i = 0; i < resultList.size(); i++) {
         Future<Set<Set<State>>> future = resultList.get(i);
         try {
-          Set<Set<State>> result = future.get();
+           future.get();
         } catch (InterruptedException | ExecutionException e) {
           e.printStackTrace();
         }
       }
+     // System.out.println("Fixed map -> " + eMap);
+
       fixed = updateMap();
     }
     service.shutdown();
@@ -78,7 +77,7 @@ public class ESolver {
       return this.ts;
     }
     CompressedTS c = new CompressedTS("s-" + this.ts.getName());
-    TS t = c.compressedTS(this.ts, rho_f);
+    TS t = c.DoCompress(this.ts, rho_f);
     return t;
   }
 
@@ -92,9 +91,9 @@ public class ESolver {
         fixedPoint = false;
       }
     }
-    // if (fixedPoint) {
-    // System.out.println("Fixed map -> " + eMap);
-    // }
+    if (fixedPoint) {
+    System.out.println("Fixed map -> " + eMap);
+    }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);

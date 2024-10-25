@@ -332,16 +332,16 @@ public class Spec {
                     aInterfaces.add(new Int(achs, ao));
                     break;
                 default:
-                    st = "";
+                   // st = "";
                     switch (recent) {
                         case "Assumptions":
                             st += " X (" + line + ")" + " &\n";
-
+                            
                             break;
                         case "Guarantees":
 
                             st += " X (" + line + ")" + " &\n";
-                            specBuilder.addln(" X (" + line + ")" + " &\n");
+                           // specBuilder.addln(" X (" + line + ")" + " &\n");
                             break;
 
                         default:

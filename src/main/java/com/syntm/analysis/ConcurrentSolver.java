@@ -270,7 +270,7 @@ public class ConcurrentSolver {
       }
 
       CompressedTS c = new CompressedTS("s-" + this.ts.getName());
-      TS t = c.compressedTS(this.ts, rho_f);
+      TS t = c.DoCompress(this.ts, rho_f);
       return t;
     } catch (InterruptedException | BrokenBarrierException e) {
       e.printStackTrace();

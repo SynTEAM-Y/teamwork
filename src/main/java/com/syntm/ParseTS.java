@@ -29,21 +29,22 @@ public class ParseTS {
 	public void readInput(final String fileP) {
 		try {
 			this.mainTS.parse(fileP);
-
-			mainTS.toDot();
+			TS mTs=this.mainTS.reduce();
+			//this.mainTS.setName("MainTS");
+			mTs.toDot();
 
 			Set<TS> sTS = new HashSet<TS>();
 
-			for (TS pa : mainTS.getParameters()) {
-				Partitioning lp = new Partitioning(pa, mainTS.getAgentById(pa.getName()));
+			for (TS pa : mTs.getParameters()) {
+				Partitioning lp = new Partitioning(pa, mTs.getAgentById(pa.getName()));
 				sTS.add(lp.computeCompressedTS());
 			}
 			// Create Dummy TS for compostion (The Id of ||)
 			TS t = new TS("");
-			State s = new State("in");
+			State s = new State("");
 			t.addState(s);
-			t.setInitState("in");
-
+			t.setInitState("");
+			
 			for (TS tss : sTS) {
 
 				t = t.openParallelCompTS(tss);

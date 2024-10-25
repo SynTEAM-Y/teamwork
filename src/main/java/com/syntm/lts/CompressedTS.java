@@ -190,8 +190,58 @@ public class CompressedTS {
         gp.print();
 
     }
+    public TS DoQuotient(TS ts, Set<Set<State>> rho) {
+        //System.out.println("This is rho -> "+rho);
+        CompressedTS t = new CompressedTS("");
+        
+        if (ts.getName().contains("T[")) {
+            t.setName(ts.getName());
+        } else {
+            t.setName(ts.getName());
+        }
+        Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
+        t.setInterface(i);
 
-    public TS compressedTS(TS ts, Set<Set<State>> rho) {
+        for (Set<State> p : rho) {
+            PartitionState s_rho = new PartitionState();
+            t.getL().apply(s_rho, p.iterator().next().getLabel());
+            s_rho.setPartition(p);
+            if (p.contains(ts.getInitState())) {
+                s_rho.setId(ts.getInitState().getId());
+                t.getLS().apply(s_rho, new Listen(ts.getInitState().getListen().getChannels()));
+                t.addState(s_rho);
+                t.setInitState(s_rho.getId());
+            } else {
+                s_rho.setId(p.iterator().next().getId());
+                t.addState(s_rho);
+            }
+
+        }
+        for (PartitionState pState : t.getStates()) {
+            for (State state : pState.getPartition()) {
+                for (Trans tr : state.getTrans()) {
+                        t.addPartitionTransition(t, pState, tr.action, t.getPstateByMembership(tr.getDestination()));
+
+                        pState.getPartitionTrans().add(
+                                new PartitionTrans(pState, tr.action, t.getPstateByMembership(tr.getDestination())));
+                }
+            }
+
+        }
+
+        for (PartitionState s : t.getStates()) {
+            Set<String> chan = new HashSet<String>();
+            for (PartitionTrans tr : s.getPartitionTrans()) {
+                chan.add(tr.getAction());
+            }
+            Listen ls = new Listen(chan);
+            t.getLS().apply(s, ls);
+        }
+        TS convT = t.convetToTS(t,ts);
+        convT.toDot();
+        return convT;
+    }
+    public TS DoCompress(TS ts, Set<Set<State>> rho) {
         CompressedTS t = new CompressedTS("");
         if (ts.getName().contains("T[")) {
             t.setName(ts.getName());
@@ -244,14 +294,16 @@ public class CompressedTS {
             Listen ls = new Listen(chan);
             t.getLS().apply(s, ls);
         }
-        TS convT = t.convetToTS(t);
+        TS convT = t.convetToTS(t,ts);
         convT.toDot();
         return convT;
 
     }
 
-    private TS convetToTS(CompressedTS t) {
+    private TS convetToTS(CompressedTS t, TS tss) {
         TS ts = new TS(t.getName());
+        ts.getParameters().addAll(tss.getParameters());
+        ts.getAgents().addAll(tss.getAgents());
         ts.setInterface(t.getInterface());
         for (PartitionState pState : t.getStates()) {
             State st = new State("");

@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.stream.*;
 import java.util.TreeSet;
 import java.util.function.BiFunction;
 
@@ -25,6 +27,7 @@ public class TS {
     private Set<TS> agents;
     private Set<TS> parameters;
     private String status;
+    private Set<String> channels;
 
     public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
@@ -37,6 +40,8 @@ public class TS {
         LS = (s, ls) -> s.setListen(ls);
         this.status = "";
         L = (s, l) -> s.setLabel(l);
+        this.channels = new HashSet<>();
+        this.channels.addAll(interface1.getChannels());
 
     }
 
@@ -51,10 +56,13 @@ public class TS {
         LS = (s, ls) -> s.setListen(ls);
         L = (s, l) -> s.setLabel(l);
         this.status = "";
+        this.channels = new HashSet<>();
+
     }
 
     public void setInterface(Int interface1) {
         Interface = interface1;
+        this.channels.addAll(this.Interface.getChannels());
     }
 
     public String getStatus() {
@@ -146,7 +154,7 @@ public class TS {
         for (State state : this.states) {
             gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                     + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
-                    + this.shortString(state.getLabel().getOutput()) + "\n\n\n" + "\"]" + "\n");
+                    + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"]" + "\n");
         }
 
         gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
@@ -240,9 +248,11 @@ public class TS {
                     break;
                 case "T":
                     String[] t = parts[1].trim().split(",");
+
                     this.getTransitions()
                             .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(),
                                     this.getStateById(t[2].trim())));
+                    this.channels.add(t[1].trim());
                     this.getStateById(t[0].trim()).getTrans()
                             .add(new Trans(this.getStateById(t[0].trim()), t[1].trim(),
                                     this.getStateById(t[2].trim())));
@@ -726,14 +736,27 @@ public class TS {
             p.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
         }
-        this.agents.add(t);
-        this.parameters.add(p);
+        this.agents.add(t.reduce());
+        this.parameters.add(p.reduce());
+        // t.toDot();
+        // p.toDot();
+        // t.reduce().toDot();
+        // p.reduce().toDot();
+        // Create Dummy TS for compostion (The Id of ||)
+        TS tt = new TS("");
+        State s = new State("");
+        tt.addState(s);
+        tt.setInitState("");
+        tt = tt.openParallelCompTS(p.reduce());
+        tt = tt.openParallelCompTS(t.reduce());
+        tt.toDot();
     }
 
     public void addTransition(TS ts, State src, String action, State des) {
         src.setOwner(ts);
         des.setOwner(ts);
         ts.transitions.add(new Trans(src, action, des));
+        this.channels.add(action);
 
     }
 
@@ -838,65 +861,81 @@ public class TS {
         Set<Set<State>> rhoinit = new HashSet<Set<State>>();
         rhoinit.add(this.getStates());
 
-        Set<String> sigma = new TreeSet<String>();
-        sigma.addAll(this.Interface.getChannels());
+        Set<String> sigma = new HashSet<String>();
+        sigma.addAll(this.channels);
 
         Set<Set<State>> rho = new HashSet<Set<State>>(rhoinit);
-        Set<Set<State>> waiting = new HashSet<Set<State>>(rhoinit);
+
         Set<Label> labs = new HashSet<Label>();
         for (State s : this.getStates()) {
             labs.add(s.getLabel());
         }
 
-        while (true) {
+        for (Label l : labs) {
+            HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
+
+            for (Set<State> partition : rho) {
+                Set<State> splitter = findSplit(partition, l);
+                if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                    splitters.put(partition, splitter);
+                }
+            }
+
+            for (Set<State> p : splitters.keySet()) {
+                Set<Set<State>> splitP = split(p, splitters.get(p));
+                rho.remove(p);
+                rho.addAll(splitP);
+            }
+
+        }
+        Set<Set<State>> waiting = new HashSet<Set<State>>(rho);
+        Boolean changedW = true;
+        //Think about carrying l-equiv states with quo.
+        while (changedW) {
             Set<State> pprime = this.popStates(waiting);
-            for (Label l : labs) {
-                for (String action : sigma) {
-                    Set<Set<State>> matchP = new HashSet<Set<State>>();
+            for (String action : sigma) {
+                HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
+                for (Set<State> partition : rho) {
+                    Set<State> splitter = this.strongBism(partition, pprime, action);
 
-                    for (Set<State> partition : rho) {
-                        Set<State> tap = this.t(partition, pprime, action, l);
-
-                        if (!tap.isEmpty() && !tap.equals(partition)) {
-                            matchP.add(partition);
-                        }
+                    if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                        splitters.put(partition, splitter);
                     }
-
-                    for (Set<State> partition : matchP) {
-                        Set<Set<State>> splitP = this.splitP(partition, pprime, action, l);
-
-                        rho.remove(partition);
-                        rho.addAll(splitP);
-
-                        waiting.remove(partition);
-                        waiting.addAll(splitP);
-                    }
+                }
+                for (Set<State> p : splitters.keySet()) {
+                    Set<Set<State>> splitP = split(p, splitters.get(p));
+                    rho.remove(p);
+                    rho.addAll(splitP);
+                    waiting.remove(p);
+                    waiting.addAll(splitP);
+                    // System.err.println("current action-> "+action);
+                    // System.err.println("");
+                    // System.err.println("current rho -> " + rho);
+                    // System.err.println("");
                 }
             }
 
             if (waiting.isEmpty()) {
-                break;
+                changedW = false;
             }
         }
         if (rho.size() == 1) {
             return this;
         }
         CompressedTS c = new CompressedTS("r-" + this.getName());
-        TS t = c.compressedTS(this, rho);
+        TS t = c.DoQuotient(this, rho);
         return t;
     }
 
-    private Set<State> popStates(final Set<Set<State>> stateSets) {
+    private Set<State> popStates(Set<Set<State>> stateSets) {
         Set<State> states = stateSets.iterator().next();
         stateSets.remove(states);
         return states;
     }
 
-    private Set<Set<State>> splitP(final Set<State> partition, final Set<State> pprime, final String action,
-            final Label l) {
+    private Set<Set<State>> splitP(Set<State> partition, Set<State> tap) {
         Set<Set<State>> splitP = new HashSet<Set<State>>();
 
-        Set<State> tap = this.t(partition, pprime, action, l);
         Set<State> nottap = new HashSet<State>(partition);
         nottap.removeAll(tap);
 
@@ -906,24 +945,50 @@ public class TS {
         return splitP;
     }
 
-    private Set<State> t(final Set<State> partition, final Set<State> pprime, final String action, final Label l) {
+    private Set<State> strongBism(Set<State> partition, Set<State> pprime, String action) {
         Set<State> acc = new HashSet<State>();
+        acc = partition
+                .stream()
+                .filter(
+                        s -> !(s.getTrans()
+                                .stream()
+                                .filter(tr -> tr.getAction().equals(action) &&
+                                        pprime.contains(tr.getDestination()))
+                                .collect(Collectors.toSet())).isEmpty())
+                .collect(Collectors.toSet());
 
-        for (State s : partition) {
-            for (State d : pprime) {
-                if (s.getLabel().equals(l)) {
-                    for (Trans tr : s.getTrans()) {
-                        if (tr.getSource().equals(s)&& tr.getDestination().equals(d) && tr.getAction().equals(action)) {
-                            acc.add(s);
-                            break;
-                        }
-                    }
-                    
-                }
-            }
-        }
+        // for (State s : partition) {
+        // for (Trans tr : s.getTrans()) {
+        // if (tr.getAction().equals(action) && pprime.contains(tr.getDestination())) {
+        // acc.add(s);
+        // break;
+        // }
+        // }
+        // }
 
         return acc;
+    }
+
+    private Set<State> findSplit(Set<State> p, Label label) {
+        Set<State> out = new HashSet<State>();
+        out = p.stream().filter(s -> s.getLabel().equals(label)).collect(Collectors.toSet());
+        // for (State s : p) {
+        // if (s.getLabel().equals(label)) {
+        // out.add(s);
+        // }
+        // }
+        return out;
+    }
+
+    private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
+        Set<Set<State>> splitP = new HashSet<Set<State>>();
+        Set<State> notsplitter = new HashSet<State>(p);
+        notsplitter.removeAll(splitter);
+
+        splitP.add(splitter);
+
+        splitP.add(notsplitter);
+        return splitP;
     }
 
 }

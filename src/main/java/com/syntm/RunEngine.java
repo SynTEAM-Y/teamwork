@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -42,7 +41,7 @@ public class RunEngine {
 			FileOutputStream fos = new FileOutputStream(Strategy, false);
 		}
 		p.redirectErrorStream(true);
-		p.redirectOutput(Redirect.appendTo(Strategy));
+		p.redirectOutput(Redirect.to(Strategy));
 		Process proc = p.start();
 		proc.waitFor();
 
@@ -68,22 +67,32 @@ public class RunEngine {
 	}
 
 	public void processInput(TS ts, Spec spec) {
-		Random rand = new Random();
+		int i=0;
 		for (Int aInt : spec.getaInterfaces()) {
-			ts.initialDecomposition(ts.getName() + rand.nextInt(10), aInt.getChannels(), aInt.getOutput());
+			ts.initialDecomposition("A" + i, aInt.getChannels(), aInt.getOutput());
+			i++;
 		}
 
 		Set<TS> sTS = new HashSet<TS>();
+		for (TS a : ts.getAgents()) {
+			a.toDot();
+		}
+		TS chk = new TS("");
+		State ss = new State("");
+		chk.addState(ss);
+		chk.setInitState("");
 
 		for (TS pa : ts.getParameters()) {
+			chk= chk.openParallelCompTS(ts.getAgentById(pa.getName()));
 			Partitioning lp = new Partitioning(pa, ts.getAgentById(pa.getName()));
 			sTS.add(lp.computeCompressedTS());
 		}
+		chk.toDot();
 		// Create Dummy TS for compostion (The Id of ||)
 		TS t = new TS("");
-		State s = new State("in");
+		State s = new State("");
 		t.addState(s);
-		t.setInitState("in");
+		t.setInitState("");
 
 		for (TS tss : sTS) {
 

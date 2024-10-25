@@ -41,18 +41,25 @@ public class Task implements Callable<Set<Set<State>>> {
         Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
         for (Set<State> ePrime : ePartitions) {
           for (Set<State> partition : this.rho_epsilon) {
-            Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
-            if (!splitter.isEmpty() && !splitter.equals(partition)) {
-              Set<Set<State>> splitP = new HashSet<>();
-              splitP = split(partition, splitter);
-              rho_temp.remove(partition);
-              rho_temp.addAll(splitP);
+            //if (partition.size() > 1) 
+            {
+              Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
+              if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                Set<Set<State>> splitP = new HashSet<>();
+                splitP = split(partition, splitter);
+                // System.err.println("This is current split -> " + rho_temp);
+                rho_temp.remove(partition);
+                rho_temp.addAll(splitP);
+                // rho_epsilon.clear();
+                // rho_epsilon.addAll(rho_temp);
 
+              }
             }
           }
         }
       }
     }
+    
     return rho_temp;
   }
 
@@ -81,66 +88,117 @@ public class Task implements Callable<Set<Set<State>>> {
 
   private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, Set<State> ePrime, String channel) {
     Set<State> out = new HashSet<State>();
-
+    // 2. b, c, a with parameter invovled
     if (epsilon.enable(epsilon, channel)
         && trEpsilon.getAction().equals(channel)) {
-      for (State s : p) {
-        for (State sPrime : p) {
 
-          if (s.canExactSilent(s.getOwner(), s, channel)
-              && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-            if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
-              if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                  channel).getDestination())
-                  && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime,
-                      channel).getDestination())) {
-                out.add(s);
-                out.add(sPrime);
-              }
-            } else {
-              if (!sPrime.getListen().getChannels().contains(channel)) {
-                if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                    channel).getDestination())
-                    && ePrime.contains(sPrime)) {
+      if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
+        // Silent moves
+        out = sSilentToE(p, ePrime, out, channel);
+
+        // reaction moves
+        if (out.isEmpty()) {
+          out = sReactToE(p, ePrime, out, channel);
+        }
+      }
+      // initiation by s
+      if (out.isEmpty())
+        out = sInitiateToE(p, ePrime, out, channel);
+
+    }
+
+    // 2 b, c, a without involving the parameter
+    if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
+      // Epsilon does not participate
+      out = sInitiateAlone(p, out, channel);
+
+      // if (out.isEmpty()) {
+      // out = sSlientAlone(p, ePrime, out, channel);
+      // }
+
+      // if (out.isEmpty()) {
+      // out = sReactToAlone(p, ePrime, out, channel);
+      // }
+
+    }
+
+    return out;
+  }
+
+  private Set<State> sReactToAlone(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    // for (Set<State> partition : rho_epsilon) { // all in same partition.
+    // for (State s : p) {
+    // if (s.canDirectReaction(s.getOwner(), s, channel)) {
+    // if (partition.contains(s.takeDirectReaction(s.getOwner(), s,
+    // channel).getDestination())) {
+    // out.add(s);
+    // }
+    // }
+    // }
+    // if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+    // break;
+    // }
+    // if (out.equals(p)) { // no split, don't waste time
+    // out.clear();
+    // }
+    // }
+
+    // if (!out.isEmpty()) {
+    // for (Set<State> partition : rho_epsilon) { // all in same partition.
+    // for (State s : p) {
+    // if (!s.canDirectReaction(s.getOwner(), s, channel)
+    // && !s.canExactSilent(s.getOwner(), s, channel)) {
+    // Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
+    // if (reach.size() != 1) {
+    // for (State sReach : reach) {
+    // if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+    // if (partition
+    // .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
+    // channel).getDestination())) {
+    // out.add(s);
+
+    // }
+    // }
+    // }
+    // }
+    // }
+    // }
+    // if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+    // break;
+    // }
+    // if (out.equals(p)) { // no split, don't waste time
+    // out.clear();
+    // }
+    // }
+    // }
+    out = sReactToE(p, ePrime, out, channel);
+    return out;
+  }
+
+  private Set<State> sReactToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    for (State s : p) {
+      if (s.canDirectReaction(s.getOwner(), s, channel)) {
+        if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())) {
+          out.add(s);
+        }
+      }
+    }
+    Set<State> pPrime = new HashSet<>();
+    pPrime.addAll(p);
+    pPrime.removeAll(out);
+    if (!out.isEmpty()) {
+      for (State s : pPrime) {
+        if (!s.canDirectReaction(s.getOwner(), s, channel)
+            && !s.canExactSilent(s.getOwner(), s, channel)) {
+          Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
+          if (reach.size() != 1) {
+            for (State sReach : reach) {
+              if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                if (ePrime
+                    .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
+                        channel).getDestination())) {
                   out.add(s);
-                  out.add(sPrime);
-                }
-              }
-            }
-          }
 
-          if (!s.getListen().getChannels().contains(channel) &&
-              !sPrime.getListen().getChannels().contains(channel)) {
-            if (ePrime.contains(s) && ePrime.contains(sPrime)) {
-              out.add(s);
-              out.add(sPrime);
-            }
-          }
-
-          if (s.canDirectReaction(s.getOwner(), s, channel)
-              && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
-            if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-              if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
-                  && ePrime
-                      .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                out.add(s);
-                out.add(sPrime);
-              }
-            } else {
-              Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel);
-              if (reach.size() != 1) {
-                for (State sReach : reach) {
-                  if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
-                    if (ePrime
-                        .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
-                            channel).getDestination())
-                        &&
-                        ePrime.contains(s.takeDirectReaction(s.getOwner(), s,
-                            channel).getDestination())) {
-                      out.add(s);
-                      out.add(sPrime);
-                    }
-                  }
                 }
               }
             }
@@ -149,7 +207,107 @@ public class Task implements Callable<Set<Set<State>>> {
       }
     }
 
-    if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
+    return out;
+  }
+
+  private Set<State> sSilentToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    boolean flag = false;
+    for (State s : p) {
+      // 3.c
+      if (s.canExactSilent(s.getOwner(), s, channel)) {
+        if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
+            channel).getDestination())) {
+          out.add(s);
+        }
+      }
+    }
+    Set<State> pPrime = new HashSet<>();
+    pPrime.addAll(p);
+    pPrime.removeAll(out);
+    if (!out.isEmpty()) {
+      for (State s : pPrime) {
+
+        if (!s.canExactSilent(s.getOwner(), s, channel)
+            && !s.canDirectReaction(s.getOwner(), s, channel)) {
+
+          //
+          Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
+          if (reach.size() != 1) {
+            for (State sReach : reach) {
+              if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                flag = true;
+              }
+              if (sReach.canExactSilent(sReach.getOwner(), sReach, channel)) {
+                flag = true;
+                if (!sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                  if (ePrime
+                      .contains(sReach.takeExactSilent(sReach.getOwner(), sReach,
+                          channel).getDestination())) {
+                    out.add(s);
+
+                  }
+                }
+              }
+            }
+          }
+          //
+          if (!flag && !s.getListen().getChannels().contains(channel)) {
+            if (ePrime.contains(s)) {
+              out.add(s);
+            }
+          }
+        }
+        flag = false;
+      }
+    }
+
+    return out;
+  }
+
+  private Set<State> sSlientAlone(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    // for (Set<State> partition : rho_epsilon) { // all in same partition.
+    // for (State s : p) {
+    // if (s.canExactSilent(s.getOwner(), s, channel)) {
+    // if (partition.contains(s.takeExactSilent(s.getOwner(), s,
+    // channel).getDestination())) {
+    // out.add(s);
+    // }
+    // }
+    // }
+    // if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+    // break;
+    // }
+    // if (out.equals(p)) { // no split, don't waste time
+    // out.clear();
+    // }
+    // }
+
+    // if (!out.isEmpty()) {
+    // for (Set<State> partition : rho_epsilon) { // all in same partition.
+    // for (State s : p) {
+    // if (!s.canExactSilent(s.getOwner(), s, channel)
+    // && !s.canDirectReaction(s.getOwner(), s, channel)) {
+    // if (!s.getListen().getChannels().contains(channel)) {
+    // if (partition.contains(s)) {
+    // out.add(s);
+    // }
+    // }
+    // }
+    // }
+    // if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+    // break;
+    // }
+    // if (out.equals(p)) { // no split, don't waste time
+    // out.clear();
+    // }
+    // }
+    // }
+    out = sSilentToE(p, ePrime, out, channel);
+    return out;
+  }
+
+  private Set<State> sInitiateToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    if (!epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
         && epsilon.getListen().getChannels().contains(channel)) {
       for (State s : p) {
         if (s.canTakeInitiative(s.getOwner(), s, channel)) {
@@ -159,25 +317,25 @@ public class Task implements Callable<Set<Set<State>>> {
         }
       }
     }
+    return out;
+  }
 
-    if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
-      for (Set<State> partition : rho_epsilon) {
-        for (State s : p) {
-          if (s.canTakeInitiative(s.getOwner(), s, channel)) {
-            if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
-              out.add(s);
-            }
+  private Set<State> sInitiateAlone(Set<State> p, Set<State> out, String channel) {
+    for (Set<State> partition : rho_epsilon) { // all in same partition.
+      for (State s : p) {
+        if (s.canTakeInitiative(s.getOwner(), s, channel)) {
+          if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
+            out.add(s);
           }
         }
-        if (!out.isEmpty() && !out.equals(p)) {
-          break;
-        }
-        if (out.equals(p)) {
-          out.clear();
-        }
+      }
+      if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+        break;
+      }
+      if (out.equals(p)) { // no split, don't waste time
+        out.clear();
       }
     }
-
     return out;
   }
 
