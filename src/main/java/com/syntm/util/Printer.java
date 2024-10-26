@@ -53,6 +53,28 @@ public class Printer {
         }
     }
 
+    public void printText() {
+        try {
+
+            if (filePrefix == null || filePrefix.isEmpty()) {
+                filePrefix = "output";
+            }
+
+            sBuilder.insert(0, "[").append("\n");
+            sBuilder.append("]").append("\n");
+            writeTextToFile(filePrefix, sBuilder.toString());
+
+            StringBuilder command = new StringBuilder();
+            command.append("dot -Tpng ");
+                    
+
+            executeCommand(command.toString());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
     private void executeCommand(String command) throws Exception {
         Runtime.getRuntime().exec(command);
     }

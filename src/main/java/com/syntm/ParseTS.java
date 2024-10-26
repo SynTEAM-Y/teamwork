@@ -31,7 +31,7 @@ public class ParseTS {
 			this.mainTS.parse(fileP);
 			TS mTs=this.mainTS.reduce();
 			//this.mainTS.setName("MainTS");
-			mTs.toDot();
+			//mTs.toDot();
 
 			Set<TS> sTS = new HashSet<TS>();
 

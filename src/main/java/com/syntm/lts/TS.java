@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.*;
-import java.util.TreeSet;
 import java.util.function.BiFunction;
 
 import com.syntm.util.Printer;
@@ -28,6 +26,8 @@ public class TS {
     private Set<TS> parameters;
     private String status;
     private Set<String> channels;
+    
+    // Set<Set<State>> rho = new HashSet<Set<State>>();
 
     public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
@@ -737,7 +737,7 @@ public class TS {
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
         }
         this.agents.add(t.reduce());
-        this.parameters.add(p.reduce());
+        this.parameters.add(p);
         // t.toDot();
         // p.toDot();
         // t.reduce().toDot();
@@ -747,7 +747,7 @@ public class TS {
         State s = new State("");
         tt.addState(s);
         tt.setInitState("");
-        tt = tt.openParallelCompTS(p.reduce());
+        tt = tt.openParallelCompTS(p);
         tt = tt.openParallelCompTS(t.reduce());
         tt.toDot();
     }
@@ -839,21 +839,20 @@ public class TS {
         return super.clone();
     }
 
-    private Set<Trans> hasTransitions(TS ts, State s) {
-        Set<Trans> trSet = new HashSet<>();
+    public void setAgents(Set<TS> agents) {
+        this.agents = agents;
+    }
 
-        for (Trans tr : ts.getTransitions()) {
-            try {
-                if (tr.getSource().equals(s)) {
-                    trSet.add(tr);
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+    public void setParameters(Set<TS> parameters) {
+        this.parameters = parameters;
+    }
 
-        }
+    public void setChannels(Set<String> channels) {
+        this.channels = channels;
+    }
 
-        return trSet;
+    public Set<String> getChannels() {
+        return channels;
     }
 
     public TS reduce() {
@@ -888,9 +887,10 @@ public class TS {
             }
 
         }
+        // this.rho =rho;
+        // System.err.println("carry my rho -> "+this.rho);
         Set<Set<State>> waiting = new HashSet<Set<State>>(rho);
         Boolean changedW = true;
-        //Think about carrying l-equiv states with quo.
         while (changedW) {
             Set<State> pprime = this.popStates(waiting);
             for (String action : sigma) {
@@ -925,6 +925,23 @@ public class TS {
         CompressedTS c = new CompressedTS("r-" + this.getName());
         TS t = c.DoQuotient(this, rho);
         return t;
+    }
+
+    private Set<Trans> hasTransitions(TS ts, State s) {
+        Set<Trans> trSet = new HashSet<>();
+
+        for (Trans tr : ts.getTransitions()) {
+            try {
+                if (tr.getSource().equals(s)) {
+                    trSet.add(tr);
+                }
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+        }
+
+        return trSet;
     }
 
     private Set<State> popStates(Set<Set<State>> stateSets) {

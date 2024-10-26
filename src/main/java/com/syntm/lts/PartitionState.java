@@ -11,6 +11,7 @@ public class PartitionState {
 	private Set<PartitionTrans> PartitionTrans;
     private Set<PartitionState> comStates;
     private CompressedTS owner;
+    
 
 	public PartitionState() {
 		this.id = "";

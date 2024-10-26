@@ -23,7 +23,6 @@ public class Partitioning {
 
     public TS computeCompressedTS() {
 
-        // Partition Locally Based On Label;
 
         Set<Set<State>> rho = new HashSet<Set<State>>();
         rho.add(this.T.getStates());
@@ -52,7 +51,6 @@ public class Partitioning {
             
         }
          ////// 
-         System.out.println("what is wrong with rho-> "+rho);
         Set<Set<State>> rhoInit = new HashSet<Set<State>>();
         rhoInit.addAll(rho);
         for (State epsilon : this.Parameter.getStates()) {
@@ -64,7 +62,7 @@ public class Partitioning {
 
         // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
         // return d.run();
-        System.out.println(this.T.getName());
+        System.out.println("TS to be minimised -> "+this.T.getName());
         ESolver d= new ESolver(sMap, this.T,c);
         return d.run();
     }

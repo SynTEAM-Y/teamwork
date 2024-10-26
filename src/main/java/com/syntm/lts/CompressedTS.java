@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import com.syntm.util.Printer;
 
@@ -16,6 +17,7 @@ public class CompressedTS {
     private Set<PartitionTrans> PartitionTransitions;
     private BiFunction<PartitionState, Listen, Listen> LS;
     private BiFunction<PartitionState, Label, Label> L;
+    Set<Set<State>> rho = new HashSet<Set<State>>();
 
     public CompressedTS(String name, Set<PartitionState> states, PartitionState initState, Int interface1,
             Set<PartitionTrans> PartitionTransitions) {
@@ -302,12 +304,14 @@ public class CompressedTS {
 
     private TS convetToTS(CompressedTS t, TS tss) {
         TS ts = new TS(t.getName());
-        ts.getParameters().addAll(tss.getParameters());
-        ts.getAgents().addAll(tss.getAgents());
+        ts.setParameters(tss.getParameters());
+        ts.setAgents(tss.getAgents());
         ts.setInterface(t.getInterface());
+        //ts.setRho(tss.getRho());
         for (PartitionState pState : t.getStates()) {
             State st = new State("");
             st = pState.toState();
+            st.setqState(pState.getPartition().stream().map(State::getId).collect(Collectors.toSet()));
             ts.addState(st);
         }
         ts.setInitState(t.getInitState().getId());

@@ -5,160 +5,161 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-public class State{
-	private String id;
-	private Label label;
-	private Listen listen;
-	private Set<Trans> trans;
-	private Set<State> comStates;
-	private TS owner;
+public class State {
+    private String id;
+    private Label label;
+    private Listen listen;
+    private Set<Trans> trans;
+    private Set<State> comStates;
+    private TS owner;
+    private Set<String> qState=new HashSet<>();
 
-	public State() {
-		this.id = "";
-		this.label = new Label();
-		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();		
-	}
-
-	public State(String id) {
-		this.id = id;
-		this.label = new Label();
-		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();		
-	}
-
-	public State(String id, Label label, Listen listen) {
-		this.id = id;
-		this.label = label;
-		this.listen = listen;
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();
-	}
-
-    public State(String id, Label label) {
-		this.id = id;
-		this.label = label;
-		this.listen = new Listen();
-		this.trans=new HashSet<Trans>();
-		this.comStates=new HashSet<State>();
-	}
-
-	public State(String id, Label label, Listen listen, Set<Trans> trans) {
-		this.id = id;
-		this.label = label;
-		this.listen = listen;
-		this.trans=trans;
-		this.comStates=new HashSet<State>();
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result + ((listen == null) ? 0 : listen.hashCode());
-
-		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		State other = (State) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (label == null) {
-			if (other.label != null)
-				return false;
-		} else if (!label.equals(other.label))
-			return false;
-		if (listen == null) {
-			if (other.listen != null)
-				return false;
-		} else if (!listen.equals(other.listen))
-			return false;
-		if (owner == null) {
-			if (other.owner != null)
-				return false;
-		} else if (!owner.equals(other.owner))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
-	}
-
-	public String getId() {
-		return id;
-	}
-	public Label getLabel() {
-		return label;
-	}
-
-	public Label setLabel(Label label) {
-		this.label = label;
-		return label;
-	}
-
-	public Listen getListen() {
-		return listen;
-	}
-
-	public Listen setListen(Listen listen) {
-		this.listen = listen;
-		return listen;
-	}
-	
-
-	public Set<Trans> getTrans() {
-		return trans;
-	}
-
-	public void setTrans(Set<Trans> trans) {
-		this.trans = trans;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Set<State> getComStates() {
-		return comStates;
-	}
-
-	public void setComStates(Set<State> comStates) {
-		this.comStates = comStates;
-	}
-
-	public TS getOwner() {
-		return owner;
-	}
-
-	public void setOwner(TS owner) {
-		this.owner = owner;
-	}
-
-    public void addTrans(Trans tr, TS ts) {
-		tr.getSource().setOwner(ts);
-		tr.getDestination().setOwner(ts);
-		this.trans.add(tr);
+    public State() {
+        this.id = "";
+        this.label = new Label();
+        this.listen = new Listen();
+        this.trans = new HashSet<Trans>();
+        this.comStates = new HashSet<State>();
     }
 
-	 public boolean canExactSilent(TS t, State s, String ch) {
+    public State(String id) {
+        this.id = id;
+        this.label = new Label();
+        this.listen = new Listen();
+        this.trans = new HashSet<Trans>();
+        this.comStates = new HashSet<State>();
+    }
+
+    public State(String id, Label label, Listen listen) {
+        this.id = id;
+        this.label = label;
+        this.listen = listen;
+        this.trans = new HashSet<Trans>();
+        this.comStates = new HashSet<State>();
+    }
+
+    public State(String id, Label label) {
+        this.id = id;
+        this.label = label;
+        this.listen = new Listen();
+        this.trans = new HashSet<Trans>();
+        this.comStates = new HashSet<State>();
+    }
+
+    public State(String id, Label label, Listen listen, Set<Trans> trans) {
+        this.id = id;
+        this.label = label;
+        this.listen = listen;
+        this.trans = trans;
+        this.comStates = new HashSet<State>();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((label == null) ? 0 : label.hashCode());
+        result = prime * result + ((listen == null) ? 0 : listen.hashCode());
+
+        result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        State other = (State) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (label == null) {
+            if (other.label != null)
+                return false;
+        } else if (!label.equals(other.label))
+            return false;
+        if (listen == null) {
+            if (other.listen != null)
+                return false;
+        } else if (!listen.equals(other.listen))
+            return false;
+        if (owner == null) {
+            if (other.owner != null)
+                return false;
+        } else if (!owner.equals(other.owner))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public Label getLabel() {
+        return label;
+    }
+
+    public Label setLabel(Label label) {
+        this.label = label;
+        return label;
+    }
+
+    public Listen getListen() {
+        return listen;
+    }
+
+    public Listen setListen(Listen listen) {
+        this.listen = listen;
+        return listen;
+    }
+
+    public Set<Trans> getTrans() {
+        return trans;
+    }
+
+    public void setTrans(Set<Trans> trans) {
+        this.trans = trans;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Set<State> getComStates() {
+        return comStates;
+    }
+
+    public void setComStates(Set<State> comStates) {
+        this.comStates = comStates;
+    }
+
+    public TS getOwner() {
+        return owner;
+    }
+
+    public void setOwner(TS owner) {
+        this.owner = owner;
+    }
+
+    public void addTrans(Trans tr, TS ts) {
+        tr.getSource().setOwner(ts);
+        tr.getDestination().setOwner(ts);
+        this.trans.add(tr);
+    }
+
+    public boolean canExactSilent(TS t, State s, String ch) {
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
@@ -269,6 +270,28 @@ public class State{
         return flag;
     }
 
+    public boolean canAnyReaction(TS t, State s, String ch) {
+        boolean flag = false;
+        if (t.getInterface().getChannels().contains(ch)) {
+            return false;
+        }
+        if (s.canDirectReaction(t, s, ch) || s.canExactSilent(t, s, ch)) {
+            flag = true;
+        }
+
+        return flag;
+    }
+
+    public Trans takeAnyReaction(TS t, State s, String ch) {
+        if (s.canExactSilent(t, s, ch)) {
+            return s.takeExactSilent(t, s, ch);
+        }
+        if (s.canDirectReaction(t, s, ch)) {
+            return s.takeDirectReaction(t, s, ch);
+        }
+        return null;
+    }
+
     public Trans takeDirectReaction(TS t, State s, String ch) {
         for (Trans tr : s.getTrans()) {
             if (!tr.getDestination().getLabel().equals(s.getLabel())
@@ -310,5 +333,13 @@ public class State{
             }
         }
         return false;
+    }
+
+    public Set<String> getqState() {
+        return qState;
+    }
+
+    public void setqState(Set<String> qState) {
+        this.qState = qState;
     }
 }
