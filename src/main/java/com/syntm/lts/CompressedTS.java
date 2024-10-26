@@ -320,6 +320,10 @@ public class CompressedTS {
 
             ts.getTransitions().add(tr.toTrans());
             ts.getStateById(tr.getSource().getId()).addTrans(tr.toTrans(), ts);
+
+            ts.getStateById(tr.getSource().getId()).getPost().add(ts.getStateById(tr.getDestination().getId()));
+
+            ts.getStateById(tr.getDestination().getId()).getPre().add(ts.getStateById(tr.getSource().getId()));
         }
 
         return ts;

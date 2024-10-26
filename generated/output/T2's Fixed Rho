@@ -10,7 +10,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=1, L=[]/[], LS=[b])]
+pre-> []
 	1 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -20,7 +21,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=2, L=[]/[], LS=[c])]
+pre-> [ State(id=0, L=[]/[], LS=[d])]
 	2 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -30,7 +32,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=3, L=[]/[], LS=[a, b, c])]
+pre-> [ State(id=1, L=[d]/[], LS=[b])]
 	3 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -40,7 +43,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=6, L=[]/[], LS=[g]),  State(id=4, L=[]/[], LS=[f]),  State(id=5, L=[]/[], LS=[e])]
+pre-> [ State(id=2, L=[b]/[], LS=[c])]
 	4 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -50,7 +54,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=7, L=[f]/[], LS=[f])]
+pre-> [ State(id=3, L=[c]/[], LS=[a, b, c])]
 	5 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -60,7 +65,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=8, L=[e]/[], LS=[e])]
+pre-> [ State(id=3, L=[c]/[], LS=[a, b, c])]
 	6 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -70,7 +76,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=9, L=[g]/[], LS=[g])]
+pre-> [ State(id=3, L=[c]/[], LS=[a, b, c])]
 	7 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -80,7 +87,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=7, L=[f]/[], LS=[f])]
+pre-> [ State(id=4, L=[a]/[], LS=[f]),  State(id=7, L=[]/[], LS=[f])]
 	8 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -90,7 +98,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=8, L=[e]/[], LS=[e])]
+pre-> [ State(id=5, L=[b]/[], LS=[e]),  State(id=8, L=[]/[], LS=[e])]
 	9 ->
 		[ State(id=6, L=[c]/[], LS=[g])]
 		[ State(id=3, L=[c]/[], LS=[a, b, c])]
@@ -100,7 +109,8 @@
 		[ State(id=2, L=[b]/[], LS=[c])]
 		[ State(id=8, L=[]/[], LS=[e]),  State(id=7, L=[]/[], LS=[f]),  State(id=9, L=[]/[], LS=[g])]
 		[ State(id=0, L=[]/[], LS=[d])]
-
+post-> [ State(id=9, L=[g]/[], LS=[g])]
+pre-> [ State(id=9, L=[]/[], LS=[g]),  State(id=6, L=[c]/[], LS=[g])]
 
  === Care of Epsilons === 
 
@@ -228,41 +238,81 @@
 
 			8 -:- [8] ,
 
+			 Pre ->[ State(id=8, L=[]/[], LS=[e]),  State(id=5, L=[b]/[], LS=[e])] -:- 8 ,
+
+			 Post ->[ State(id=8, L=[]/[], LS=[e])] -:- 8 ,
+
 		 Quotient states for 7 ->
 
 			7 -:- [7] ,
+
+			 Pre ->[ State(id=7, L=[]/[], LS=[f]),  State(id=4, L=[a]/[], LS=[f])] -:- 7 ,
+
+			 Post ->[ State(id=7, L=[]/[], LS=[f])] -:- 7 ,
 
 		 Quotient states for 6 ->
 
 			6 -:- [6] ,
 
+			 Pre ->[ State(id=3, L=[c]/[], LS=[a, b, c])] -:- 6 ,
+
+			 Post ->[ State(id=9, L=[]/[], LS=[g])] -:- 6 ,
+
 		 Quotient states for 9 ->
 
 			9 -:- [9] ,
+
+			 Pre ->[ State(id=6, L=[c]/[], LS=[g]),  State(id=9, L=[]/[], LS=[g])] -:- 9 ,
+
+			 Post ->[ State(id=9, L=[]/[], LS=[g])] -:- 9 ,
 
 		 Quotient states for 3 ->
 
 			3 -:- [3] ,
 
+			 Pre ->[ State(id=2, L=[b]/[], LS=[c])] -:- 3 ,
+
+			 Post ->[ State(id=6, L=[c]/[], LS=[g]),  State(id=5, L=[b]/[], LS=[e]),  State(id=4, L=[a]/[], LS=[f])] -:- 3 ,
+
 		 Quotient states for 5 ->
 
 			5 -:- [5] ,
+
+			 Pre ->[ State(id=3, L=[c]/[], LS=[a, b, c])] -:- 5 ,
+
+			 Post ->[ State(id=8, L=[]/[], LS=[e])] -:- 5 ,
 
 		 Quotient states for 4 ->
 
 			4 -:- [4] ,
 
+			 Pre ->[ State(id=3, L=[c]/[], LS=[a, b, c])] -:- 4 ,
+
+			 Post ->[ State(id=7, L=[]/[], LS=[f])] -:- 4 ,
+
 		 Quotient states for 2 ->
 
 			2 -:- [2] ,
+
+			 Pre ->[ State(id=1, L=[d]/[], LS=[b])] -:- 2 ,
+
+			 Post ->[ State(id=3, L=[c]/[], LS=[a, b, c])] -:- 2 ,
 
 		 Quotient states for 1 ->
 
 			1 -:- [1] ,
 
+			 Pre ->[ State(id=0, L=[]/[], LS=[d])] -:- 1 ,
+
+			 Post ->[ State(id=2, L=[b]/[], LS=[c])] -:- 1 ,
+
 		 Quotient states for 0 ->
 
 			0 -:- [0] ,
+
+			 Pre ->[] -:- 0 ,
+
+			 Post ->[ State(id=1, L=[d]/[], LS=[b])] -:- 0 ,
 
 
 ]

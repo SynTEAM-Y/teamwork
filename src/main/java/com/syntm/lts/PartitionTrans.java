@@ -8,6 +8,7 @@ public class PartitionTrans implements Comparable<PartitionTrans> {
         this.source = source;
         this.action = action;
         this.destination = destination;
+        
     }
     public PartitionState getSource() {
         return source;

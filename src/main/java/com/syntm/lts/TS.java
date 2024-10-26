@@ -26,7 +26,7 @@ public class TS {
     private Set<TS> parameters;
     private String status;
     private Set<String> channels;
-    
+
     // Set<Set<State>> rho = new HashSet<Set<State>>();
 
     public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
@@ -733,8 +733,14 @@ public class TS {
 
             t.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId())));
+            t.getStateById(tr.source.getId()).getPost().add(t.getStateById(tr.destination.getId()));
+
+            t.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
+
             p.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
+            p.getStateById(tr.source.getId()).getPost().add(p.getStateById(tr.destination.getId()));
+            p.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
         }
         this.agents.add(t.reduce());
         this.parameters.add(p);

@@ -11,9 +11,26 @@ public class PartitionState {
 	private Set<PartitionTrans> PartitionTrans;
     private Set<PartitionState> comStates;
     private CompressedTS owner;
+    private Set<State> post=new HashSet<>();
+    private Set<State> pre=new HashSet<>();
     
+	public Set<State> getPost() {
+        return post;
+    }
 
-	public PartitionState() {
+    public void setPost(Set<State> post) {
+        this.post = post;
+    }
+
+    public Set<State> getPre() {
+        return pre;
+    }
+
+    public void setPre(Set<State> pre) {
+        this.pre = pre;
+    }
+
+    public PartitionState() {
 		this.id = "";
 		this.label = new Label();
 		this.listen = new Listen();

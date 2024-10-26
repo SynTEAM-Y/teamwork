@@ -1,6 +1,7 @@
 package com.syntm.analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.concurrent.Future;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
+import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
 
 public class ESolver {
@@ -94,7 +96,6 @@ public class ESolver {
       }
     }
     if (fixedPoint) {
-      // System.out.println("Fixed map -> " + eMap);
       printFixedRho(eMap);
     }
 
@@ -105,6 +106,38 @@ public class ESolver {
     return fixedPoint;
   }
 
+  public Set<Set<State>> buildFinalRho(){
+    List<State> keys = new ArrayList<State>();
+    HashMap<State,Set<State>> atState = new HashMap<>();
+    HashMap<State,Set<State>> preState = new HashMap<>();
+    TS paramTS = new TS("");
+    paramTS = eMap.keySet().iterator().next().getOwner();
+    
+    for (State state : this.ts.getStates()) {
+      Set<State> temp = new HashSet<>();
+      for (String id : state.getqState()) {
+       temp.add(paramTS.getStateById(id));
+      }
+      atState.put(state, temp);
+    }
+
+    for (State s : this.ts.getStates()) {
+      Set<State> temp = new HashSet<>();
+      for (State sPrime : this.ts.getStates()) {
+       if (sPrime.getTrans().stream().map(Trans::getDestination).collect(Collectors.toSet()).contains(s)) {
+        temp.add(sPrime);
+       } ;
+      }
+    }
+    
+    for (State epsilon : eMap.keySet()) {
+      keys.add(epsilon);
+    }
+    keys.sort((e1, e2) -> e1.getId().compareTo(e2.getId()));
+
+
+    return null;
+  }
   public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
 
     Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
@@ -121,7 +154,9 @@ public class ESolver {
       for (Set<State> set : map.get(epsilon)) {
         gp.addln("\t\t" + set);
       }
-      gp.addln("");
+      gp.addln("post-> "+epsilon.getPost());
+      gp.addln("pre-> "+epsilon.getPre());
+
     }
     gp.addln("\n === Care of Epsilons === \n");
 
@@ -132,13 +167,13 @@ public class ESolver {
       final Set<State> temp = t.lMap.keySet()
           .stream()
           .filter(s -> s.getId() != t.getEpsilon().getId()).collect(Collectors.toSet());
-      System.err.println("temp ->" + temp);
+     // System.err.println("temp ->" + temp);
 
       Set<String> ids = temp.stream().map(State::getId).collect(Collectors.toSet());
 
       ids.add(t.getEpsilon().getId());
 
-      System.err.println("ids ->" + ids);
+      //System.err.println("ids ->" + ids);
 
      
 
@@ -179,6 +214,14 @@ public class ESolver {
       gp.addln("\t\t Quotient states for " + state.getId() + " ->\n");
       gp.addln("\t\t\t"
      +state.getId()+ " -:- "+ state.getqState()
+      + " ,\n");
+
+      gp.addln("\t\t\t Pre ->"
+     +state.getPre()+ " -:- "+ state.getId()
+      + " ,\n");
+
+      gp.addln("\t\t\t Post ->"
+     +state.getPost()+ " -:- "+ state.getId()
       + " ,\n");
     }
     gp.printText();

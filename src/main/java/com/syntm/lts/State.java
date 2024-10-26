@@ -13,13 +13,30 @@ public class State {
     private Set<State> comStates;
     private TS owner;
     private Set<String> qState=new HashSet<>();
-
+    private Set<State> post=new HashSet<>();
+    private Set<State> pre=new HashSet<>();
     public State() {
         this.id = "";
         this.label = new Label();
         this.listen = new Listen();
         this.trans = new HashSet<Trans>();
         this.comStates = new HashSet<State>();
+    }
+
+    public Set<State> getPost() {
+        return post;
+    }
+
+    public void setPost(Set<State> post) {
+        this.post = post;
+    }
+
+    public Set<State> getPre() {
+        return pre;
+    }
+
+    public void setPre(Set<State> pre) {
+        this.pre = pre;
     }
 
     public State(String id) {
