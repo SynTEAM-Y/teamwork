@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class State {
     private String id;
@@ -12,9 +13,10 @@ public class State {
     private Set<Trans> trans;
     private Set<State> comStates;
     private TS owner;
-    private Set<String> qState=new HashSet<>();
-    private Set<State> post=new HashSet<>();
-    private Set<State> pre=new HashSet<>();
+    private Set<String> qState = new HashSet<>();
+    private Set<State> post = new HashSet<>();
+    private Set<State> pre = new HashSet<>();
+
     public State() {
         this.id = "";
         this.label = new Label();
@@ -119,7 +121,7 @@ public class State {
     public String toString() {
         return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
     }
-    
+
     public String getId() {
         return id;
     }
@@ -292,7 +294,14 @@ public class State {
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
         }
-        if (s.canDirectReaction(t, s, ch) || s.canExactSilent(t, s, ch)) {
+        Set<Trans> trs = new HashSet<>();
+
+        trs = s.getTrans()
+                .stream()
+                .filter(tr -> tr.getAction().equals(ch))
+                .collect(Collectors.toSet());
+
+        if (!trs.isEmpty()) {
             flag = true;
         }
 
@@ -300,11 +309,11 @@ public class State {
     }
 
     public Trans takeAnyReaction(TS t, State s, String ch) {
-        if (s.canExactSilent(t, s, ch)) {
-            return s.takeExactSilent(t, s, ch);
-        }
-        if (s.canDirectReaction(t, s, ch)) {
-            return s.takeDirectReaction(t, s, ch);
+        for (Trans tr : s.getTrans()) {
+            if (tr.getAction().equals(ch)
+                    && !t.getInterface().getChannels().contains(ch)) {
+                return tr;
+            }
         }
         return null;
     }
