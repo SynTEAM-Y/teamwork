@@ -745,7 +745,7 @@ public class TS {
         this.agents.add(t.reduce());
         this.parameters.add(p);
         // t.toDot();
-        // p.toDot();
+        p.toDot();
         // t.reduce().toDot();
         // p.reduce().toDot();
         // Create Dummy TS for compostion (The Id of ||)
@@ -755,7 +755,7 @@ public class TS {
         tt.setInitState("");
         tt = tt.openParallelCompTS(p);
         tt = tt.openParallelCompTS(t.reduce());
-        tt.toDot();
+        // tt.toDot();
     }
 
     public void addTransition(TS ts, State src, String action, State des) {
@@ -878,23 +878,24 @@ public class TS {
 
         for (Label l : labs) {
             HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
-
             for (Set<State> partition : rho) {
-                Set<State> splitter = findSplit(partition, l);
-                if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                    splitters.put(partition, splitter);
+                if (partition.size() > 1) {
+                    Set<State> splitter = findSplit(partition, l);
+                    if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                        splitters.put(partition, splitter);
+                    }
+                }
+            }
+            if (!splitters.isEmpty()) {
+                for (Set<State> p : splitters.keySet()) {
+                    Set<Set<State>> splitP = split(p, splitters.get(p));
+                    rho.remove(p);
+                    rho.addAll(splitP);
                 }
             }
 
-            for (Set<State> p : splitters.keySet()) {
-                Set<Set<State>> splitP = split(p, splitters.get(p));
-                rho.remove(p);
-                rho.addAll(splitP);
-            }
-
         }
-        // this.rho =rho;
-        // System.err.println("carry my rho -> "+this.rho);
+
         Set<Set<State>> waiting = new HashSet<Set<State>>(rho);
         Boolean changedW = true;
         while (changedW) {
@@ -914,10 +915,6 @@ public class TS {
                     rho.addAll(splitP);
                     waiting.remove(p);
                     waiting.addAll(splitP);
-                    // System.err.println("current action-> "+action);
-                    // System.err.println("");
-                    // System.err.println("current rho -> " + rho);
-                    // System.err.println("");
                 }
             }
 

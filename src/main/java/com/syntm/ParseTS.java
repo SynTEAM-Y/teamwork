@@ -49,7 +49,7 @@ public class ParseTS {
 
 				t = t.openParallelCompTS(tss);
 			}
-			t.toDot();
+			//t.toDot();
 			t = t.prunedTS(t);
 			t.toDot();
 

@@ -1,5 +1,6 @@
 package com.syntm.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -37,30 +38,31 @@ public class Task implements Callable<Set<Set<State>>> {
   @Override
   public Set<Set<State>> call() throws Exception {
     for (String ch : channels) {
+
       for (Trans trEpsilon : epsilon.getTrans()) {
         Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
         for (Set<State> ePrime : ePartitions) {
-          for (Set<State> partition : this.rho_epsilon) {
-            //if (partition.size() > 1) 
-            {
+          HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
+          for (Set<State> partition : this.rho_temp) {
+            if (partition.size() > 1) {
               Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
               if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                Set<Set<State>> splitP = new HashSet<>();
-                splitP = split(partition, splitter);
-                // System.err.println("This is current split -> " + rho_temp);
-                rho_temp.remove(partition);
-                rho_temp.addAll(splitP);
-                // rho_epsilon.clear();
-                // rho_epsilon.addAll(rho_temp);
-
+                splitters.put(partition, splitter);
               }
+            }
+          }
+          if (!splitters.isEmpty()) {
+            for (Set<State> p : splitters.keySet()) {
+              Set<Set<State>> splitP = split(p, splitters.get(p));
+              rho_temp.remove(p);
+              rho_temp.addAll(splitP);
             }
           }
         }
       }
     }
-    
     return rho_temp;
+
   }
 
   public State getEpsilon() {
@@ -95,11 +97,11 @@ public class Task implements Callable<Set<Set<State>>> {
       if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
         out = sAnyToE(p, ePrime, out, channel);
         // Silent moves
-        //out = sSilentToE(p, ePrime, out, channel);
+        // out = sSilentToE(p, ePrime, out, channel);
 
         // reaction moves
         // if (out.isEmpty()) {
-        //   out = sReactToE(p, ePrime, out, channel);
+        // out = sReactToE(p, ePrime, out, channel);
         // }
       }
       // initiation by s
@@ -127,7 +129,7 @@ public class Task implements Callable<Set<Set<State>>> {
   }
 
   private Set<State> sAnyToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
-   // boolean flag = false;
+    // boolean flag = false;
     for (State s : p) {
       // 3.c
       if (s.canAnyReaction(s.getOwner(), s, channel)) {
@@ -142,11 +144,10 @@ public class Task implements Callable<Set<Set<State>>> {
     pPrime.removeAll(out);
     if (!out.isEmpty()) {
       for (State s : pPrime) {
-        if (!s.canAnyReaction(s.getOwner(), s, channel)
-            ) {
-          if ( !s.getListen().getChannels().contains(channel)) {
-           // if (ePrime.contains(s))
-             {
+        if (!s.canAnyReaction(s.getOwner(), s, channel)) {
+          if (!s.getListen().getChannels().contains(channel)) {
+            // if (ePrime.contains(s))
+            {
               out.add(s);
             }
           }
@@ -156,7 +157,6 @@ public class Task implements Callable<Set<Set<State>>> {
 
     return out;
   }
-
 
   private Set<State> sReactToAlone(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
     // for (Set<State> partition : rho_epsilon) { // all in same partition.

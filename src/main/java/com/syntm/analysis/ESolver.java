@@ -48,7 +48,7 @@ public class ESolver {
     boolean fixed = false;
     while (!fixed) {
       counter += 1;
-      // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+       //System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
       // Execute all tasks and get reference to Future objects
       List<Future<Set<Set<State>>>> resultList = null;
       try {
@@ -64,7 +64,7 @@ public class ESolver {
           e.printStackTrace();
         }
       }
-      // System.out.println("Fixed map -> " + eMap);
+      // System.out.println("current map -> " + eMap);
 
       fixed = updateMap();
     }
@@ -154,8 +154,8 @@ public class ESolver {
       for (Set<State> set : map.get(epsilon)) {
         gp.addln("\t\t" + set);
       }
-      gp.addln("post-> "+epsilon.getPost());
-      gp.addln("pre-> "+epsilon.getPre());
+      gp.addln("\n\t" +"post-> "+epsilon.getPost()+"\n");
+      gp.addln("\t" +"pre-> "+epsilon.getPre()+"\n");
 
     }
     gp.addln("\n === Care of Epsilons === \n");
