@@ -114,7 +114,10 @@ public class TS {
     public Int getInterface() {
         return Interface;
     }
+    public String formatTSName(){
 
+        return this.getName().substring(2,this.getName().length()-1);
+    }
     public String shortString(Set<String> longString) {
         String st = "";
         for (String string : longString) {
@@ -170,7 +173,7 @@ public class TS {
 
     }
 
-    public void toDot(State simState, Trans transition) {
+    public Printer toDot(State simState, Trans transition) {
         // System.out.println("# of states of " + this.name + "-> " +
         // this.getStates().size());
         Printer gp = new Printer(name);
@@ -187,19 +190,19 @@ public class TS {
         gp.addln("init [shape=point,style=invis];");
         for (State state : this.states) {
             if (state.equals(transition.getSource()) || state.equals(transition.getDestination())) {
-                gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                gp.addln("\t" + this.formatTSName()+state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                         + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                         + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
                         + "#f25959\"]" + "\n");
             } else {
                 if (state.equals(this.getStateById(simState.getId()))) {
-                    gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                    gp.addln("\t" + this.formatTSName()+state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                         + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                         + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
                         + "#f25959\"]" + "\n");
 
                 } else {
-                    gp.addln("\t" + state.getId().toString() + "[label=\""
+                    gp.addln("\t" + this.formatTSName()+state.getId().toString() + "[label=\""
                             + formatListen(state.getListen().getChannels())
                             + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                             + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"]" + "\n");
@@ -207,26 +210,26 @@ public class TS {
             }
         }
 
-        gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+        gp.addln("\t" + " init -> " + this.formatTSName()+this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
                 + ";\n");
         for (Trans t : this.getTransitions()) {
-            String source = t.getSource().getId().toString();
-            String dest = t.getDestination().getId().toString();
+            String source = this.formatTSName()+t.getSource().getId().toString();
+            String dest = this.formatTSName()+t.getDestination().getId().toString();
             String action = t.getAction().toString();
-            if (action.equals(transition.getAction()) && source.equals(transition.getSource().getId())
-                    && dest.equals(transition.getDestination().getId())) {
+            if (action.equals(transition.getAction()) && source.equals(this.formatTSName()+transition.getSource().getId())
+                    && dest.equals(this.formatTSName()+transition.getDestination().getId())) {
                 gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\" color=\"" + "#f25959\"]" + ";\n");
             } else {
                 gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
             }
         }
 
-        gp.print();
-
+        //gp.print();
+        return gp.clusterIt(this.formatTSName());
     }
 
-    public void next(State state, Trans transition) {
-        toDot(new State(), transition);
+    public Printer next(Trans transition) {
+       return toDot(new State(), transition);
     }
 
     public Set<Trans> getTransitions() {

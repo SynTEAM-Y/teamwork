@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
+import com.syntm.util.Printer;
 
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
@@ -78,7 +79,7 @@ public class ParseTS {
 		String in = "";
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Set<State> simStates = new HashSet<>();
-
+		Printer simEnv = new Printer("SimulationEnv");
 		System.out.println(ANSI_GREEN + "Simulate? y/n" + ANSI_RESET);
 		in = stdin.readLine().toString();
 		if (!in.equals("n")) {
@@ -95,12 +96,14 @@ public class ParseTS {
 						System.out.println(ANSI_RED + "Pick a state for Agent " + ts.getName()
 								+ " ONLY from this list -> " + ids + ANSI_RESET);
 						in = stdin.readLine().toString();
-						ts.toDot(ts.getStateById(in), new Trans());
+						simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
 					}
 					simStates.add(ts.getStateById(in));
-					ts.toDot(ts.getStateById(in), new Trans());
+					simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
 
 				}
+				simEnv.printNested();
+				simEnv.setsBuilder(new StringBuilder());
 				onFly(simStates);
 				simStates.clear();
 			}
@@ -111,10 +114,11 @@ public class ParseTS {
 	private void onFly(Set<State> states) throws IOException {
 		String in = "";
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		
+		//Printer simEnv = new Printer("SimEnv");
 		Set<State> sStates = new HashSet<>(states);
 		while (true) {
 			Set<Trans> enabled = new HashSet<>();
+			Printer simEnv = new Printer("SimulationEnv");
 			enabled = sStates
 					.stream()
 					.map(State::getTrans)
@@ -135,6 +139,12 @@ public class ParseTS {
 
 			if (initiateSet.isEmpty()) {
 				System.out.println(ANSI_RED + "System is Deadlocked from your selection!" + ANSI_RESET);
+				// for (Trans tr : recvSet) {
+				// 	// simEnv.add(tr.getSource().getOwner().next(tr).formattedString());
+				// 	simEnv.add(tr.getSource().getOwner().toDot(tr.getSource().getOwner().getStateById(in), new Trans())
+				// 			.formattedString());
+				// }
+				// simEnv.printNested();
 				break;
 			} else {
 				System.out.println(ANSI_GREEN + "Select a send transition" + ANSI_RESET);
@@ -150,26 +160,43 @@ public class ParseTS {
 				System.out.println(ANSI_GREEN +
 						"[x] :  Previous View " + ANSI_RESET);
 				in = stdin.readLine();
+				final String input = in;
 				if (in.equals("x")) {
 					break;
 				}
-				tMap.get(in).getSource().getOwner().next(tMap.get(in).getSource(), tMap.get(in));
+				Set<State> rcv = new HashSet<>();
+
+				simEnv.add(tMap.get(in).getSource().getOwner().next(tMap.get(in)).formattedString());
 
 				sStates.remove(tMap.get(in).getSource());
 
 				sStates.add(
 						tMap.get(in).getDestination().getOwner().getStateById(tMap.get(in).getDestination().getId()));
-
-				for (Trans tr : recvSet) {
-					if (tr.getAction().equals(tMap.get(in).getAction())
-							&& !tr.getSource().getOwner().equals(tMap.get(in).getSource().getOwner())) {
-						tr.getSource().getOwner().next(tr.getSource(), tr);
+				rcv.addAll(sStates);
+				rcv.remove(
+						tMap.get(in).getDestination().getOwner().getStateById(tMap.get(in).getDestination().getId()));
+				for (State st : rcv) {
+					Set<Trans> trs = new HashSet<>();
+					trs = st.getTrans()
+							.stream()
+							.filter(tr -> tr.getAction().equals(tMap.get(input).getAction()))
+							.collect(Collectors.toSet());
+					if (!trs.isEmpty()) {
+						Trans tr = new Trans();
+						tr = trs.iterator().next();
+						simEnv.add(st.getOwner().next(tr).formattedString());
 						sStates.remove(tr.getSource());
 						sStates.add(tr.getDestination().getOwner().getStateById(tr.getDestination().getId()));
+					} else {
+						simEnv.add(st.getOwner()
+								.toDot(st.getOwner().getStateById(st.getId()), new Trans()).formattedString());
 					}
 				}
 
+				simEnv.printNested();
+				//simEnv.setsBuilder(new StringBuilder());
 			}
+
 		}
 
 	}
