@@ -144,7 +144,7 @@ public class TS {
         Printer gp = new Printer(name);
         gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
         gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
-        gp.addln("\"" + this.getInterface().toString());
+        gp.addln("\"" + this.getName()+" -> "+this.getInterface().toString());
         gp.addln(
                 "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
         gp.addln("\n\n\n\n");
@@ -168,6 +168,63 @@ public class TS {
 
         gp.print();
 
+    }
+
+    public void toDot(State simState, Trans transition) {
+        // System.out.println("# of states of " + this.name + "-> " +
+        // this.getStates().size());
+        Printer gp = new Printer(name);
+        gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
+        gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
+        gp.addln("\"" + this.getName()+" -> "+this.getInterface().toString());
+        gp.addln(
+                "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
+        gp.addln("\n\n\n\n");
+        gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
+
+        gp.addln("init [shape=point,style=invis];");
+        for (State state : this.states) {
+            if (state.equals(transition.getSource()) || state.equals(transition.getDestination())) {
+                gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                        + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                        + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
+                        + "#f25959\"]" + "\n");
+            } else {
+                if (state.equals(this.getStateById(simState.getId()))) {
+                    gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                        + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                        + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
+                        + "#f25959\"]" + "\n");
+
+                } else {
+                    gp.addln("\t" + state.getId().toString() + "[label=\""
+                            + formatListen(state.getListen().getChannels())
+                            + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                            + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"]" + "\n");
+                }
+            }
+        }
+
+        gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+                + ";\n");
+        for (Trans t : this.getTransitions()) {
+            String source = t.getSource().getId().toString();
+            String dest = t.getDestination().getId().toString();
+            String action = t.getAction().toString();
+            if (action.equals(transition.getAction()) && source.equals(transition.getSource().getId())
+                    && dest.equals(transition.getDestination().getId())) {
+                gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\" color=\"" + "#f25959\"]" + ";\n");
+            } else {
+                gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
+            }
+        }
+
+        gp.print();
+
+    }
+
+    public void next(State state, Trans transition) {
+        toDot(new State(), transition);
     }
 
     public Set<Trans> getTransitions() {

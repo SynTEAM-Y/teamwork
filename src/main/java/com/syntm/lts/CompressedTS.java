@@ -280,6 +280,7 @@ public class CompressedTS {
                     if (!t.getInterface().getChannels().contains(tr.action)
                             && !pState.getPartition().contains(tr.getDestination())) {
                         t.addPartitionTransition(t, pState, tr.action, t.getPstateByMembership(tr.getDestination()));
+                        
                         pState.getPartitionTrans().add(
                                 new PartitionTrans(pState, tr.action, t.getPstateByMembership(tr.getDestination())));
                     }
