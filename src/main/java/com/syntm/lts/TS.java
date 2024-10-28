@@ -174,12 +174,14 @@ public class TS {
         // System.out.println("# of states of " + this.name + "-> " +
         // this.getStates().size());
         Printer gp = new Printer(name);
-        gp.addln("\ngraph [rankdir=LR,ranksep=.6,nodesep=0.5];\n");
-        gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\" label=\n");
-        gp.addln("\"" + this.getName()+" -> "+this.getInterface().toString());
-        gp.addln(
-                "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
-        gp.addln("\n\n\n\n");
+        gp.addln("\ngraph [fontcolor=\"green\",fontsize=10,rankdir=LR,ranksep=.6,nodesep=0.5"+",label=\"" +this.getName()+" : CH="+this.getInterface().getChannels()+", OUT="+this.getInterface().getOutput()+" \"];\n");
+        // gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=11 style=\"filled\" label=\n");
+        // gp.addln("\"" + this.getName()+" -> "+this.getInterface().toString());
+        // gp.addln(
+        //         "\"]}");
+        // gp.addln(
+        //         "\nAny generated TS is open to interaction\\l with the external world. Some transtions\\l are only reactions and cannot execute\\l without an external initiator.\\l\\l According to the semantics, a transition is\\l a reaction if its channel is not included in\\l channel labelling of the reached state.\\l\"]}");
+        //gp.addln("\n\n\n\n");
         gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
 
         gp.addln("init [shape=point,style=invis];");

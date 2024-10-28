@@ -248,7 +248,7 @@ public class CompressedTS {
         if (ts.getName().contains("T[")) {
             t.setName(ts.getName());
         } else {
-            t.setName("[" + ts.getName() + "]~");
+            t.setName("[" + ts.getName() + "]");
         }
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);
