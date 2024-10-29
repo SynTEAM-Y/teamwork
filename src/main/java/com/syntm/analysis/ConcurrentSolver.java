@@ -14,7 +14,7 @@ import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
-
+//not used, need to be updated majorly 
 public class ConcurrentSolver {
   private class Worker implements Runnable {
     State epsilon;

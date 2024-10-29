@@ -193,7 +193,6 @@ public class CompressedTS {
 
     }
     public TS DoQuotient(TS ts, Set<Set<State>> rho) {
-        //System.out.println("This is rho -> "+rho);
         CompressedTS t = new CompressedTS("");
         
         if (ts.getName().contains("T[")) {
@@ -207,6 +206,8 @@ public class CompressedTS {
         for (Set<State> p : rho) {
             PartitionState s_rho = new PartitionState();
             t.getL().apply(s_rho, p.iterator().next().getLabel());
+            
+
             s_rho.setPartition(p);
             if (p.contains(ts.getInitState())) {
                 s_rho.setId(ts.getInitState().getId());
@@ -252,7 +253,7 @@ public class CompressedTS {
         }
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);
-
+        
         for (Set<State> p : rho) {
             PartitionState s_rho = new PartitionState();
             t.getL().apply(s_rho, p.iterator().next().getLabel());
@@ -266,6 +267,7 @@ public class CompressedTS {
                 s_rho.setId(p.iterator().next().getId());
                 t.addState(s_rho);
             }
+
 
         }
         for (PartitionState pState : t.getStates()) {
@@ -308,7 +310,6 @@ public class CompressedTS {
         ts.setParameters(tss.getParameters());
         ts.setAgents(tss.getAgents());
         ts.setInterface(t.getInterface());
-        //ts.setRho(tss.getRho());
         for (PartitionState pState : t.getStates()) {
             State st = new State("");
             st = pState.toState();

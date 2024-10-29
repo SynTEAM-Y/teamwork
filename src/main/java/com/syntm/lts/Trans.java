@@ -9,7 +9,6 @@ public class Trans implements Comparable<Trans> {
         this.source = source;
         this.action = action;
         this.destination = destination;
-        
     }
 
     public Trans() {

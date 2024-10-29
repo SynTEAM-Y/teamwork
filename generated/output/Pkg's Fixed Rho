@@ -1,0 +1,290 @@
+[
+ An e-Cooperative Bisimulation for Pkg
+
+	0 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=1, L=[a]/[rF], LS=[f])]
+
+	pre-> []
+
+	1 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=2, L=[f]/[rP], LS=[p])]
+
+	pre-> [ State(id=0, L=[]/[], LS=[a])]
+
+	2 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=3, L=[p]/[], LS=[a, d])]
+
+	pre-> [ State(id=6, L=[]/[], LS=[f]),  State(id=1, L=[]/[], LS=[f]),  State(id=7, L=[d]/[], LS=[f])]
+
+	3 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=5, L=[a]/[rF], LS=[d, f]),  State(id=4, L=[]/[], LS=[a])]
+
+	pre-> [ State(id=9, L=[d]/[], LS=[p]),  State(id=2, L=[]/[], LS=[p])]
+
+	4 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=6, L=[a]/[rF], LS=[f])]
+
+	pre-> [ State(id=3, L=[]/[rD], LS=[a, d])]
+
+	5 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=7, L=[]/[rF], LS=[f]),  State(id=8, L=[f]/[rP], LS=[d])]
+
+	pre-> [ State(id=3, L=[]/[rD], LS=[a, d])]
+
+	6 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=2, L=[f]/[rP], LS=[p])]
+
+	pre-> [ State(id=4, L=[d]/[], LS=[a])]
+
+	7 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=2, L=[f]/[rP], LS=[p])]
+
+	pre-> [ State(id=5, L=[]/[rD], LS=[d, f])]
+
+	8 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=9, L=[]/[rP], LS=[p])]
+
+	pre-> [ State(id=5, L=[]/[rD], LS=[d, f])]
+
+	9 ->
+		[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])]
+		[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]
+		[ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]
+
+	post-> [ State(id=3, L=[p]/[], LS=[a, d])]
+
+	pre-> [ State(id=8, L=[]/[rD], LS=[d])]
+
+
+ === Care of Epsilons === 
+
+	0-> decides for:
+
+		 Itself:  State(id=0, L=[]/[], LS=[a]) 
+
+		 Its successors:  
+
+			[ State(id=1, L=[a]/[rF], LS=[f])] ,
+
+		 Equivalence classes of Intereset for 0 ->
+
+			[[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]] ,
+
+	1-> decides for:
+
+		 Itself:  State(id=1, L=[a]/[rF], LS=[f]) 
+
+		 Its successors:  
+
+			[ State(id=2, L=[f]/[rP], LS=[p])] ,
+
+		 Equivalence classes of Intereset for 1 ->
+
+			[[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]] ,
+
+	2-> decides for:
+
+		 Itself:  State(id=2, L=[f]/[rP], LS=[p]) 
+
+		 Its successors:  
+
+			[ State(id=3, L=[p]/[], LS=[a, d])] ,
+
+		 Equivalence classes of Intereset for 2 ->
+
+			[[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])], [ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]] ,
+
+	3-> decides for:
+
+		 Itself:  State(id=3, L=[p]/[], LS=[a, d]) 
+
+		 Its successors:  
+
+			[ State(id=5, L=[a]/[rF], LS=[d, f]),  State(id=4, L=[]/[], LS=[a])] ,
+
+		 Equivalence classes of Intereset for 3 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]] ,
+
+	4-> decides for:
+
+		 Itself:  State(id=4, L=[]/[], LS=[a]) 
+
+		 Its successors:  
+
+			[ State(id=6, L=[a]/[rF], LS=[f])] ,
+
+		 Equivalence classes of Intereset for 4 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]] ,
+
+	5-> decides for:
+
+		 Itself:  State(id=5, L=[a]/[rF], LS=[d, f]) 
+
+		 Its successors:  
+
+			[ State(id=7, L=[]/[rF], LS=[f]),  State(id=8, L=[f]/[rP], LS=[d])] ,
+
+		 Equivalence classes of Intereset for 5 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]] ,
+
+	6-> decides for:
+
+		 Itself:  State(id=6, L=[a]/[rF], LS=[f]) 
+
+		 Its successors:  
+
+			[ State(id=2, L=[f]/[rP], LS=[p])] ,
+
+		 Equivalence classes of Intereset for 6 ->
+
+			[[ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]] ,
+
+	7-> decides for:
+
+		 Itself:  State(id=7, L=[]/[rF], LS=[f]) 
+
+		 Its successors:  
+
+			[ State(id=2, L=[f]/[rP], LS=[p])] ,
+
+		 Equivalence classes of Intereset for 7 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=2, L=[]/[], LS=[p]),  State(id=0, L=[]/[], LS=[a]),  State(id=6, L=[]/[], LS=[f])]] ,
+
+	8-> decides for:
+
+		 Itself:  State(id=8, L=[f]/[rP], LS=[d]) 
+
+		 Its successors:  
+
+			[ State(id=9, L=[]/[rP], LS=[p])] ,
+
+		 Equivalence classes of Intereset for 8 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]] ,
+
+	9-> decides for:
+
+		 Itself:  State(id=9, L=[]/[rP], LS=[p]) 
+
+		 Its successors:  
+
+			[ State(id=3, L=[p]/[], LS=[a, d])] ,
+
+		 Equivalence classes of Intereset for 9 ->
+
+			[[ State(id=7, L=[d]/[], LS=[f]),  State(id=9, L=[d]/[], LS=[p]),  State(id=4, L=[d]/[], LS=[a])], [ State(id=3, L=[]/[rD], LS=[a, d]),  State(id=5, L=[]/[rD], LS=[d, f]),  State(id=8, L=[]/[rD], LS=[d])]] ,
+
+		 Quotient states for 2 ->
+
+			2 -:- [2] ,
+
+			 Pre ->[ State(id=7, L=[d]/[], LS=[f]),  State(id=6, L=[]/[], LS=[f])] -:- 2 ,
+
+			 Post ->[ State(id=3, L=[]/[rD], LS=[a, d])] -:- 2 ,
+
+		 Quotient states for 7 ->
+
+			7 -:- [7] ,
+
+			 Pre ->[ State(id=5, L=[]/[rD], LS=[d, f])] -:- 7 ,
+
+			 Post ->[ State(id=2, L=[]/[], LS=[p])] -:- 7 ,
+
+		 Quotient states for 3 ->
+
+			3 -:- [3] ,
+
+			 Pre ->[ State(id=2, L=[]/[], LS=[p]),  State(id=9, L=[d]/[], LS=[p])] -:- 3 ,
+
+			 Post ->[ State(id=5, L=[]/[rD], LS=[d, f]),  State(id=4, L=[d]/[], LS=[a])] -:- 3 ,
+
+		 Quotient states for 0 ->
+
+			0 -:- [0] ,
+
+			 Pre ->[] -:- 0 ,
+
+			 Post ->[ State(id=6, L=[]/[], LS=[f])] -:- 0 ,
+
+		 Quotient states for 9 ->
+
+			9 -:- [9] ,
+
+			 Pre ->[ State(id=8, L=[]/[rD], LS=[d])] -:- 9 ,
+
+			 Post ->[ State(id=3, L=[]/[rD], LS=[a, d])] -:- 9 ,
+
+		 Quotient states for 5 ->
+
+			5 -:- [5] ,
+
+			 Pre ->[ State(id=3, L=[]/[rD], LS=[a, d])] -:- 5 ,
+
+			 Post ->[ State(id=7, L=[d]/[], LS=[f]),  State(id=8, L=[]/[rD], LS=[d])] -:- 5 ,
+
+		 Quotient states for 4 ->
+
+			4 -:- [4] ,
+
+			 Pre ->[ State(id=3, L=[]/[rD], LS=[a, d])] -:- 4 ,
+
+			 Post ->[ State(id=6, L=[]/[], LS=[f])] -:- 4 ,
+
+		 Quotient states for 8 ->
+
+			8 -:- [8] ,
+
+			 Pre ->[ State(id=5, L=[]/[rD], LS=[d, f])] -:- 8 ,
+
+			 Post ->[ State(id=9, L=[d]/[], LS=[p])] -:- 8 ,
+
+		 Quotient states for 6 ->
+
+			6 -:- [1, 6] ,
+
+			 Pre ->[ State(id=0, L=[]/[], LS=[a]),  State(id=4, L=[d]/[], LS=[a])] -:- 6 ,
+
+			 Post ->[ State(id=2, L=[]/[], LS=[p])] -:- 6 ,
+
+
+]

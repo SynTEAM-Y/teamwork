@@ -37,8 +37,6 @@ public class ESolver {
       Task w = new Task(s.getId(), eMap.get(s), eMap, channels);
       wList.add(i, w);
       i += i;
-      // service.execute(w);
-      // new Thread(w).start();
     }
 
   }

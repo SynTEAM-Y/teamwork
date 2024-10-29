@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import com.google.common.collect.Sets;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 import com.syntm.util.Printer;
@@ -35,6 +38,10 @@ public class ParseTS {
 		fileP = parseTS.checkFileName(fileP);
 		Set<TS> sTS = parseTS.readInput(fileP);
 		// parseTS.writeOutput("TStext");
+		TS cComp = parseTS.compose(sTS);
+		cComp.toDot();
+		System.out.println(ANSI_GREEN + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
+				+ " -> " + parseTS.mainTS.equivCheck(cComp) + ANSI_RESET);
 		parseTS.simulate(sTS);
 
 	}
@@ -43,30 +50,12 @@ public class ParseTS {
 		try {
 			this.mainTS.parse(fileP);
 			TS mTs = this.mainTS.reduce();
-			// this.mainTS.setName("MainTS");
-			// mTs.toDot();
-
 			Set<TS> sTS = new HashSet<TS>();
 
 			for (TS pa : mTs.getParameters()) {
 				Partitioning lp = new Partitioning(pa, mTs.getAgentById(pa.getName()));
 				sTS.add(lp.computeCompressedTS());
 			}
-			// Create Dummy TS for compostion (The Id of ||)
-			TS t = new TS("");
-			State s = new State("");
-			t.addState(s);
-			t.setInitState("");
-
-			for (TS tss : sTS) {
-
-				t = t.openParallelCompTS(tss);
-				// tss.toDot(false,tss.getInitState().getTrans().iterator().next());
-				// tss.toDot(true,new Trans());
-			}
-			// t.toDot();
-			t = t.prunedTS(t);
-			t.toDot();
 
 			return sTS;
 		} catch (IOException e) {
@@ -111,10 +100,124 @@ public class ParseTS {
 
 	}
 
+	public Set<List<State>> cartesianProduct(List<Set<State>> sets) {
+		Set<List<State>> cartesianProduct = Sets.cartesianProduct(sets);
+		return cartesianProduct;
+	}
+
+	private TS compose(Set<TS> sTS) {
+		TS t = new TS("");
+		Set<String> chan = new HashSet<>();
+		Set<String> output = new HashSet<>();
+		List<Set<State>> stateSets = new ArrayList<>();
+		for (TS ts : sTS) {
+			t.setName(ts.getName() + "|" + t.getName());
+			chan.addAll(ts.getInterface().getChannels());
+			output.addAll(ts.getInterface().getOutput());
+			stateSets.add(ts.getStates());
+
+		}
+		t.setName(t.getName().substring(0, t.getName().length() - 1));
+
+		Set<List<State>> cproduct = new HashSet<>();
+		cproduct = cartesianProduct(stateSets);
+		for (List<State> list : cproduct) {
+			State sc = new State("");
+			Set<String> ls = new HashSet<>();
+			Set<String> ch = new HashSet<>();
+			Set<String> out = new HashSet<>();
+			for (State st : list) {
+				ls.addAll(st.getListen().getChannels());
+				ch.addAll(st.getLabel().getChannel());
+				out.addAll(st.getLabel().getOutput());
+				sc.getComStates().add(st);
+				sc.setId(sc.getId() + "" + st.getId());
+			}
+			sc.setListen(new Listen(ls));
+			sc.setLabel(new Label(ch, out));
+			t.addState(sc);
+		}
+
+		final Set<State> initSet = new HashSet<>(
+				sTS.stream().map(TS::getInitState).collect(Collectors.toSet()));
+
+		State initState = t.getStates()
+				.stream()
+				.filter(tstate -> tstate.getComStates().equals(initSet))
+				.collect(Collectors.toSet())
+				.iterator()
+				.next();
+		t.setInitState(initState.getId());
+
+		Int i = new Int(chan, output);
+		t.setInterface(i);
+
+		for (State state : t.getStates()) {
+			Set<State> crntStates = new HashSet<>();
+			crntStates.addAll(state.getComStates());
+
+			Set<Trans> enabled = new HashSet<>();
+
+			enabled = crntStates
+					.stream()
+					.map(State::getTrans)
+					.collect(Collectors.toSet())
+					.stream()
+					.flatMap(tr -> tr.stream())
+					.collect(Collectors.toSet());
+
+			Set<Trans> initiateSet = new HashSet<>();
+
+			initiateSet = enabled
+					.stream()
+					.filter(tr -> tr.getSource().getOwner().getInterface().getChannels().contains(tr.getAction()))
+					.collect(Collectors.toSet());
+
+			Set<State> rcv = new HashSet<>();
+			if (!initiateSet.isEmpty()) {
+				for (Trans sTR : initiateSet) {
+					rcv.addAll(crntStates);
+					rcv.remove(sTR.getSource());
+					Set<State> nxtSet = new HashSet<>();
+					for (State rcvST : rcv) {
+						Set<Trans> rcvTRs = new HashSet<>();
+
+						rcvTRs = rcvST.getTrans()
+								.stream()
+								.filter(tran -> tran.getAction().equals(sTR.getAction()))
+								.collect(Collectors.toSet());
+						if (!rcvTRs.isEmpty()) {
+							nxtSet.add(rcvTRs.iterator().next().getDestination());
+						} else {
+							nxtSet.add(rcvST);
+						}
+					}
+					nxtSet.add(sTR.getDestination());
+					t.addTransition(t, t.getStateByComposite(t, crntStates), sTR.getAction(),
+							t.getStateByComposite(t, nxtSet));
+					t.getStateByComposite(t, crntStates).addTrans(new Trans(t.getStateByComposite(t, crntStates),
+							sTR.getAction(), t.getStateByComposite(t, nxtSet)), t);
+
+				}
+			}
+
+		}
+
+		t.setStates(reachFrom(t, t.getInitState()));
+		Set<Trans> trans = new HashSet<>();
+		for (Trans tr : t.getTransitions()) {
+			if (!t.getStates().contains(tr.getSource())) {
+				trans.add(tr);
+			}
+		}
+		t.getTransitions().removeAll(trans);
+
+		return t;
+	}
+
 	private void onFly(Set<State> states) throws IOException {
 		String in = "";
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		//Printer simEnv = new Printer("SimEnv");
 		Set<State> sStates = new HashSet<>(states);
 		while (true) {
 			Set<Trans> enabled = new HashSet<>();
@@ -138,13 +241,7 @@ public class ParseTS {
 			recvSet.removeAll(initiateSet);
 
 			if (initiateSet.isEmpty()) {
-				System.out.println(ANSI_RED + "System is Deadlocked from your selection!" + ANSI_RESET);
-				// for (Trans tr : recvSet) {
-				// 	// simEnv.add(tr.getSource().getOwner().next(tr).formattedString());
-				// 	simEnv.add(tr.getSource().getOwner().toDot(tr.getSource().getOwner().getStateById(in), new Trans())
-				// 			.formattedString());
-				// }
-				// simEnv.printNested();
+				System.out.println(ANSI_RED + "System is Deadlocked!" + ANSI_RESET);
 				break;
 			} else {
 				System.out.println(ANSI_GREEN + "Select a send transition" + ANSI_RESET);
@@ -194,7 +291,6 @@ public class ParseTS {
 				}
 
 				simEnv.printNested();
-				//simEnv.setsBuilder(new StringBuilder());
 			}
 
 		}
@@ -229,6 +325,44 @@ public class ParseTS {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Set<State> reachFrom(TS ts, State s) {
+
+		HashMap<State, Boolean> visited = new HashMap<>();
+		for (State st : ts.getStates()) {
+			visited.put(st, false);
+		}
+		LinkedList<State> queue = new LinkedList<State>();
+		Set<Trans> transitiveC = new HashSet<>();
+		Set<State> reach = new HashSet<>();
+		visited.put(s, false);
+		queue.add(s);
+		while (queue.size() != 0) {
+			s = queue.poll();
+			reach.add(s);
+			transitiveC = hasTransitions(ts, s);
+			if (transitiveC != null) {
+				if (transitiveC.size() != 0) {
+					for (Trans tr : transitiveC) {
+						if (!visited.get(tr.getDestination())) {
+							visited.put(tr.getDestination(), true);
+							queue.add(tr.getDestination());
+						}
+					}
+				}
+			}
+		}
+		return reach;
+	}
+
+	private Set<Trans> hasTransitions(TS ts, State s) {
+		Set<Trans> trSet = new HashSet<>();
+		trSet = ts.getTransitions()
+				.stream()
+				.filter(tr -> tr.getSource().equals(s))
+				.collect(Collectors.toSet());
+		return trSet;
 	}
 
 }

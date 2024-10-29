@@ -78,7 +78,7 @@ public class State {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((label == null) ? 0 : label.hashCode());
+        result = prime * result + ((label.toString() == null) ? 0 : label.toString().hashCode());
         result = prime * result + ((listen == null) ? 0 : listen.hashCode());
 
         result = prime * result + ((owner == null) ? 0 : owner.hashCode());
@@ -99,10 +99,10 @@ public class State {
                 return false;
         } else if (!id.equals(other.id))
             return false;
-        if (label == null) {
-            if (other.label != null)
+        if (label.toString() == null) {
+            if (other.label.toString() != null)
                 return false;
-        } else if (!label.equals(other.label))
+        } else if (!label.toString().equals(other.label.toString()))
             return false;
         if (listen == null) {
             if (other.listen != null)
