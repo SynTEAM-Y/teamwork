@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class State {
     private String id;
@@ -13,10 +12,9 @@ public class State {
     private Set<Trans> trans;
     private Set<State> comStates;
     private TS owner;
-    private Set<String> qState = new HashSet<>();
-    private Set<State> post = new HashSet<>();
-    private Set<State> pre = new HashSet<>();
-
+    private Set<String> qState=new HashSet<>();
+    private Set<State> post=new HashSet<>();
+    private Set<State> pre=new HashSet<>();
     public State() {
         this.id = "";
         this.label = new Label();
@@ -78,7 +76,7 @@ public class State {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((label.toString() == null) ? 0 : label.toString().hashCode());
+        result = prime * result + ((label == null) ? 0 : label.hashCode());
         result = prime * result + ((listen == null) ? 0 : listen.hashCode());
 
         result = prime * result + ((owner == null) ? 0 : owner.hashCode());
@@ -99,10 +97,10 @@ public class State {
                 return false;
         } else if (!id.equals(other.id))
             return false;
-        if (label.toString() == null) {
-            if (other.label.toString() != null)
+        if (label == null) {
+            if (other.label != null)
                 return false;
-        } else if (!label.toString().equals(other.label.toString()))
+        } else if (!label.equals(other.label))
             return false;
         if (listen == null) {
             if (other.listen != null)
@@ -121,7 +119,7 @@ public class State {
     public String toString() {
         return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
     }
-
+    
     public String getId() {
         return id;
     }
@@ -294,14 +292,7 @@ public class State {
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
         }
-        Set<Trans> trs = new HashSet<>();
-
-        trs = s.getTrans()
-                .stream()
-                .filter(tr -> tr.getAction().equals(ch))
-                .collect(Collectors.toSet());
-
-        if (!trs.isEmpty()) {
+        if (s.canDirectReaction(t, s, ch) || s.canExactSilent(t, s, ch)) {
             flag = true;
         }
 
@@ -309,11 +300,11 @@ public class State {
     }
 
     public Trans takeAnyReaction(TS t, State s, String ch) {
-        for (Trans tr : s.getTrans()) {
-            if (tr.getAction().equals(ch)
-                    && !t.getInterface().getChannels().contains(ch)) {
-                return tr;
-            }
+        if (s.canExactSilent(t, s, ch)) {
+            return s.takeExactSilent(t, s, ch);
+        }
+        if (s.canDirectReaction(t, s, ch)) {
+            return s.takeDirectReaction(t, s, ch);
         }
         return null;
     }

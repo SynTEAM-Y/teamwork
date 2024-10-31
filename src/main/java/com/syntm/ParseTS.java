@@ -29,7 +29,7 @@ public class ParseTS {
 	public static final String ANSI_CYAN = "\u001B[36m";
 	public static final String ANSI_WHITE = "\u001B[37m";
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException, InterruptedException {
 		ParseTS parseTS = new ParseTS();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
@@ -46,13 +46,14 @@ public class ParseTS {
 
 	}
 
-	public Set<TS> readInput(final String fileP) {
+	public Set<TS> readInput(final String fileP) throws InterruptedException {
 		try {
 			this.mainTS.parse(fileP);
 			TS mTs = this.mainTS.reduce();
 			Set<TS> sTS = new HashSet<TS>();
 
 			for (TS pa : mTs.getParameters()) {
+
 				Partitioning lp = new Partitioning(pa, mTs.getAgentById(pa.getName()));
 				sTS.add(lp.computeCompressedTS());
 			}
@@ -104,6 +105,7 @@ public class ParseTS {
 		Set<List<State>> cartesianProduct = Sets.cartesianProduct(sets);
 		return cartesianProduct;
 	}
+
 
 	private TS compose(Set<TS> sTS) {
 		TS t = new TS("");

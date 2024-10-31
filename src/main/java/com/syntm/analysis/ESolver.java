@@ -1,10 +1,10 @@
 package com.syntm.analysis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
 import java.util.stream.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -15,20 +15,21 @@ import java.util.concurrent.Future;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
-import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
 
 public class ESolver {
   private ConcurrentHashMap<State, Set<Set<State>>> eMap;
   private TS ts;
+  private TS p;
   private Set<String> channels;
   List<Task> wList;
   private ExecutorService service;
 
-  public ESolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, Set<String> sch) {
+  public ESolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, TS p, Set<String> sch) {
     eMap = new ConcurrentHashMap<>(indexedFamily);
     this.channels = sch;
     this.ts = t;
+    this.p = p;
     wList = new ArrayList<Task>();
     int corecount = Runtime.getRuntime().availableProcessors();
     service = (ExecutorService) Executors.newFixedThreadPool(corecount);
@@ -42,11 +43,11 @@ public class ESolver {
   }
 
   public TS run() {
-    int counter = 0;
+    // int counter = 0;
     boolean fixed = false;
     while (!fixed) {
-      counter += 1;
-       //System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+      // counter += 1;
+      // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
       // Execute all tasks and get reference to Future objects
       List<Future<Set<Set<State>>>> resultList = null;
       try {
@@ -69,12 +70,8 @@ public class ESolver {
     service.shutdown();
 
     Set<Set<State>> rho_f = new HashSet<>();
-    String id = ts.getInitState().getId();
-    for (State s : eMap.keySet()) {
-      if (s.getId().equals(id)) {
-        rho_f = new HashSet<>(eMap.get(s));
-      }
-    }
+    rho_f = buildFinalRho();
+
     if (rho_f.size() == 1) {
       return this.ts;
     }
@@ -93,9 +90,9 @@ public class ESolver {
         fixedPoint = false;
       }
     }
-    if (fixedPoint) {
-      printFixedRho(eMap);
-    }
+    // if (fixedPoint) {
+    // printFixedRho(eMap);
+    // }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);
@@ -104,40 +101,70 @@ public class ESolver {
     return fixedPoint;
   }
 
-  public Set<Set<State>> buildFinalRho(){
-    List<State> keys = new ArrayList<State>();
-    HashMap<State,Set<State>> atState = new HashMap<>();
-    HashMap<State,Set<State>> preState = new HashMap<>();
-    TS paramTS = new TS("");
-    paramTS = eMap.keySet().iterator().next().getOwner();
-    
-    for (State state : this.ts.getStates()) {
-      Set<State> temp = new HashSet<>();
-      for (String id : state.getqState()) {
-       temp.add(paramTS.getStateById(id));
-      }
-      atState.put(state, temp);
-    }
+  public Set<Set<State>> buildFinalRho() {
+    Set<State> closed = new HashSet<>();
+    Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
 
-    for (State s : this.ts.getStates()) {
-      Set<State> temp = new HashSet<>();
-      for (State sPrime : this.ts.getStates()) {
-       if (sPrime.getTrans().stream().map(Trans::getDestination).collect(Collectors.toSet()).contains(s)) {
-        temp.add(sPrime);
-       } ;
+    HashMap<String, Set<State>> cares = new HashMap<>();
+
+    Set<String> ids = new HashSet<>();
+    ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
+
+    for (State state : eMap.keySet()) {
+      if (!state.equals(p.getInitState())) {
+        rho_intersect.retainAll(eMap.get(state));
       }
     }
-    
-    for (State epsilon : eMap.keySet()) {
-      keys.add(epsilon);
+
+    for (String st : ids) {
+      Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
+          .collect(Collectors.toSet()).iterator().next();
+      cares.put(st, states);
+
     }
-    keys.sort((e1, e2) -> e1.getId().compareTo(e2.getId()));
 
+    if (rho_intersect.equals(eMap.get(p.getInitState()))) {
+      return rho_intersect;
+    }
+    rho_intersect.clear();
 
-    return null;
+    for (String s : ids) {
+      if (!closed.contains(ts.getStateById(s))) {
+        Set<State> b = new HashSet<>();
+        b = cares.get(s);
+        Set<Set<State>> interSet = new HashSet<>();
+        for (State sPrime : b) {
+          if (!sPrime.getId().equals(s)) {
+            Set<State> pWise = new HashSet<>();
+            pWise.addAll(b);
+            if (pWise.retainAll(cares.get(sPrime.getId()))) {
+              if (!pWise.isEmpty()) {
+                interSet.add(pWise);
+              }
+            }
+          }
+        }
+        Set<State> unionBi = new HashSet<>();
+        for (Set<State> pw : interSet) {
+          unionBi.addAll(pw);
+        }
+        b.removeAll(unionBi);
+        if (b.isEmpty()) {
+          rho_intersect.addAll(interSet);
+          closed.addAll(unionBi);
+        } else {
+          rho_intersect.addAll(interSet);
+          rho_intersect.add(b);
+          closed.addAll(unionBi);
+          closed.addAll(b);
+        }
+      }
+    }
+   // System.err.println("rho final" + rho_intersect);
+    return rho_intersect;
   }
-  public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
 
+  public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
     Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
     gp.addln("\n An e-Cooperative Bisimulation for " + this.ts.getName() + "\n");
     List<State> keys = new ArrayList<State>();
@@ -152,76 +179,12 @@ public class ESolver {
       for (Set<State> set : map.get(epsilon)) {
         gp.addln("\t\t" + set);
       }
-      gp.addln("\n\t" +"post-> "+epsilon.getPost()+"\n");
-      gp.addln("\t" +"pre-> "+epsilon.getPre()+"\n");
+      gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
+      gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
 
     }
-    gp.addln("\n === Care of Epsilons === \n");
-
-    wList.sort((e1, e2) -> e1.getEpsilon().getId().compareTo(e2.getEpsilon().getId()));
-
-    for (Task t : wList) {
-
-      final Set<State> temp = t.lMap.keySet()
-          .stream()
-          .filter(s -> s.getId() != t.getEpsilon().getId()).collect(Collectors.toSet());
-     // System.err.println("temp ->" + temp);
-
-      Set<String> ids = temp.stream().map(State::getId).collect(Collectors.toSet());
-
-      ids.add(t.getEpsilon().getId());
-
-      //System.err.println("ids ->" + ids);
-
-     
-
-      Set<Set<State>> cares = new HashSet<>();
-
-       cares = map.get(t.getEpsilon())
-      .stream()
-      .filter(p -> !p
-                      .stream()
-                      .filter( s -> ids.contains(s.getId()))
-                      .collect(Collectors.toSet()).isEmpty())
-      .collect(Collectors.toSet());
-      
-      
-
-      cares.addAll(map.get(t.getEpsilon())
-          .stream()
-          .filter(p -> !p
-              .stream().filter(s -> s.getId().equals(t.getEpsilon().getId())).collect(Collectors.toSet())
-              .isEmpty())
-          .collect(Collectors.toSet()));
-
-      gp.addln("\t" + t.getEpsilon().getId() + "-> decides for:\n");
-      gp.addln("\t\t Itself: " + t.getEpsilon() + " \n");
-      gp.addln("\t\t Its successors: " + " \n");
-      gp.addln("\t\t\t"
-          + temp
-          + " ,\n");
-      gp.addln("\t\t Equivalence classes of Intereset for " + t.getEpsilon().getId() + " ->\n");
-      gp.addln("\t\t\t"
-          + cares
-          + " ,\n");
-    }
-    Set<String> qSet = new HashSet<>();
-    
-    for (State state : this.ts.getStates()) {
-      qSet.addAll(state.getqState());
-      gp.addln("\t\t Quotient states for " + state.getId() + " ->\n");
-      gp.addln("\t\t\t"
-     +state.getId()+ " -:- "+ state.getqState()
-      + " ,\n");
-
-      gp.addln("\t\t\t Pre ->"
-     +state.getPre()+ " -:- "+ state.getId()
-      + " ,\n");
-
-      gp.addln("\t\t\t Post ->"
-     +state.getPost()+ " -:- "+ state.getId()
-      + " ,\n");
-    }
+    // wList.sort((e1, e2) ->
+    // e1.getEpsilon().getId().compareTo(e2.getEpsilon().getId()));
     gp.printText();
 
   }

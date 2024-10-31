@@ -30,7 +30,7 @@ import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
 
 public class RunEngine {
-	private TS mainTS;
+	//private TS mainTS;
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
 	public static final String ANSI_RED = "\u001B[31m";
@@ -58,6 +58,7 @@ public class RunEngine {
 		File Strategy = new File("Mealy");
 		if (Strategy.exists()) {
 			FileOutputStream fos = new FileOutputStream(Strategy, false);
+			fos.close();
 		}
 		p.redirectErrorStream(true);
 		p.redirectOutput(Redirect.to(Strategy));

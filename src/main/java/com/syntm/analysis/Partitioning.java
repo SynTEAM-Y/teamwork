@@ -48,7 +48,7 @@ public class Partitioning {
                 }
             }
         }
-        
+        //////
         Set<Set<State>> rhoInit = new HashSet<Set<State>>();
         rhoInit.addAll(rho);
         for (State epsilon : this.Parameter.getStates()) {
@@ -61,23 +61,28 @@ public class Partitioning {
         // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
         // return d.run();
         System.out.println("TS to be minimised -> " + this.T.getName());
-        ESolver d = new ESolver(sMap, this.T, c);
+        ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
         return d.run();
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {
         Set<State> out = new HashSet<State>();
-        out = p.stream().filter(s -> s.getLabel().toString().equals(label.toString())).collect(Collectors.toSet());
-        
+        out = p.stream().filter(s -> s.getLabel().equals(label)).collect(Collectors.toSet());
+        // for (State s : p) {
+        // if (s.getLabel().equals(label)) {
+        // out.add(s);
+        // }
+        // }
         return out;
     }
 
     private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
         Set<Set<State>> splitP = new HashSet<Set<State>>();
         Set<State> notsplitter = new HashSet<State>(p);
-        
         notsplitter.removeAll(splitter);
+
         splitP.add(splitter);
+
         splitP.add(notsplitter);
         return splitP;
     }

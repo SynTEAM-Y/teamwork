@@ -63,7 +63,7 @@ public class Printer {
     }
 
     public Printer clusterIt(String name) {
-        getsBuilder().insert(0, "subgraph cluster"+name+" {").append("\n");
+        getsBuilder().insert(0, "\n subgraph cluster"+name+" {").append("\n");
         getsBuilder().append("}").append("\n");
         return this;
     }
@@ -76,8 +76,9 @@ public class Printer {
             }
 
             sBuilder.insert(0,
-                    "digraph G {graph [fontcolor=\"green\",fontsize=10,rankdir=LR,ranksep=.6,nodesep=0.5];\n" + //
-                            "    compound=true;")
+                    "digraph G {\n" + //
+                                                " graph [fontcolor=\"green\",fontsize=10,rankdir=LR,ranksep=.6,nodesep=0.5];\n" + //
+                            " peripheries=0;\n   compound=true;")
                     .append("\n");
             sBuilder.append("}").append("\n");
             writeTextToFile(filePrefix + ".dot", sBuilder.toString());

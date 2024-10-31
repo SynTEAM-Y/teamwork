@@ -1,6 +1,7 @@
 package com.syntm.analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,7 @@ import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
-//not used, need to be updated majorly 
+
 public class ConcurrentSolver {
   private class Worker implements Runnable {
     State epsilon;
@@ -47,17 +48,24 @@ public class ConcurrentSolver {
       try {
         while (true) {
           for (String ch : channels) {
+
             for (Trans trEpsilon : epsilon.getTrans()) {
               Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
               for (Set<State> ePrime : ePartitions) {
-                for (Set<State> partition : this.rho_epsilon) {
-                  Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
-                  if (!splitter.isEmpty() && !splitter.equals(partition)) {
-                    Set<Set<State>> splitP = new HashSet<>();
-                    splitP = split(partition, splitter);
-                    rho_temp.remove(partition);
+                HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
+                for (Set<State> partition : this.rho_temp) {
+                  if (partition.size() > 1) {
+                    Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
+                    if (!splitter.isEmpty() && !splitter.equals(partition)) {
+                      splitters.put(partition, splitter);
+                    }
+                  }
+                }
+                if (!splitters.isEmpty()) {
+                  for (Set<State> p : splitters.keySet()) {
+                    Set<Set<State>> splitP = split(p, splitters.get(p));
+                    rho_temp.remove(p);
                     rho_temp.addAll(splitP);
-
                   }
                 }
               }
@@ -98,75 +106,58 @@ public class ConcurrentSolver {
 
     private Set<State> applyEBisim(Set<State> p, Trans trEpsilon, Set<State> ePrime, String channel) {
       Set<State> out = new HashSet<State>();
-
+      // Parameter invovled
       if (epsilon.enable(epsilon, channel)
           && trEpsilon.getAction().equals(channel)) {
-        for (State s : p) {
-          for (State sPrime : p) {
-
-            if (s.canExactSilent(s.getOwner(), s, channel)
-                && !sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-              if (sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
-                if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                    channel).getDestination())
-                    && ePrime.contains(sPrime.takeExactSilent(sPrime.getOwner(), sPrime,
-                        channel).getDestination())) {
-                  out.add(s);
-                  out.add(sPrime);
-                }
-              } else {
-                if (!sPrime.getListen().getChannels().contains(channel)) {
-                  if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-                      channel).getDestination())
-                      && ePrime.contains(sPrime)) {
-                    out.add(s);
-                    out.add(sPrime);
-                  }
-                }
-              }
-            }
-
-            if (!s.getListen().getChannels().contains(channel) &&
-                !sPrime.getListen().getChannels().contains(channel)) {
-              if (ePrime.contains(s) && ePrime.contains(sPrime)) {
+  
+        if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
+          // reaction by s
+          out = sAnyToE(p, ePrime, out, channel);
+        }
+        // initiation by s
+        if (out.isEmpty()) {
+          out = sInitiateToE(p, ePrime, out, channel);
+        }
+      }
+  
+      // Parameter is not involved
+      if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
+        // Epsilon does not participate
+        out = sInitiateAlone(p, out, channel);
+      }
+  
+      return out;
+    }
+  
+    private Set<State> sAnyToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+      for (State s : p) {
+        // 3.c
+        if (s.canAnyReaction(s.getOwner(), s, channel)) {
+          if (ePrime.contains(s.takeAnyReaction(s.getOwner(), s,
+              channel).getDestination())) {
+            out.add(s);
+          }
+        }
+      }
+      Set<State> pPrime = new HashSet<>();
+      pPrime.addAll(p);
+      pPrime.removeAll(out);
+      if (!out.isEmpty()) {
+        for (State s : pPrime) {
+          if (!s.canAnyReaction(s.getOwner(), s, channel)) {
+            if (!s.getListen().getChannels().contains(channel)) {
+              {
                 out.add(s);
-                out.add(sPrime);
-              }
-            }
-
-            if (s.canDirectReaction(s.getOwner(), s, channel)
-                && !sPrime.canExactSilent(sPrime.getOwner(), sPrime, channel)) {
-              if (sPrime.canDirectReaction(sPrime.getOwner(), sPrime, channel)) {
-                if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())
-                    && ePrime
-                        .contains(sPrime.takeDirectReaction(sPrime.getOwner(), sPrime, channel).getDestination())) {
-                  out.add(s);
-                  out.add(sPrime);
-                }
-              } else {
-                Set<State> reach = sPrime.weakBFS(sPrime.getOwner(), sPrime, channel);
-                if (reach.size() != 1) {
-                  for (State sReach : reach) {
-                    if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
-                      if (ePrime
-                          .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
-                              channel).getDestination())
-                          &&
-                          ePrime.contains(s.takeDirectReaction(s.getOwner(), s,
-                              channel).getDestination())) {
-                        out.add(s);
-                        out.add(sPrime);
-                      }
-                    }
-                  }
-                }
               }
             }
           }
         }
       }
-
-      if (out.isEmpty() && !epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
+  
+      return out;
+    }
+    private Set<State> sInitiateToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+      if (!epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
           && epsilon.getListen().getChannels().contains(channel)) {
         for (State s : p) {
           if (s.canTakeInitiative(s.getOwner(), s, channel)) {
@@ -176,36 +167,36 @@ public class ConcurrentSolver {
           }
         }
       }
-
-      if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
-        for (Set<State> partition : rho_epsilon) {
-          for (State s : p) {
-            if (s.canTakeInitiative(s.getOwner(), s, channel)) {
-              if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
-                out.add(s);
-              }
-            }
-          }
-          if (!out.isEmpty() && !out.equals(p)) {
-            break;
-          }
-          if (out.equals(p)) {
-            out.clear();
-          }
-        }
-      }
-
       return out;
     }
-
+  
+    private Set<State> sInitiateAlone(Set<State> p, Set<State> out, String channel) {
+      for (Set<State> partition : rho_epsilon) { // all in same partition.
+        for (State s : p) {
+          if (s.canTakeInitiative(s.getOwner(), s, channel)) {
+            if (partition.contains(s.takeInitiative(s.getOwner(), s, channel).getDestination())) {
+              out.add(s);
+            }
+          }
+        }
+        if (!out.isEmpty() && !out.equals(p)) { // split happen, exit
+          break;
+        }
+        if (out.equals(p)) { // no split, don't waste time
+          out.clear();
+        }
+      }
+      return out;
+    }
+  
     private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
       Set<Set<State>> splitP = new HashSet<Set<State>>();
       Set<State> notsplitter = new HashSet<State>(p);
-
+  
       notsplitter.removeAll(splitter);
       splitP.add(splitter);
       splitP.add(notsplitter);
-
+  
       return splitP;
     }
 
@@ -246,12 +237,12 @@ public class ConcurrentSolver {
   }
 
   public TS run() {
-    int counter = 0;
+    //int counter = 0;
     boolean fixed = false;
     try {
       while (!fixed) {
-        counter += 1;
-       // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+        //counter += 1;
+        // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
         roundBarrier.await();
         fixed = updateMap();
         if (!fixed) {
@@ -289,9 +280,9 @@ public class ConcurrentSolver {
         fixedPoint = false;
       }
     }
-    // if (fixedPoint) {
-    //   System.out.println("Fixed map -> " + eMap);
-    // }
+    if (fixedPoint) {
+    System.out.println("Fixed map -> " + eMap);
+    }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);

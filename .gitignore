@@ -27,3 +27,4 @@ replay_pid*
 #folders to ignore
 Examples/examples/
 bin/
+/target/

@@ -33,8 +33,6 @@ public class Label {
         this.output = output;
     }
 
-   
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -70,8 +68,8 @@ public class Label {
     public String toString() {
         return channel + "/" + output;
     }
-
-    public Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException
+    {
         return super.clone();
     }
 }

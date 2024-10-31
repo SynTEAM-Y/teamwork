@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "RunEngine",
+            "request": "launch",
+            "mainClass": "com.syntm.RunEngine",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
+            "name": "ParseTS",
+            "request": "launch",
+            "mainClass": "com.syntm.ParseTS",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open index.html",
+            "file": "/Users/yehiaa/Documents/git/teamwork/target/site/index.html"
+        }
+    ]
+}

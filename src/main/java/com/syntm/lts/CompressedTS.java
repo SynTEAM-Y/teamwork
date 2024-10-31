@@ -193,6 +193,7 @@ public class CompressedTS {
 
     }
     public TS DoQuotient(TS ts, Set<Set<State>> rho) {
+        //System.out.println("This is rho -> "+rho);
         CompressedTS t = new CompressedTS("");
         
         if (ts.getName().contains("T[")) {
@@ -206,8 +207,6 @@ public class CompressedTS {
         for (Set<State> p : rho) {
             PartitionState s_rho = new PartitionState();
             t.getL().apply(s_rho, p.iterator().next().getLabel());
-            
-
             s_rho.setPartition(p);
             if (p.contains(ts.getInitState())) {
                 s_rho.setId(ts.getInitState().getId());
@@ -249,11 +248,11 @@ public class CompressedTS {
         if (ts.getName().contains("T[")) {
             t.setName(ts.getName());
         } else {
-            t.setName("[" + ts.getName() + "]");
+            t.setName("[" + ts.getName() + "]~");
         }
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);
-        
+
         for (Set<State> p : rho) {
             PartitionState s_rho = new PartitionState();
             t.getL().apply(s_rho, p.iterator().next().getLabel());
@@ -268,7 +267,6 @@ public class CompressedTS {
                 t.addState(s_rho);
             }
 
-
         }
         for (PartitionState pState : t.getStates()) {
             for (State state : pState.getPartition()) {
@@ -282,7 +280,6 @@ public class CompressedTS {
                     if (!t.getInterface().getChannels().contains(tr.action)
                             && !pState.getPartition().contains(tr.getDestination())) {
                         t.addPartitionTransition(t, pState, tr.action, t.getPstateByMembership(tr.getDestination()));
-                        
                         pState.getPartitionTrans().add(
                                 new PartitionTrans(pState, tr.action, t.getPstateByMembership(tr.getDestination())));
                     }
@@ -310,6 +307,7 @@ public class CompressedTS {
         ts.setParameters(tss.getParameters());
         ts.setAgents(tss.getAgents());
         ts.setInterface(t.getInterface());
+        //ts.setRho(tss.getRho());
         for (PartitionState pState : t.getStates()) {
             State st = new State("");
             st = pState.toState();
