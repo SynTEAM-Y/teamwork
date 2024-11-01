@@ -73,9 +73,7 @@ public class ESolver {
     Set<Set<State>> rho_f = new HashSet<>();
     rho_f = buildFinalRho();
 
-    if (rho_f.size() == 1) {
-      return this.ts;
-    }
+    
     CompressedTS c = new CompressedTS("s-" + this.ts.getName());
     TS t = c.DoCompress(this.ts, rho_f);
     return t;
