@@ -34,7 +34,6 @@ public class ParseTS {
 	public static void main(final String[] args) throws IOException, InterruptedException {
 		ParseTS parseTS = new ParseTS();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-
 		System.out.println(ANSI_GREEN + "Enter a TS for decomposition: " + ANSI_RESET);
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);

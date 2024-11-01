@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JavaSE-17"/>
+	<classpathentry kind="src" path="target/generated-sources/annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="optional" value="true"/>
+			<attribute name="ignore_optional_problems" value="true"/>
+			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
@@ -19,39 +16,599 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="test" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="optional" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="src/main/java/com/syntm/ParseTS.java"/>
-	<classpathentry kind="src" path="target/generated-sources/annotations">
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="ignore_optional_problems" value="true"/>
-			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/guava/guava/33.3.1-jre/guava-33.3.1-jre.jar">
 		<attributes>
-			<attribute name="optional" value="true"/>
+			<attribute name="maven.artifactId" value="guava"/>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="ignore_optional_problems" value="true"/>
-			<attribute name="m2e-apt" value="true"/>
-			<attribute name="test" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="33.3.1-jre"/>
+			<attribute name="maven.groupId" value="com.google.guava"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/guava/failureaccess/1.0.2/failureaccess-1.0.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="failureaccess"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.0.2"/>
+			<attribute name="maven.groupId" value="com.google.guava"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="listenablefuture"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="9999.0-empty-to-avoid-conflict-with-guava"/>
+			<attribute name="maven.groupId" value="com.google.guava"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jsr305"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.0.2"/>
+			<attribute name="maven.groupId" value="com.google.code.findbugs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="checker-qual"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.43.0"/>
+			<attribute name="maven.groupId" value="org.checkerframework"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/errorprone/error_prone_annotations/2.28.0/error_prone_annotations-2.28.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="error_prone_annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.28.0"/>
+			<attribute name="maven.groupId" value="com.google.errorprone"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/google/j2objc/j2objc-annotations/3.0.0/j2objc-annotations-3.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="j2objc-annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.0.0"/>
+			<attribute name="maven.groupId" value="com.google.j2objc"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/github/docker-java/docker-java/3.0.14/docker-java-3.0.14.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="docker-java"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.0.14"/>
+			<attribute name="maven.groupId" value="com.github.docker-java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.6.4/jackson-jaxrs-json-provider-2.6.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-jaxrs-json-provider"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.4"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.jaxrs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.6.4/jackson-jaxrs-base-2.6.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-jaxrs-base"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.4"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.jaxrs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.6.4/jackson-core-2.6.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.4"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.6.4/jackson-databind-2.6.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-databind"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.4"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.6.0/jackson-annotations-2.6.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.0"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.6.4/jackson-module-jaxb-annotations-2.6.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jackson-module-jaxb-annotations"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6.4"/>
+			<attribute name="maven.groupId" value="com.fasterxml.jackson.module"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/jersey/connectors/jersey-apache-connector/2.23.1/jersey-apache-connector-2.23.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jersey-apache-connector"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.23.1"/>
+			<attribute name="maven.groupId" value="org.glassfish.jersey.connectors"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/jersey/core/jersey-common/2.23.1/jersey-common-2.23.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jersey-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.23.1"/>
+			<attribute name="maven.groupId" value="org.glassfish.jersey.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/javax/annotation/javax.annotation-api/1.2/javax.annotation-api-1.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="javax.annotation-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.2"/>
+			<attribute name="maven.groupId" value="javax.annotation"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/jersey/bundles/repackaged/jersey-guava/2.23.1/jersey-guava-2.23.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jersey-guava"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.23.1"/>
+			<attribute name="maven.groupId" value="org.glassfish.jersey.bundles.repackaged"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/osgi-resource-locator/1.0.1/osgi-resource-locator-1.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="osgi-resource-locator"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.0.1"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/javax/ws/rs/javax.ws.rs-api/2.0.1/javax.ws.rs-api-2.0.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="javax.ws.rs-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.1"/>
+			<attribute name="maven.groupId" value="javax.ws.rs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="httpcore"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.4.5"/>
+			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/apache/httpcomponents/httpclient/4.5/httpclient-4.5.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="httpclient"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.5"/>
+			<attribute name="maven.groupId" value="org.apache.httpcomponents"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/jersey/core/jersey-client/2.23.1/jersey-client-2.23.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jersey-client"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.23.1"/>
+			<attribute name="maven.groupId" value="org.glassfish.jersey.core"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/hk2-api/2.4.0-b34/hk2-api-2.4.0-b34.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hk2-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.4.0-b34"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/hk2-utils/2.4.0-b34/hk2-utils-2.4.0-b34.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hk2-utils"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.4.0-b34"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/external/aopalliance-repackaged/2.4.0-b34/aopalliance-repackaged-2.4.0-b34.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="aopalliance-repackaged"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.4.0-b34"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2.external"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/external/javax.inject/2.4.0-b34/javax.inject-2.4.0-b34.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="javax.inject"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.4.0-b34"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2.external"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/glassfish/hk2/hk2-locator/2.4.0-b34/hk2-locator-2.4.0-b34.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="hk2-locator"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.4.0-b34"/>
+			<attribute name="maven.groupId" value="org.glassfish.hk2"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/javassist/javassist/3.18.1-GA/javassist-3.18.1-GA.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="javassist"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="3.18.1-GA"/>
+			<attribute name="maven.groupId" value="org.javassist"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/kohlschutter/junixsocket/junixsocket-common/2.0.4/junixsocket-common-2.0.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junixsocket-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.4"/>
+			<attribute name="maven.groupId" value="com.kohlschutter.junixsocket"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="log4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.2.17"/>
+			<attribute name="maven.groupId" value="log4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/kohlschutter/junixsocket/junixsocket-native-common/2.0.4/junixsocket-native-common-2.0.4.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="junixsocket-native-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.4"/>
+			<attribute name="maven.groupId" value="com.kohlschutter.junixsocket"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/scijava/native-lib-loader/2.0.2/native-lib-loader-2.0.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="native-lib-loader"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.0.2"/>
+			<attribute name="maven.groupId" value="org.scijava"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/apache/commons/commons-compress/1.12/commons-compress-1.12.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-compress"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.12"/>
+			<attribute name="maven.groupId" value="org.apache.commons"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/commons-codec/commons-codec/1.10/commons-codec-1.10.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-codec"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.10"/>
+			<attribute name="maven.groupId" value="commons-codec"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-lang"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.6"/>
+			<attribute name="maven.groupId" value="commons-lang"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="commons-io"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="2.5"/>
+			<attribute name="maven.groupId" value="commons-io"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/slf4j/slf4j-api/1.7.21/slf4j-api-1.7.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="slf4j-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.7.21"/>
+			<attribute name="maven.groupId" value="org.slf4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.21/jcl-over-slf4j-1.7.21.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="jcl-over-slf4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.7.21"/>
+			<attribute name="maven.groupId" value="org.slf4j"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.54/bcpkix-jdk15on-1.54.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="bcpkix-jdk15on"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.54"/>
+			<attribute name="maven.groupId" value="org.bouncycastle"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.54/bcprov-jdk15on-1.54.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="bcprov-jdk15on"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.54"/>
+			<attribute name="maven.groupId" value="org.bouncycastle"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-codec-http/4.1.11.Final/netty-codec-http-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-http"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-codec/4.1.11.Final/netty-codec-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-handler/4.1.11.Final/netty-handler-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-handler"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-buffer/4.1.11.Final/netty-buffer-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-buffer"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-transport/4.1.11.Final/netty-transport-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-resolver/4.1.11.Final/netty-resolver-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-resolver"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-handler-proxy/4.1.11.Final/netty-handler-proxy-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-handler-proxy"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-codec-socks/4.1.11.Final/netty-codec-socks-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-codec-socks"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-transport-native-epoll/4.1.11.Final/netty-transport-native-epoll-4.1.11.Final-linux-x86_64.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport-native-epoll"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.classifier" value="linux-x86_64"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-common/4.1.11.Final/netty-common-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="javadoc_location" value="jar:file:/Users/yehiaa/.m2/repository/io/netty/netty-common/4.1.11.Final/netty-common-4.1.11.Final-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.11.Final/netty-transport-native-unix-common-4.1.11.Final.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport-native-unix-common"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/io/netty/netty-transport-native-kqueue/4.1.11.Final/netty-transport-native-kqueue-4.1.11.Final-osx-x86_64.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="netty-transport-native-kqueue"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="4.1.11.Final"/>
+			<attribute name="maven.classifier" value="osx-x86_64"/>
+			<attribute name="maven.groupId" value="io.netty"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/graalvm/js/js/20.0.0/js-20.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="js"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="20.0.0"/>
+			<attribute name="maven.groupId" value="org.graalvm.js"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/graalvm/regex/regex/20.0.0/regex-20.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="regex"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="20.0.0"/>
+			<attribute name="maven.groupId" value="org.graalvm.regex"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/graalvm/truffle/truffle-api/20.0.0/truffle-api-20.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="truffle-api"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="20.0.0"/>
+			<attribute name="maven.groupId" value="org.graalvm.truffle"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/graalvm/sdk/graal-sdk/20.0.0/graal-sdk-20.0.0.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="graal-sdk"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="20.0.0"/>
+			<attribute name="maven.groupId" value="org.graalvm.sdk"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/ow2/asm/asm/7.1/asm-7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/ow2/asm/asm-tree/7.1/asm-tree-7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm-tree"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/ow2/asm/asm-analysis/7.1/asm-analysis-7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm-analysis"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/ow2/asm/asm-commons/7.1/asm-commons-7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm-commons"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/org/ow2/asm/asm-util/7.1/asm-util-7.1.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="asm-util"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="7.1"/>
+			<attribute name="maven.groupId" value="org.ow2.asm"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/com/ibm/icu/icu4j/64.2/icu4j-64.2.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="icu4j"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="64.2"/>
+			<attribute name="javadoc_location" value="jar:file:/Users/yehiaa/.m2/repository/com/ibm/icu/icu4j/64.2/icu4j-64.2-javadoc.jar!/"/>
+			<attribute name="maven.groupId" value="com.ibm.icu"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="logback-classic"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.2.3"/>
+			<attribute name="maven.groupId" value="ch.qos.logback"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/Users/yehiaa/.m2/repository/ch/qos/logback/logback-core/1.2.3/logback-core-1.2.3.jar">
+		<attributes>
+			<attribute name="maven.artifactId" value="logback-core"/>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.scope" value="compile"/>
+			<attribute name="maven.version" value="1.2.3"/>
+			<attribute name="maven.groupId" value="ch.qos.logback"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
