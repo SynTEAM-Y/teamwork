@@ -171,6 +171,10 @@ public class ParseTS {
 				ls.addAll(st.getListen().getChannels());
 				ch.addAll(st.getLabel().getChannel());
 				out.addAll(st.getLabel().getOutput());
+				if (out.size()>1) {
+					out.remove("-");
+				}
+				
 				sc.getComStates().add(st);
 				sc.setId(sc.getId() + "" + st.getId());
 			}

@@ -139,7 +139,7 @@ public class RunEngine {
 					cComp.toDot();
 
 					System.out.println(
-							ANSI_RED + "Check Equivalence of " + ts.getName() + " and " + cComp.getName()
+							ANSI_BLUE + "Check Equivalence of " + ts.getName() + " and " + cComp.getName()
 									+ " -> " + ts.equivCheck(cComp) + ANSI_RESET);
 					break;
 				case "2":
@@ -253,6 +253,9 @@ public class RunEngine {
 				ls.addAll(st.getListen().getChannels());
 				ch.addAll(st.getLabel().getChannel());
 				out.addAll(st.getLabel().getOutput());
+				if (out.size()>1) {
+					out.remove("-");
+				}
 				sc.getComStates().add(st);
 				sc.setId(sc.getId() + "" + st.getId());
 			}

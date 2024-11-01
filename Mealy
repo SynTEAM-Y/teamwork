@@ -1,35 +1,43 @@
 Lauching Strix with Parameters:  -f (
- !r2 &
- !rs &
- !r3 &
  !r0 &
  !r1 &
- X G (r2 | rs | r3 | r0 | r1 ) &
- X G ((!rs & !r3 & !r0 & !r1 ) | (!r2 & !r3 & !r0 & !r1 ) | (!r2 & !rs & !r0 & !r1 ) | (!r2 & !rs & !r3 & !r1 ) | (!r2 & !rs & !r3 & !r0 )  ) &
+ X G (r0 | r1 ) &
+ X G ((!r1 ) | (!r0 )  ) &
  X (true) ) -> ( !g0 &
  !g1 &
- !g2 &
- !g3 &
  !g0 &
  !g1 &
- !g2 &
- !g3 &
- X (G (!rs -> ((!g0 & !g1 & !g2) | !g0 & !g1 & !g3 | !g0 & !g3 & !g2 | (!g3 & !g1 & !g2)) & (rs -> (!g0 & !g1 & !g2& !g3))) ) &
+ X (G ((g0 & G !r0) -> (F !g0))) &
+ X (G ((g1 & G !r1) -> (F !g1))) &
+ X (G ((g0 & X (!r0 & !g0)) -> X (r0 R !g0))) &
+ X (G ((g1 & X (!r1 & !g1)) -> X (r1 R !g1))) &
+ X (G (!g0 | !g1)) &
+ X (r0 R !g0) &
+ X (r1 R !g1) &
  X (G (r0 -> F g0)) &
- X (G (r1 -> F g1)) &
- X (G (r2 -> F g2)) &
- X (G (r3 -> F g3)) ) --ins=r0,rs,r1,r2,r3 --outs=g0,g1,g2,g3 --k
+ X (G (r1 -> F g1)) ) --ins=r0,r1 --outs=g0,g1 --k
 REALIZABLE
-.inputs r0 rs r1 r2 r3
-.outputs g0 g1 g2 g3
-.i 5
-.o 4
-.p 6
-.s 2
+.inputs r0 r1
+.outputs g0 g1
+.i 2
+.o 2
+.p 17
+.s 9
 .r S0
-00000 S0 S1 0000
-01000 S1 S1 0000
-10000 S1 S1 1000
-00100 S1 S1 0100
-00010 S1 S1 0010
-00001 S1 S1 0001
+00 S0 S1 00
+10 S1 S2 00
+01 S1 S3 00
+10 S2 S4 10
+01 S2 S5 10
+10 S3 S6 01
+01 S3 S7 01
+01 S4 S3 00
+10 S4 S4 10
+10 S5 S6 01
+01 S5 S7 01
+10 S6 S4 10
+01 S6 S8 00
+10 S7 S2 00
+01 S7 S7 01
+01 S8 S5 10
+10 S8 S5 10

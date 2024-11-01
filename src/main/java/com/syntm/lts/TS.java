@@ -330,7 +330,6 @@ public class TS {
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
                     Set<String> ao = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
-                    // this.getInitState().setLabel(new Label());
                     this.initialDecomposition(parts[1].trim(), achs, ao);
                     break;
                 default:
@@ -796,11 +795,20 @@ public class TS {
             Set<String> out = new HashSet<>(i.getOutput());
             Set<String> pO = new HashSet<>(pInt.getOutput());
             out.retainAll(s.getLabel().getOutput());
+            if (out.isEmpty()) {
+                out.add("-");
+            }
             pO.retainAll(s.getLabel().getOutput());
+            if (pO.isEmpty()) {
+                pO.add("-");
+            }
             mChan.addAll(chan);
             mChan.addAll(pChan);
             mO.addAll(out);
             mO.addAll(pO);
+            if (mO.size()>1) {
+                mO.remove("-");
+            }
             s.setLabel(new Label(mChan,mO));
             Label lab = new Label(chan, out);
             Label pLab = new Label(pChan, pO);
@@ -829,6 +837,19 @@ public class TS {
             p.getStateById(tr.source.getId()).getPost().add(p.getStateById(tr.destination.getId()));
             p.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
         }
+        for (State pr : this.getStates()) {
+                pr.getTrans().clear(); 
+        }
+        for (Trans tr : this.getTransitions()) {
+            for (State state : this.getStates()) {
+                if (tr.getSource().getId().equals(state.getId())) {
+                    tr.setSource(state);
+                    tr.setDestination(this.getStateById(tr.getDestination().getId()));
+                    state.addTrans(tr, state.getOwner());    
+                }
+            }
+        }
+        
         this.agents.add(t.reduce());
         this.parameters.add(p);
         // t.toDot();
@@ -940,7 +961,7 @@ public class TS {
 
     public Boolean equivCheck(TS ts) {
         Set<Set<State>> rho = this.rhoCompute(ts);
-        System.err.println(rho);
+       // System.err.println(rho);
         Set<State> res = this.popStates(rho
                 .stream()
                 .filter(p -> p.contains(this.getInitState()))
@@ -973,7 +994,6 @@ public class TS {
         for (State s : stateSet) {
             labs.add(s.getLabel());
         }
-        System.err.println(labs);
         for (Label l : labs) {
             HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
             for (Set<State> partition : rho) {

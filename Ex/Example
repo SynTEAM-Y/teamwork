@@ -1,4 +1,4 @@
-Int:a,b,c,d,e,f,g: 
+Int:a,b,c,d,e,f,g:-
 LS:0:d
 LS:1:b
 LS:2:c
@@ -6,19 +6,19 @@ LS:3:a,b,c
 LS:4:f
 LS:5:e
 LS:6:g
-LS:7:f 
+LS:7:f
 LS:8:e
-LS:9:g 
-L:0: : 
-L:1:d: 
-L:2:b: 
-L:3:c: 
-L:4:a:  
-L:5:b: 
-L:6:c: 
-L:7:f: 
-L:8:e: 
-L:9:g: 
+LS:9:g
+L:0::-
+L:1:d:-
+L:2:b:-
+L:3:c:-
+L:4:a:-
+L:5:b:-
+L:6:c:-
+L:7:f:-
+L:8:e:-
+L:9:g:-
 Init:0
 T:0,d,1
 T:1,b,2
@@ -32,6 +32,6 @@ T:6,g,9
 T:7,f,7
 T:8,e,8
 T:9,g,9
-A:T1:f,e,g: 
-A:T2:a,b,c,d: 
+A:T1:f,e,g:-
+A:T2:a,b,c,d:-
 !
