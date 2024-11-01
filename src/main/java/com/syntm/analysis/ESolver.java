@@ -49,12 +49,13 @@ public class ESolver {
       // counter += 1;
       // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
       // Execute all tasks and get reference to Future objects
-      List<Future<Set<Set<State>>>> resultList = null;
+      List<Future<Set<Set<State>>>> resultList = new ArrayList<>();
       try {
         resultList = service.invokeAll(wList);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
+      
       for (int i = 0; i < resultList.size(); i++) {
         Future<Set<Set<State>>> future = resultList.get(i);
         try {

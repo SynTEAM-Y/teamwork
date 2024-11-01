@@ -5,13 +5,17 @@ com/syntm/lts/CompressedTS.class
 com/syntm/lts/Label.class
 com/syntm/analysis/Partitioning.class
 com/syntm/lts/Int.class
+com/syntm/analysis/SeqSolver.class
+com/syntm/analysis/ESolver.class
 com/syntm/util/StringUtil.class
 com/syntm/analysis/ConcurrentSolver.class
 com/syntm/lts/PartitionTrans.class
 com/syntm/analysis/ConcurrentSolver$Worker.class
 com/syntm/lts/Listen.class
 com/syntm/lts/State.class
+com/syntm/analysis/Task.class
 com/syntm/lts/Mealy.class
+com/syntm/analysis/SeqSolver$Task.class
 com/syntm/lts/TS.class
 com/syntm/ParseTS.class
 com/syntm/lts/Trans.class

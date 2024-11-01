@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import com.google.common.collect.Sets;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 import com.syntm.util.Printer;
+
 
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
@@ -38,11 +40,48 @@ public class ParseTS {
 		fileP = parseTS.checkFileName(fileP);
 		Set<TS> sTS = parseTS.readInput(fileP);
 		// parseTS.writeOutput("TStext");
-		TS cComp = parseTS.compose(sTS);
-		cComp.toDot();
-		System.out.println(ANSI_GREEN + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
-				+ " -> " + parseTS.mainTS.equivCheck(cComp) + ANSI_RESET);
-		parseTS.simulate(sTS);
+		String exit = "";
+		while (!exit.equals("x")) {
+			System.out.println("");
+			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
+
+			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "x"));
+			System.out.println(ANSI_GREEN +
+					"[" + 1 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
+			System.out.println(ANSI_GREEN +
+					"[" + 2 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
+			System.out.println(ANSI_GREEN +
+					"[" + "x" + "] :  Exit? " + ANSI_RESET);
+
+			String in = "";
+
+			in = stdin.readLine();
+
+			while (!choice.contains(in.toString())) {
+				System.out.println(ANSI_RED + "Option does not exist!" + ANSI_RESET);
+				System.out.println(ANSI_RED + "Try again " + ANSI_RESET);
+				in = stdin.readLine();
+			}
+			switch (in.toString()) {
+				case "1":
+					TS cComp = parseTS.compose(sTS);
+					cComp.toDot();
+
+					System.out.println(
+							ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
+									+ " -> " + parseTS.mainTS.equivCheck(cComp) + ANSI_RESET);
+					break;
+				case "2":
+					parseTS.simulate(sTS);
+					break;
+				case "x":
+					exit = "x";
+					break;
+
+				default:
+					break;
+			}
+		}
 
 	}
 
@@ -67,37 +106,39 @@ public class ParseTS {
 
 	private void simulate(Set<TS> sTS) throws IOException {
 		String in = "";
+		String orientation = "";
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Set<State> simStates = new HashSet<>();
 		Printer simEnv = new Printer("SimulationEnv");
-		System.out.println(ANSI_GREEN + "Simulate? y/n" + ANSI_RESET);
-		in = stdin.readLine().toString();
-		if (!in.equals("n")) {
-			while (true) {
-				for (TS ts : sTS) {
-					Set<String> ids = new HashSet<>();
-					ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
-					System.out.println(
-							ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + ANSI_RESET);
-					in = stdin.readLine().toString();
+		System.out.println(ANSI_GREEN +
+				"Choose a graph orientation, LR or T ?! " + ANSI_RESET);
+		orientation = stdin.readLine().toString();
+		// while (true) {
+		for (TS ts : sTS) {
+			Set<String> ids = new HashSet<>();
+			ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
-					while (!ids.contains(in)) {
-						System.out.println(ANSI_RED + "State does not exist!" + ANSI_RESET);
-						System.out.println(ANSI_RED + "Pick a state for Agent " + ts.getName()
-								+ " ONLY from this list -> " + ids + ANSI_RESET);
-						in = stdin.readLine().toString();
-						simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
-					}
-					simStates.add(ts.getStateById(in));
-					simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
+			System.out.println(
+					ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + ANSI_RESET);
 
-				}
-				simEnv.printNested();
-				simEnv.setsBuilder(new StringBuilder());
-				onFly(simStates);
-				simStates.clear();
+			in = stdin.readLine().toString();
+
+			while (!ids.contains(in)) {
+				System.out.println(ANSI_RED + "State does not exist!" + ANSI_RESET);
+				System.out.println(ANSI_RED + "Pick a state for Agent " + ts.getName()
+						+ " ONLY from this list -> " + ids + ANSI_RESET);
+				in = stdin.readLine().toString();
+				simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
 			}
+			simStates.add(ts.getStateById(in));
+			simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
+
 		}
+		simEnv.printNested(orientation);
+		simEnv.setsBuilder(new StringBuilder());
+		onFly(simStates, orientation);
+		simStates.clear();
+		// }
 
 	}
 
@@ -105,7 +146,6 @@ public class ParseTS {
 		Set<List<State>> cartesianProduct = Sets.cartesianProduct(sets);
 		return cartesianProduct;
 	}
-
 
 	private TS compose(Set<TS> sTS) {
 		TS t = new TS("");
@@ -217,7 +257,7 @@ public class ParseTS {
 		return t;
 	}
 
-	private void onFly(Set<State> states) throws IOException {
+	private void onFly(Set<State> states, String orientation) throws IOException {
 		String in = "";
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Set<State> sStates = new HashSet<>(states);
@@ -248,17 +288,31 @@ public class ParseTS {
 			} else {
 				System.out.println(ANSI_GREEN + "Select a send transition" + ANSI_RESET);
 				int c = 0;
+				Set<String> choice = new HashSet<>();
+				choice.add("x");
+
 				HashMap<String, Trans> tMap = new HashMap<>();
 				for (Trans trans : initiateSet) {
 					System.out.println(ANSI_GREEN +
 							"[" + c + "] : " + trans + " from Agent " + trans.getSource().getOwner().getName()
 							+ ANSI_RESET);
 					tMap.put(String.valueOf(c), trans);
+					choice.add(String.valueOf(c));
 					c++;
 				}
+
 				System.out.println(ANSI_GREEN +
 						"[x] :  Previous View " + ANSI_RESET);
+
 				in = stdin.readLine();
+
+				// System.err.println(Integer.parseInt(in)+"???");
+				while (!choice.contains(in.toString())) {
+					System.out.println(ANSI_RED + "Option does not exist!" + ANSI_RESET);
+					System.out.println(ANSI_RED + "Try again " + ANSI_RESET);
+					in = stdin.readLine();
+				}
+
 				final String input = in;
 				if (in.equals("x")) {
 					break;
@@ -288,11 +342,12 @@ public class ParseTS {
 						sStates.add(tr.getDestination().getOwner().getStateById(tr.getDestination().getId()));
 					} else {
 						simEnv.add(st.getOwner()
-								.toDot(st.getOwner().getStateById(st.getId()), new Trans()).formattedString());
+								.toDot(st.getOwner().getStateById(st.getId()), new Trans())
+								.formattedString());
 					}
 				}
 
-				simEnv.printNested();
+				simEnv.printNested(orientation);
 			}
 
 		}

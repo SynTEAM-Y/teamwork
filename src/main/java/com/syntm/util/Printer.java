@@ -68,7 +68,7 @@ public class Printer {
         return this;
     }
 
-    public void printNested() {
+    public void printNested(String orientation) {
         try {
 
             if (filePrefix == null || filePrefix.isEmpty()) {
@@ -77,7 +77,7 @@ public class Printer {
 
             sBuilder.insert(0,
                     "digraph G {\n" + //
-                                                " graph [fontcolor=\"green\",fontsize=10,rankdir=LR,ranksep=.6,nodesep=0.5];\n" + //
+                                                " graph [fontcolor=\"green\",fontsize=10,rankdir="+orientation+",ranksep=.6,nodesep=0.5];\n" + //
                             " peripheries=0;\n   compound=true;")
                     .append("\n");
             sBuilder.append("}").append("\n");

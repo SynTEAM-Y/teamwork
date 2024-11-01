@@ -169,12 +169,13 @@ public class TS {
         gp.print();
 
     }
+
     public Printer toDot(State simState, Trans transition) {
         Printer gp = new Printer(name);
         gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=.6,nodesep=0.5" + ",label=\""
                 + this.getName() + " : CH=" + this.getInterface().getChannels() + ", OUT="
                 + this.getInterface().getOutput() + " \"];\n");
-        
+
         gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
 
         gp.addln("init [shape=point,style=invis];");
@@ -220,10 +221,12 @@ public class TS {
 
         return gp.clusterIt(this.formatTSName());
     }
+
     public String formatTSName() {
 
         return this.getName().substring(2, this.getName().length() - 2);
     }
+
     public Printer next(Trans transition) {
         return toDot(new State(), transition);
     }
@@ -235,6 +238,7 @@ public class TS {
     public Set<TS> getAgents() {
         return agents;
     }
+
     public State getStateByComposite(TS t, Set<State> comp) {
         for (State s : t.getStates()) {
             if (s.getComStates().equals(comp)) {
@@ -326,6 +330,7 @@ public class TS {
                 case "A":
                     Set<String> achs = new HashSet<String>(Arrays.asList(parts[2].trim().split(",")));
                     Set<String> ao = new HashSet<>(Arrays.asList(parts[3].trim().split(",")));
+                    // this.getInitState().setLabel(new Label());
                     this.initialDecomposition(parts[1].trim(), achs, ao);
                     break;
                 default:
@@ -765,22 +770,38 @@ public class TS {
         TS t = new TS(name);
         TS p = new TS("P-" + name);
         Int i = new Int(channels, outputs);
+        Set<String> mCh = new HashSet<>();
+        Set<String> mOut = new HashSet<>();
         Set<String> pCh = new HashSet<>(this.getInterface().getChannels());
         pCh.removeAll(channels);
+
         Set<String> pOut = new HashSet<>(this.getInterface().getOutput());
         pOut.removeAll(outputs);
+        mCh.addAll(pCh);
+        mCh.addAll(channels);
+        mOut.addAll(outputs);
+        mOut.addAll(pOut);
         Int pInt = new Int(pCh, pOut);
+        this.setInterface(new Int(mCh, mOut));
         t.setInterface(i);
         p.setInterface(pInt);
+
         for (State s : this.getStates()) {
             Set<String> chan = new HashSet<>(i.getChannels());
             Set<String> pChan = new HashSet<>(pInt.getChannels());
+            Set<String> mChan = new HashSet<>();
+            Set<String> mO = new HashSet<>();
             chan.retainAll(s.getLabel().getChannel());
             pChan.retainAll(s.getLabel().getChannel());
             Set<String> out = new HashSet<>(i.getOutput());
             Set<String> pO = new HashSet<>(pInt.getOutput());
             out.retainAll(s.getLabel().getOutput());
             pO.retainAll(s.getLabel().getOutput());
+            mChan.addAll(chan);
+            mChan.addAll(pChan);
+            mO.addAll(out);
+            mO.addAll(pO);
+            s.setLabel(new Label(mChan,mO));
             Label lab = new Label(chan, out);
             Label pLab = new Label(pChan, pO);
             State st = new State(s.getId(), lab, s.getListen());
@@ -811,7 +832,7 @@ public class TS {
         this.agents.add(t.reduce());
         this.parameters.add(p);
         // t.toDot();
-        //p.toDot();
+        // p.toDot();
     }
 
     public void addTransition(TS ts, State src, String action, State des) {
@@ -919,7 +940,7 @@ public class TS {
 
     public Boolean equivCheck(TS ts) {
         Set<Set<State>> rho = this.rhoCompute(ts);
-        //System.err.println(rho);
+        System.err.println(rho);
         Set<State> res = this.popStates(rho
                 .stream()
                 .filter(p -> p.contains(this.getInitState()))
@@ -952,7 +973,7 @@ public class TS {
         for (State s : stateSet) {
             labs.add(s.getLabel());
         }
-
+        System.err.println(labs);
         for (Label l : labs) {
             HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
             for (Set<State> partition : rho) {
@@ -1034,37 +1055,25 @@ public class TS {
         return states;
     }
 
-    private Set<Set<State>> splitP(Set<State> partition, Set<State> tap) {
-        Set<Set<State>> splitP = new HashSet<Set<State>>();
-
-        Set<State> nottap = new HashSet<State>(partition);
-        nottap.removeAll(tap);
-
-        splitP.add(tap);
-        splitP.add(nottap);
-
-        return splitP;
-    }
-
     private Set<State> strongBism(Set<State> partition, Set<State> pprime, String action) {
-        Set<State> acc = new HashSet<State>();
+        Set<State> acc = new HashSet<>();
         // acc = partition
-        //         .stream()
-        //         .filter(
-        //                 s -> !(s.getTrans()
-        //                         .stream()
-        //                         .filter(tr -> tr.getAction().equals(action) &&
-        //                                 pprime.contains(tr.getDestination()))
-        //                         .collect(Collectors.toSet())).isEmpty())
-        //         .collect(Collectors.toSet());
+        // .stream()
+        // .filter(
+        // s -> !(s.getTrans()
+        // .stream()
+        // .filter(tr -> tr.getAction().equals(action) &&
+        // pprime.contains(tr.getDestination()))
+        // .collect(Collectors.toSet())).isEmpty())
+        // .collect(Collectors.toSet());
 
         for (State s : partition) {
-        for (Trans tr : s.getTrans()) {
-        if (tr.getAction().equals(action) && pprime.contains(tr.getDestination())) {
-        acc.add(s);
-        break;
-        }
-        }
+            for (Trans tr : s.getTrans()) {
+                if (tr.getAction().equals(action) && pprime.contains(tr.getDestination())) {
+                    acc.add(s);
+                    break;
+                }
+            }
         }
 
         return acc;

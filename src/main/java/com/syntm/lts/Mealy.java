@@ -430,14 +430,14 @@ public class Mealy {
             } else {
                 if (tr.getAction().equals("/")) {
                     State st = new State(this.code.get(IdState(tr)).toString(),
-                            new Label(new HashSet<>(Arrays.asList(" ")),
-                                    new HashSet<>(Arrays.asList(" "))));
+                            new Label(new HashSet<>(Arrays.asList("")),
+                                    new HashSet<>(Arrays.asList(""))));
                     ts.addState(st);
                 } else {
                     if (tr.getAction().startsWith("/")) {
                         String[] parts = tr.getAction().split("/");
                         State st = new State(this.code.get(IdState(tr)).toString(),
-                                new Label(new HashSet<>(Arrays.asList(" ")),
+                                new Label(new HashSet<>(Arrays.asList("")),
                                         new HashSet<>(Arrays.asList(parts[1].trim().split(",")))));
                         ts.addState(st);
                     }
@@ -445,7 +445,7 @@ public class Mealy {
                         String[] parts = tr.getAction().split("/");
                         State st = new State(this.code.get(IdState(tr)).toString(),
                                 new Label(new HashSet<>(Arrays.asList(parts[0].trim().split(","))),
-                                        new HashSet<>(Arrays.asList(" "))));
+                                        new HashSet<>(Arrays.asList(""))));
                         ts.addState(st);
                     }
                 }
@@ -479,6 +479,7 @@ public class Mealy {
 
         }
         ts.setInitState(m.code.get(IdState(m.getInitTrans())).toString());
+        //ts.getInitState().setLabel(new Label());
 
         
         TS t= ts.reduce();
