@@ -10,11 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
+import com.syntm.util.Printer;
 
 public class ConcurrentSolver {
   private class Worker implements Runnable {
@@ -109,7 +111,7 @@ public class ConcurrentSolver {
       // Parameter invovled
       if (epsilon.enable(epsilon, channel)
           && trEpsilon.getAction().equals(channel)) {
-  
+
         if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
           // reaction by s
           out = sAnyToE(p, ePrime, out, channel);
@@ -119,16 +121,16 @@ public class ConcurrentSolver {
           out = sInitiateToE(p, ePrime, out, channel);
         }
       }
-  
+
       // Parameter is not involved
       if (out.isEmpty() && !epsilon.getListen().getChannels().contains(channel)) {
         // Epsilon does not participate
         out = sInitiateAlone(p, out, channel);
       }
-  
+
       return out;
     }
-  
+
     private Set<State> sAnyToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
       for (State s : p) {
         // 3.c
@@ -153,9 +155,10 @@ public class ConcurrentSolver {
           }
         }
       }
-  
+
       return out;
     }
+
     private Set<State> sInitiateToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
       if (!epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)
           && epsilon.getListen().getChannels().contains(channel)) {
@@ -169,7 +172,7 @@ public class ConcurrentSolver {
       }
       return out;
     }
-  
+
     private Set<State> sInitiateAlone(Set<State> p, Set<State> out, String channel) {
       for (Set<State> partition : rho_epsilon) { // all in same partition.
         for (State s : p) {
@@ -188,15 +191,15 @@ public class ConcurrentSolver {
       }
       return out;
     }
-  
+
     private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
       Set<Set<State>> splitP = new HashSet<Set<State>>();
       Set<State> notsplitter = new HashSet<State>(p);
-  
+
       notsplitter.removeAll(splitter);
       splitP.add(splitter);
       splitP.add(notsplitter);
-  
+
       return splitP;
     }
 
@@ -209,6 +212,7 @@ public class ConcurrentSolver {
   }
 
   private TS ts;
+  private TS p;
   private Set<String> channels;
   List<Worker> wList;
   final CyclicBarrier roundBarrier;
@@ -216,15 +220,15 @@ public class ConcurrentSolver {
 
   private ExecutorService service;
 
-  public ConcurrentSolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, Set<String> sch) {
+  public ConcurrentSolver(ConcurrentHashMap<State, Set<Set<State>>> indexedFamily, TS t, TS p, Set<String> sch) {
     eMap = new ConcurrentHashMap<>(indexedFamily);
     this.channels = sch;
     this.ts = t;
+    this.p = p;
     wList = new ArrayList<Worker>();
     int N = eMap.size() + 1;
     roundBarrier = new CyclicBarrier(N);
     updateBarrier = new CyclicBarrier(N);
-    // int corecount = Runtime.getRuntime().availableProcessors();
     service = Executors.newFixedThreadPool(N);
     int i = 0;
     for (State s : eMap.keySet()) {
@@ -232,16 +236,15 @@ public class ConcurrentSolver {
       wList.add(i, w);
       i += i;
       service.execute(w);
-      // new Thread(w).start();
     }
   }
 
   public TS run() {
-    //int counter = 0;
+    // int counter = 0;
     boolean fixed = false;
     try {
       while (!fixed) {
-        //counter += 1;
+        // counter += 1;
         // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
         roundBarrier.await();
         fixed = updateMap();
@@ -253,12 +256,7 @@ public class ConcurrentSolver {
       service.shutdown();
 
       Set<Set<State>> rho_f = new HashSet<>();
-      String id = ts.getInitState().getId();
-      for (State s : eMap.keySet()) {
-        if (s.getId().equals(id)) {
-          rho_f = new HashSet<>(eMap.get(s));
-        }
-      }
+      rho_f = buildFinalRho();
 
       CompressedTS c = new CompressedTS("s-" + this.ts.getName());
       TS t = c.DoCompress(this.ts, rho_f);
@@ -268,6 +266,68 @@ public class ConcurrentSolver {
       return null;
     }
 
+  }
+
+  private Set<Set<State>> buildFinalRho() {
+    Set<State> closed = new HashSet<>();
+    Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
+
+    HashMap<String, Set<State>> cares = new HashMap<>();
+
+    Set<String> ids = new HashSet<>();
+    ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
+
+    for (State state : eMap.keySet()) {
+      if (!state.equals(p.getInitState())) {
+        rho_intersect.retainAll(eMap.get(state));
+      }
+    }
+
+    for (String st : ids) {
+      Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
+          .collect(Collectors.toSet()).iterator().next();
+      cares.put(st, states);
+
+    }
+
+    if (rho_intersect.equals(eMap.get(p.getInitState()))) {
+      return rho_intersect;
+    }
+    rho_intersect.clear();
+
+    for (String s : ids) {
+      if (!closed.contains(ts.getStateById(s))) {
+        Set<State> b = new HashSet<>();
+        b = cares.get(s);
+        Set<Set<State>> interSet = new HashSet<>();
+        for (State sPrime : b) {
+          if (!sPrime.getId().equals(s)) {
+            Set<State> pWise = new HashSet<>();
+            pWise.addAll(b);
+            if (pWise.retainAll(cares.get(sPrime.getId()))) {
+              if (!pWise.isEmpty()) {
+                interSet.add(pWise);
+              }
+            }
+          }
+        }
+        Set<State> unionBi = new HashSet<>();
+        for (Set<State> pw : interSet) {
+          unionBi.addAll(pw);
+        }
+        b.removeAll(unionBi);
+        if (b.isEmpty()) {
+          rho_intersect.addAll(interSet);
+          closed.addAll(unionBi);
+        } else {
+          rho_intersect.addAll(interSet);
+          rho_intersect.add(b);
+          closed.addAll(unionBi);
+          closed.addAll(b);
+        }
+      }
+    }
+    return rho_intersect;
   }
 
   private boolean updateMap() {
@@ -280,9 +340,9 @@ public class ConcurrentSolver {
         fixedPoint = false;
       }
     }
-    if (fixedPoint) {
-    System.out.println("Fixed map -> " + eMap);
-    }
+    //if (fixedPoint) {
+     // printFixedRho(eMap);
+    //}
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);
@@ -290,4 +350,27 @@ public class ConcurrentSolver {
 
     return fixedPoint;
   }
+  public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
+    Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
+    gp.addln("\n An e-Cooperative Bisimulation for " + this.ts.getName() + "\n");
+    List<State> keys = new ArrayList<State>();
+
+    for (State epsilon : map.keySet()) {
+      keys.add(epsilon);
+    }
+    keys.sort((e1, e2) -> e1.getId().compareTo(e2.getId()));
+
+    for (State epsilon : keys) {
+      gp.addln("\t" + epsilon.getId() + " ->");
+      for (Set<State> set : map.get(epsilon)) {
+        gp.addln("\t\t" + set);
+      }
+      gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
+      gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
+
+    }
+    gp.printText();
+
+  }
+
 }

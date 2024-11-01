@@ -48,26 +48,35 @@ public class Partitioning {
                 }
             }
         }
-        //////
+
         Set<Set<State>> rhoInit = new HashSet<Set<State>>();
+        HashMap<State, Set<Set<State>>> hMap = new HashMap<>();
         rhoInit.addAll(rho);
         for (State epsilon : this.Parameter.getStates()) {
             sMap.put(epsilon, rhoInit);
+            hMap.put(epsilon, rhoInit);
 
         }
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.Parameter.getInterface().getChannels());
 
-        // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T,c);
-        // return d.run();
         System.out.println("TS to be minimised -> " + this.T.getName());
         ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
         return d.run();
+
+        // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T, this.Parameter,c);
+        // return d.run();
+
+        // SeqSolver d= new SeqSolver(hMap, this.T, this.Parameter,c);
+        // return d.run();
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {
         Set<State> out = new HashSet<State>();
-        out = p.stream().filter(s -> s.getLabel().equals(label)).collect(Collectors.toSet());
+        out = p
+                .stream()
+                .filter(s -> s.getLabel().equals(label))
+                .collect(Collectors.toSet());
         // for (State s : p) {
         // if (s.getLabel().equals(label)) {
         // out.add(s);
