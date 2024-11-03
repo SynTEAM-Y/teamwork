@@ -55,7 +55,7 @@ public class ESolver {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      
+
       for (int i = 0; i < resultList.size(); i++) {
         Future<Set<Set<State>>> future = resultList.get(i);
         try {
@@ -73,7 +73,6 @@ public class ESolver {
     Set<Set<State>> rho_f = new HashSet<>();
     rho_f = buildFinalRho();
 
-    
     CompressedTS c = new CompressedTS("s-" + this.ts.getName());
     TS t = c.DoCompress(this.ts, rho_f);
     return t;
@@ -89,9 +88,10 @@ public class ESolver {
         fixedPoint = false;
       }
     }
-    // if (fixedPoint) {
-    // printFixedRho(eMap);
-    // }
+    if (fixedPoint) {
+      // System.err.println(eMap);
+       printFixedRho(eMap);
+    }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);
@@ -159,7 +159,7 @@ public class ESolver {
         }
       }
     }
-   // System.err.println("rho final" + rho_intersect);
+    // System.err.println("rho final" + rho_intersect);
     return rho_intersect;
   }
 

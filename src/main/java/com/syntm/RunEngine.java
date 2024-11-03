@@ -18,6 +18,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.collect.Sets;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.Int;
@@ -31,7 +33,7 @@ import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
 
 public class RunEngine {
-	//private TS mainTS;
+	// private TS mainTS;
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
 	public static final String ANSI_RED = "\u001B[31m";
@@ -44,6 +46,8 @@ public class RunEngine {
 
 	public static void main(final String[] args)
 			throws IOException, InterruptedException, ExecutionException, TimeoutException {
+		File outputFolder = new File("./generated/output/");
+		FileUtils.cleanDirectory(outputFolder);
 		RunEngine parse = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Spec spec = new Spec();
@@ -88,16 +92,17 @@ public class RunEngine {
 
 	public void processInput(TS ts, Spec spec) throws IOException {
 		int i = 0;
+
 		for (Int aInt : spec.getaInterfaces()) {
 			ts.initialDecomposition("A" + i, aInt.getChannels(), aInt.getOutput());
 			i++;
 		}
+		ts.toDot();
 
 		Set<TS> sTS = new HashSet<TS>();
-		for (TS a : ts.getAgents()) {
-			a.toDot();
-		}
-		
+		// for (TS a : ts.getAgents()) {
+		// a.toDot();
+		// }
 
 		for (TS pa : ts.getParameters()) {
 			Partitioning lp = new Partitioning(pa, ts.getAgentById(pa.getName()));
@@ -107,8 +112,9 @@ public class RunEngine {
 		// //writeOutput("comp", cComp);
 		// //writeOutput("ts", ts);
 		// cComp.toDot();
-		// System.out.println(ANSI_GREEN + "Check Equivalence of " + ts.getName() + " and " + cComp.getName()
-		// 		+ " -> " + ts.equivCheck(cComp) + ANSI_RESET);
+		// System.out.println(ANSI_GREEN + "Check Equivalence of " + ts.getName() + "
+		// and " + cComp.getName()
+		// + " -> " + ts.equivCheck(cComp) + ANSI_RESET);
 		// this.simulate(sTS);
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		String exit = "";
@@ -116,11 +122,13 @@ public class RunEngine {
 			System.out.println("");
 			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
 
-			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "x"));
+			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
 			System.out.println(ANSI_GREEN +
-					"[" + 1 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
+					"[" + 1 + "] :  Generate distirbuted TS? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
-					"[" + 2 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
+					"[" + 2 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
+			System.out.println(ANSI_GREEN +
+					"[" + 3 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
 					"[" + "x" + "] :  Exit? " + ANSI_RESET);
 
@@ -135,6 +143,17 @@ public class RunEngine {
 			}
 			switch (in.toString()) {
 				case "1":
+					for (TS tss : sTS) {
+						tss.toDot();
+					}
+					ts.toDot();
+					for (TS tss : ts.getAgents()) {
+						tss.toDot();
+					}
+					System.out.println(
+							ANSI_BLUE + "Generated" + ANSI_RESET);
+					break;
+				case "2":
 					TS cComp = compose(sTS);
 					cComp.toDot();
 
@@ -142,7 +161,7 @@ public class RunEngine {
 							ANSI_BLUE + "Check Equivalence of " + ts.getName() + " and " + cComp.getName()
 									+ " -> " + ts.equivCheck(cComp) + ANSI_RESET);
 					break;
-				case "2":
+				case "3":
 					simulate(sTS);
 					break;
 				case "x":
@@ -153,7 +172,6 @@ public class RunEngine {
 					break;
 			}
 		}
-
 	}
 
 	private String checkFileName(String fileName) {
@@ -185,6 +203,7 @@ public class RunEngine {
 			e.printStackTrace();
 		}
 	}
+
 	private void simulate(Set<TS> sTS) throws IOException {
 		String in = "";
 		String orientation = "";
@@ -253,7 +272,7 @@ public class RunEngine {
 				ls.addAll(st.getListen().getChannels());
 				ch.addAll(st.getLabel().getChannel());
 				out.addAll(st.getLabel().getOutput());
-				if (out.size()>1) {
+				if (out.size() > 1) {
 					out.remove("-");
 				}
 				sc.getComStates().add(st);
@@ -437,6 +456,7 @@ public class RunEngine {
 		}
 
 	}
+
 	public Set<State> reachFrom(TS ts, State s) {
 
 		HashMap<State, Boolean> visited = new HashMap<>();

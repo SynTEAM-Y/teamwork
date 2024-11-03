@@ -52,7 +52,8 @@ public class ConcurrentSolver {
           for (String ch : channels) {
 
             for (Trans trEpsilon : epsilon.getTrans()) {
-              Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
+              List<Set<State>> ePartitions = new ArrayList<Set<State>>(this.lMap.get(trEpsilon.getDestination()));
+              ePartitions.sort((e1, e2) -> e2.size() - e1.size());
               for (Set<State> ePrime : ePartitions) {
                 HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
                 for (Set<State> partition : this.rho_temp) {
@@ -340,9 +341,9 @@ public class ConcurrentSolver {
         fixedPoint = false;
       }
     }
-    //if (fixedPoint) {
-     // printFixedRho(eMap);
-    //}
+    // if (fixedPoint) {
+    // printFixedRho(eMap);
+    // }
 
     for (int i = 0; i < wList.size(); i++) {
       wList.get(i).setlMap(eMap);
@@ -350,6 +351,7 @@ public class ConcurrentSolver {
 
     return fixedPoint;
   }
+
   public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
     Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
     gp.addln("\n An e-Cooperative Bisimulation for " + this.ts.getName() + "\n");

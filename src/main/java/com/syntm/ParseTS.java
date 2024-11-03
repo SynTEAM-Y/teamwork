@@ -1,7 +1,9 @@
 package com.syntm;
 
+import org.apache.commons.io.FileUtils;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +20,6 @@ import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 import com.syntm.util.Printer;
 
-
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
 	public static final String ANSI_RESET = "\u001B[0m";
@@ -34,21 +35,29 @@ public class ParseTS {
 	public static void main(final String[] args) throws IOException, InterruptedException {
 		ParseTS parseTS = new ParseTS();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+
+		File outputFolder = new File("./generated/output/");
+		FileUtils.cleanDirectory(outputFolder);
+
 		System.out.println(ANSI_GREEN + "Enter a TS for decomposition: " + ANSI_RESET);
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
 		Set<TS> sTS = parseTS.readInput(fileP);
+		
+		parseTS.mainTS.toDot();
 		// parseTS.writeOutput("TStext");
 		String exit = "";
 		while (!exit.equals("x")) {
 			System.out.println("");
 			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
 
-			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "x"));
+			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
 			System.out.println(ANSI_GREEN +
-					"[" + 1 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
+					"[" + 1 + "] :  Generate distributed TS? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
-					"[" + 2 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
+					"[" + 2 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
+			System.out.println(ANSI_GREEN +
+					"[" + 3 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
 					"[" + "x" + "] :  Exit? " + ANSI_RESET);
 
@@ -63,6 +72,17 @@ public class ParseTS {
 			}
 			switch (in.toString()) {
 				case "1":
+					for (TS ts : sTS) {
+						ts.toDot();
+					}
+					parseTS.mainTS.toDot();
+					for (TS ts : parseTS.mainTS.getAgents()) {
+						ts.toDot();
+					}
+					System.out.println(
+							ANSI_BLUE + "Generated" + ANSI_RESET);
+					break;
+				case "2":
 					TS cComp = parseTS.compose(sTS);
 					cComp.toDot();
 
@@ -70,7 +90,7 @@ public class ParseTS {
 							ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
 									+ " -> " + parseTS.mainTS.equivCheck(cComp) + ANSI_RESET);
 					break;
-				case "2":
+				case "3":
 					parseTS.simulate(sTS);
 					break;
 				case "x":
@@ -88,6 +108,7 @@ public class ParseTS {
 		try {
 			this.mainTS.parse(fileP);
 			TS mTs = this.mainTS.reduce();
+			this.mainTS = mTs;
 			Set<TS> sTS = new HashSet<TS>();
 
 			for (TS pa : mTs.getParameters()) {
@@ -171,10 +192,10 @@ public class ParseTS {
 				ls.addAll(st.getListen().getChannels());
 				ch.addAll(st.getLabel().getChannel());
 				out.addAll(st.getLabel().getOutput());
-				if (out.size()>1) {
+				if (out.size() > 1) {
 					out.remove("-");
 				}
-				
+
 				sc.getComStates().add(st);
 				sc.setId(sc.getId() + "" + st.getId());
 			}

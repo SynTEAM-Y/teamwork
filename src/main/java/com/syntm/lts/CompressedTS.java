@@ -240,7 +240,7 @@ public class CompressedTS {
             t.getLS().apply(s, ls);
         }
         TS convT = t.convetToTS(t,ts);
-        convT.toDot();
+       // convT.toDot();
         return convT;
     }
     public TS DoCompress(TS ts, Set<Set<State>> rho) {
@@ -297,7 +297,7 @@ public class CompressedTS {
             t.getLS().apply(s, ls);
         }
         TS convT = t.convetToTS(t,ts);
-        convT.toDot();
+        //convT.toDot();
         return convT;
 
     }

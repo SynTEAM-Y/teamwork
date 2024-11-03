@@ -17,12 +17,6 @@
             "request": "launch",
             "mainClass": "com.syntm.ParseTS",
             "projectName": "teamwork"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Open index.html",
-            "file": "/Users/yehiaa/Documents/git/teamwork/target/site/index.html"
         }
     ]
 }

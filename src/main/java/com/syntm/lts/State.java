@@ -12,9 +12,10 @@ public class State {
     private Set<Trans> trans;
     private Set<State> comStates;
     private TS owner;
-    private Set<String> qState=new HashSet<>();
-    private Set<State> post=new HashSet<>();
-    private Set<State> pre=new HashSet<>();
+    private Set<String> qState = new HashSet<>();
+    private Set<State> post = new HashSet<>();
+    private Set<State> pre = new HashSet<>();
+
     public State() {
         this.id = "";
         this.label = new Label();
@@ -119,7 +120,7 @@ public class State {
     public String toString() {
         return " State" + "(id=" + id + ", L=" + label + ", LS=" + listen + ")";
     }
-    
+
     public String getId() {
         return id;
     }
@@ -236,6 +237,21 @@ public class State {
             }
             if (tr.getDestination().getLabel().equals(s.getLabel())
                     && !t.getInterface().getChannels().contains(ch)
+                    && !tr.getAction().equals(ch)) {
+                tSet.add(tr);
+            }
+
+        }
+        return tSet;
+    }
+
+    public Set<Trans> TakeDiff(TS t, State s, String ch) {
+        Set<Trans> tSet = new HashSet<Trans>();
+        for (Trans tr : s.getTrans()) {
+            if (tr.getAction().equals(ch)) {
+                return new HashSet<>();
+            }
+            if (!t.getInterface().getChannels().contains(ch)
                     && !tr.getAction().equals(ch)) {
                 tSet.add(tr);
             }

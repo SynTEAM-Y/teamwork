@@ -43,11 +43,14 @@ public class SeqSolver {
         public void run() {
 
             for (String ch : channels) {
+                List<Set<State>> rhoList = new ArrayList<>(this.rho_temp);
                 for (Trans trEpsilon : epsilon.getTrans()) {
-                    Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
+                    List<Set<State>> ePartitions = new ArrayList<Set<State>>(this.lMap.get(trEpsilon.getDestination()));
+                    ePartitions.sort((e1, e2) ->  e2.size()- e1.size());
                     for (Set<State> ePrime : ePartitions) {
                         HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
-                        for (Set<State> partition : this.rho_temp) {
+                        rhoList.sort((e1, e2) ->  e2.size()- e1.size());
+                        for (Set<State> partition : rhoList) {
                             if (partition.size() > 1) {
                                 Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
                                 if (!splitter.isEmpty() && !splitter.equals(partition)) {
@@ -58,6 +61,8 @@ public class SeqSolver {
                         if (!splitters.isEmpty()) {
                             for (Set<State> p : splitters.keySet()) {
                                 Set<Set<State>> splitP = split(p, splitters.get(p));
+                                rhoList.remove(p);
+                                rhoList.addAll(splitP);
                                 rho_temp.remove(p);
                                 rho_temp.addAll(splitP);
                             }
@@ -127,6 +132,7 @@ public class SeqSolver {
                 }
             }
             Set<State> pPrime = new HashSet<>();
+            Set<State> outt = new HashSet<>(out);
             pPrime.addAll(p);
             pPrime.removeAll(out);
             if (!out.isEmpty()) {
@@ -135,6 +141,21 @@ public class SeqSolver {
                         if (!s.getListen().getChannels().contains(channel)) {
                             {
                                 out.add(s);
+                                // for (State ss : outt) {
+                                // if (p.contains(ss.takeAnyReaction(ss.getOwner(), ss,
+                                // channel).getDestination())) {
+                                // out.add(s);
+                                // break;
+                                // }
+                                // }
+                                // if (!s.TakeDiff(ts, s, channel).isEmpty()) {
+                                // for (Trans tr : s.TakeDiff(ts, s, channel)) {
+                                // if (p.contains(tr.getDestination())) {
+                                // out.add(s);
+                                // break;
+                                // }
+                                // }
+                                // }
                             }
                         }
                     }

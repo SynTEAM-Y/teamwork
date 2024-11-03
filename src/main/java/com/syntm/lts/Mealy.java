@@ -281,7 +281,7 @@ public class Mealy {
                     System.out.println(
                             "\n\n Specification is REALIZABLE for a single agent\n\n You may get a distributed Implementation!\n\n");
                     this.setStatus("REALIZABLE");
-                    this.setName("Strategy");
+                    this.setName("Mealy");
                     break;
                 case "UNREALIZABLE":
                     this.setName("Counter Strategy");

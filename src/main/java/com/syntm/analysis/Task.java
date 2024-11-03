@@ -1,7 +1,9 @@
 package com.syntm.analysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,14 +23,14 @@ public class Task implements Callable<Set<Set<State>>> {
       Set<String> channels) {
     this.channels = new HashSet<String>(channels);
     this.epsilon = eMap.keySet()
-                    .stream()
-                    .filter(s -> s.getId().equals(e))
-                    .collect(Collectors.toSet()).iterator().next();
+        .stream()
+        .filter(s -> s.getId().equals(e))
+        .collect(Collectors.toSet()).iterator().next();
     // for (State state : eMap.keySet()) {
-    //   if (state.getId().equals(e)) {
-    //     this.epsilon = state;
-    //     break;
-    //   }
+    // if (state.getId().equals(e)) {
+    // this.epsilon = state;
+    // break;
+    // }
     // }
     this.rho_epsilon = new HashSet<>(rho_Set);
 
@@ -46,7 +48,8 @@ public class Task implements Callable<Set<Set<State>>> {
     for (String ch : channels) {
 
       for (Trans trEpsilon : epsilon.getTrans()) {
-        Set<Set<State>> ePartitions = new HashSet<>(this.lMap.get(trEpsilon.getDestination()));
+        List<Set<State>> ePartitions = new ArrayList<Set<State>>(this.lMap.get(trEpsilon.getDestination()));
+        ePartitions.sort((e1, e2) -> e2.size() - e1.size());
         for (Set<State> ePrime : ePartitions) {
           HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
           for (Set<State> partition : this.rho_temp) {
@@ -156,95 +159,94 @@ public class Task implements Callable<Set<Set<State>>> {
     return out;
   }
 
-  // private Set<State> sReactToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
-  //   for (State s : p) {
-  //     if (s.canDirectReaction(s.getOwner(), s, channel)) {
-  //       if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())) {
-  //         out.add(s);
-  //       }
-  //     }
-  //   }
-  //   Set<State> pPrime = new HashSet<>();
-  //   pPrime.addAll(p);
-  //   pPrime.removeAll(out);
-  //   if (!out.isEmpty()) {
-  //     for (State s : pPrime) {
-  //       if (!s.canDirectReaction(s.getOwner(), s, channel)
-  //           && !s.canExactSilent(s.getOwner(), s, channel)) {
-  //         Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
-  //         if (reach.size() != 1) {
-  //           for (State sReach : reach) {
-  //             if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
-  //               if (ePrime
-  //                   .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
-  //                       channel).getDestination())) {
-  //                 out.add(s);
+  private Set<State> sReactToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    for (State s : p) {
+      if (s.canDirectReaction(s.getOwner(), s, channel)) {
+        if (ePrime.contains(s.takeDirectReaction(s.getOwner(), s, channel).getDestination())) {
+          out.add(s);
+        }
+      }
+    }
+    Set<State> pPrime = new HashSet<>();
+    pPrime.addAll(p);
+    pPrime.removeAll(out);
+    if (!out.isEmpty()) {
+      for (State s : pPrime) {
+        if (!s.canDirectReaction(s.getOwner(), s, channel)
+            && !s.canExactSilent(s.getOwner(), s, channel)) {
+          Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
+          if (reach.size() != 1) {
+            for (State sReach : reach) {
+              if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                if (ePrime
+                    .contains(sReach.takeDirectReaction(sReach.getOwner(), sReach,
+                        channel).getDestination())) {
+                  out.add(s);
 
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
 
-  //   return out;
-  // }
+    return out;
+  }
 
-  // private Set<State> sSilentToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
-  //   boolean flag = false;
-  //   for (State s : p) {
-  //     // 3.c
-  //     if (s.canExactSilent(s.getOwner(), s, channel)) {
-  //       if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
-  //           channel).getDestination())) {
-  //         out.add(s);
-  //       }
-  //     }
-  //   }
-  //   Set<State> pPrime = new HashSet<>();
-  //   pPrime.addAll(p);
-  //   pPrime.removeAll(out);
-  //   if (!out.isEmpty()) {
-  //     for (State s : pPrime) {
+  private Set<State> sSilentToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+    boolean flag = false;
+    for (State s : p) {
+      // 3.c
+      if (s.canExactSilent(s.getOwner(), s, channel)) {
+        if (ePrime.contains(s.takeExactSilent(s.getOwner(), s,
+            channel).getDestination())) {
+          out.add(s);
+        }
+      }
+    }
+    Set<State> pPrime = new HashSet<>();
+    pPrime.addAll(p);
+    pPrime.removeAll(out);
+    if (!out.isEmpty()) {
+      for (State s : pPrime) {
 
-  //       if (!s.canExactSilent(s.getOwner(), s, channel)
-  //           && !s.canDirectReaction(s.getOwner(), s, channel)) {
+        if (!s.canExactSilent(s.getOwner(), s, channel)
+            && !s.canDirectReaction(s.getOwner(), s, channel)) {
 
-  //         //
-  //         Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
-  //         if (reach.size() != 1) {
-  //           for (State sReach : reach) {
-  //             if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
-  //               flag = true;
-  //             }
-  //             if (sReach.canExactSilent(sReach.getOwner(), sReach, channel)) {
-  //               flag = true;
-  //               if (!sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
-  //                 if (ePrime
-  //                     .contains(sReach.takeExactSilent(sReach.getOwner(), sReach,
-  //                         channel).getDestination())) {
-  //                   out.add(s);
+          //
+          Set<State> reach = s.weakBFS(s.getOwner(), s, channel);
+          if (reach.size() != 1) {
+            for (State sReach : reach) {
+              if (sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                flag = true;
+              }
+              if (sReach.canExactSilent(sReach.getOwner(), sReach, channel)) {
+                flag = true;
+                if (!sReach.canDirectReaction(sReach.getOwner(), sReach, channel)) {
+                  if (ePrime
+                      .contains(sReach.takeExactSilent(sReach.getOwner(), sReach,
+                          channel).getDestination())) {
+                    out.add(s);
 
-  //                 }
-  //               }
-  //             }
-  //           }
-  //         }
-  //         //
-  //         if (!flag && !s.getListen().getChannels().contains(channel)) {
-  //           if (ePrime.contains(s)) {
-  //             out.add(s);
-  //           }
-  //         }
-  //       }
-  //       flag = false;
-  //     }
-  //   }
+                  }
+                }
+              }
+            }
+          }
+          //
+          if (!flag && !s.getListen().getChannels().contains(channel)) {
+            if (ePrime.contains(s)) {
+              out.add(s);
+            }
+          }
+        }
+        flag = false;
+      }
+    }
 
-  //   return out;
-  // }
-
+    return out;
+  }
 
   private Set<State> sInitiateToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
     if (!epsilon.canTakeInitiative(epsilon.getOwner(), epsilon, channel)

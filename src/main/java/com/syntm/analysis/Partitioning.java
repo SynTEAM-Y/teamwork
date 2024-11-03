@@ -48,7 +48,6 @@ public class Partitioning {
                 }
             }
         }
-
         Set<Set<State>> rhoInit = new HashSet<Set<State>>();
         HashMap<State, Set<Set<State>>> hMap = new HashMap<>();
         rhoInit.addAll(rho);
@@ -61,14 +60,14 @@ public class Partitioning {
         c.addAll(this.Parameter.getInterface().getChannels());
 
         System.out.println("TS to be minimised -> " + this.T.getName());
-        ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
-        return d.run();
+        // ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
+        // return d.run();
 
         // ConcurrentSolver d= new ConcurrentSolver(sMap, this.T, this.Parameter,c);
         // return d.run();
 
-        // SeqSolver d= new SeqSolver(hMap, this.T, this.Parameter,c);
-        // return d.run();
+        SeqSolver d= new SeqSolver(hMap, this.T, this.Parameter,c);
+        return d.run();
     }
 
     private Set<State> findSplit(Set<State> p, Label label) {
