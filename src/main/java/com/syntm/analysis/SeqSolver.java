@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.javatuples.Pair;
 
-import com.oracle.truffle.regex.nashorn.regexp.joni.constants.Arguments;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
@@ -246,7 +245,7 @@ public class SeqSolver {
     }
 
     public TS run() {
-        int counter = 0;
+        //int counter = 0;
         boolean fixed = false;
         while (!fixed) {
             // counter += 1;
@@ -258,7 +257,6 @@ public class SeqSolver {
         }
 
         Set<Set<State>> rho_f = new HashSet<>();
-        // rho_f = buildFinalRho();
         rho_f = buildPartition();
 
         CompressedTS c = new CompressedTS("s-" + this.ts.getName());
