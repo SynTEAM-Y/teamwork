@@ -105,7 +105,7 @@ public class SeqSolver {
 
                 if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
                     // reaction by s
-                    out = sAnyToE(p, ePrime, out, channel);
+                    out = sRacToE(p, ePrime, out, channel);
                 }
                 // initiation by s
                 if (out.isEmpty()) {
@@ -122,7 +122,7 @@ public class SeqSolver {
             return out;
         }
 
-        private Set<State> sAnyToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
+        private Set<State> sRacToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
             for (State s : p) {
                 // 3.c
                 if (s.canAnyReaction(s.getOwner(), s, channel)) {
@@ -245,7 +245,7 @@ public class SeqSolver {
     }
 
     public TS run() {
-        //int counter = 0;
+        // int counter = 0;
         boolean fixed = false;
         while (!fixed) {
             // counter += 1;
@@ -275,9 +275,9 @@ public class SeqSolver {
                 fixedPoint = false;
             }
         }
-        if (fixedPoint) {
-            // printFixedRho(eMap);
-        }
+        // if (fixedPoint) {
+        // printFixedRho(eMap);
+        // }
 
         for (int i = 0; i < wList.size(); i++) {
             wList.get(i).setlMap(eMap);
