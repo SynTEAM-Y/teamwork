@@ -3,7 +3,6 @@ package com.syntm;
 import org.apache.commons.io.FileUtils;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,6 +51,7 @@ public class ParseTS {
 			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
 
 			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
+		
 			System.out.println(ANSI_GREEN +
 					"[" + 1 + "] :  Generate distributed TS? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
@@ -116,7 +116,18 @@ public class ParseTS {
 				Partitioning lp = new Partitioning(pa, mTs.getAgentById(pa.getName()));
 				sTS.add(lp.computeCompressedTS());
 			}
-
+			// //create dummy TS 
+			// TS dummy = new TS(" ");
+			// State sdummy = new State("");
+			// dummy.addState(sdummy);
+			// dummy.setInitState(sdummy.getId());
+			// for (TS ts : sTS) {
+			// 	dummy =dummy.openParallelCompTS(ts);
+			// 	//dummy.toDot();
+			// }
+			// //dummy=dummy.prunedTS(dummy);
+			// TS closed =dummy.close();
+			// closed.toDot();
 			return sTS;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -167,6 +178,7 @@ public class ParseTS {
 		return cartesianProduct;
 	}
 
+	
 	private TS compose(Set<TS> sTS) {
 		TS t = new TS("");
 		Set<String> chan = new HashSet<>();

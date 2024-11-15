@@ -1,12 +1,16 @@
 package com.syntm.analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.javatuples.Pair;
+
+import com.oracle.truffle.regex.nashorn.regexp.joni.constants.Arguments;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
@@ -46,10 +50,10 @@ public class SeqSolver {
                 List<Set<State>> rhoList = new ArrayList<>(this.rho_temp);
                 for (Trans trEpsilon : epsilon.getTrans()) {
                     List<Set<State>> ePartitions = new ArrayList<Set<State>>(this.lMap.get(trEpsilon.getDestination()));
-                    ePartitions.sort((e1, e2) ->  e2.size()- e1.size());
+                    ePartitions.sort((e1, e2) -> e2.size() - e1.size());
                     for (Set<State> ePrime : ePartitions) {
                         HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
-                        rhoList.sort((e1, e2) ->  e2.size()- e1.size());
+                        rhoList.sort((e1, e2) -> e2.size() - e1.size());
                         for (Set<State> partition : rhoList) {
                             if (partition.size() > 1) {
                                 Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
@@ -139,24 +143,23 @@ public class SeqSolver {
                 for (State s : pPrime) {
                     if (!s.canAnyReaction(s.getOwner(), s, channel)) {
                         if (!s.getListen().getChannels().contains(channel)) {
-                            {
-                                out.add(s);
-                                // for (State ss : outt) {
-                                // if (p.contains(ss.takeAnyReaction(ss.getOwner(), ss,
-                                // channel).getDestination())) {
-                                // out.add(s);
-                                // break;
-                                // }
-                                // }
-                                // if (!s.TakeDiff(ts, s, channel).isEmpty()) {
-                                // for (Trans tr : s.TakeDiff(ts, s, channel)) {
-                                // if (p.contains(tr.getDestination())) {
-                                // out.add(s);
-                                // break;
-                                // }
-                                // }
-                                // }
+
+                            out.add(s);
+
+                            // Ahead of Epsilon
+                            for (State ss : outt) {
+                                if (p.contains(ss.takeAnyReaction(ss.getOwner(), ss,
+                                        channel).getDestination())) {
+                                    out.add(s);
+                                    break; // use functional PR to simplify
+                                }
                             }
+
+                            // Before of Epsilon
+                            if (!out.contains(s)) {
+
+                            }
+
                         }
                     }
                 }
@@ -238,7 +241,7 @@ public class SeqSolver {
     }
 
     public TS run() {
-        // int counter = 0;
+        int counter = 0;
         boolean fixed = false;
         while (!fixed) {
             // counter += 1;
@@ -250,7 +253,8 @@ public class SeqSolver {
         }
 
         Set<Set<State>> rho_f = new HashSet<>();
-        rho_f = buildFinalRho();
+        // rho_f = buildFinalRho();
+        rho_f = buildPartition();
 
         CompressedTS c = new CompressedTS("s-" + this.ts.getName());
         TS t = c.DoCompress(this.ts, rho_f);
@@ -269,7 +273,7 @@ public class SeqSolver {
             }
         }
         if (fixedPoint) {
-            printFixedRho(eMap);
+            // printFixedRho(eMap);
         }
 
         for (int i = 0; i < wList.size(); i++) {
@@ -335,6 +339,93 @@ public class SeqSolver {
                     rho_intersect.add(b);
                     closed.addAll(unionBi);
                     closed.addAll(b);
+                }
+            }
+        }
+        // System.err.println("rho final" + rho_intersect);
+        return rho_intersect;
+    }
+
+    public Set<Set<State>> buildPartition() {
+        Set<State> closed = new HashSet<>();
+        Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
+
+        HashMap<String, Set<State>> cares = new HashMap<>();
+
+        Set<String> ids = new HashSet<>();
+        ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
+
+        for (State state : eMap.keySet()) {
+            if (!state.equals(p.getInitState())) {
+                rho_intersect.retainAll(eMap.get(state));
+            }
+        }
+
+        for (String st : ids) {
+            Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
+                    .collect(Collectors.toSet()).iterator().next();
+            cares.put(st, states);
+
+        }
+
+        if (rho_intersect.equals(eMap.get(p.getInitState()))) {
+            return rho_intersect;
+        }
+        rho_intersect.clear();
+
+        for (String s : ids) {
+            if (!closed.contains(ts.getStateById(s))) {
+                Set<State> b = new HashSet<>();
+                b = cares.get(s);
+                b.removeAll(closed);
+                Set<State> excluded = new HashSet<>();
+                List<Pair<State, Set<State>>> candidates = new ArrayList<>();
+                for (State sPrime : b) {
+                    if (!sPrime.getId().equals(s)) {
+                        Set<State> pWise = new HashSet<>();
+                        pWise.addAll(b);
+                        pWise.retainAll(cares.get(sPrime.getId()));
+                        if (pWise.contains(ts.getStateById(s))) {
+                            candidates.add(new Pair<State, Set<State>>(sPrime, pWise));
+                        }
+                        if (!pWise.contains(ts.getStateById(s))) {
+                            excluded.add(sPrime);
+                        }
+                    }
+                }
+                b.removeAll(excluded);
+                List<Pair<State, Set<State>>> cPW = new ArrayList<>(candidates);
+                for (Pair<State, Set<State>> p : cPW) {
+                    Set<State> pExec = new HashSet<>();
+                    pExec.addAll(p.getValue1());
+                    pExec.retainAll(excluded);
+                    if (!pExec.isEmpty()) {
+                        candidates.remove(p);
+                        p.getValue1().removeAll(pExec);
+                        candidates.add(p);
+                    }
+                }
+                if (candidates.isEmpty()) {
+                    rho_intersect.add(new HashSet<>(Arrays.asList(ts.getStateById(s))));
+                    closed.add(ts.getStateById(s));
+                } else {
+                    for (Pair<State, Set<State>> candidate : candidates) {
+                        Set<State> disagree = new HashSet<>();
+                        for (State fState : candidate.getValue1()) {
+                            if (!fState.getId().equals(s) && !fState.getId().equals(candidate.getValue0().getId())) {
+                                Set<State> inSet = new HashSet<>(candidate.getValue1());
+                                inSet.retainAll(candidates.stream().filter(p -> p.getValue0().equals(fState))
+                                        .collect(Collectors.toSet()).iterator().next().getValue1());
+                                if (!inSet.equals(candidate.getValue1())) {
+                                    disagree.add(fState);
+                                }
+                            }
+                        }
+                        candidate.getValue1().removeAll(disagree);
+                    }
+                    candidates.sort((e1, e2) -> e2.getValue1().size() - e1.getValue1().size());
+                    rho_intersect.add(candidates.get(0).getValue1());
+                    closed.addAll(candidates.get(0).getValue1());
                 }
             }
         }
