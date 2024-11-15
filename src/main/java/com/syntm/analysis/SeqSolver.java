@@ -50,10 +50,8 @@ public class SeqSolver {
                 List<Set<State>> rhoList = new ArrayList<>(this.rho_temp);
                 for (Trans trEpsilon : epsilon.getTrans()) {
                     List<Set<State>> ePartitions = new ArrayList<Set<State>>(this.lMap.get(trEpsilon.getDestination()));
-                    ePartitions.sort((e1, e2) -> e2.size() - e1.size());
                     for (Set<State> ePrime : ePartitions) {
                         HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
-                        rhoList.sort((e1, e2) -> e2.size() - e1.size());
                         for (Set<State> partition : rhoList) {
                             if (partition.size() > 1) {
                                 Set<State> splitter = applyEBisim(partition, trEpsilon, ePrime, ch);
@@ -144,8 +142,6 @@ public class SeqSolver {
                     if (!s.canAnyReaction(s.getOwner(), s, channel)) {
                         if (!s.getListen().getChannels().contains(channel)) {
 
-                            out.add(s);
-
                             // Ahead of Epsilon
                             for (State ss : outt) {
                                 if (p.contains(ss.takeAnyReaction(ss.getOwner(), ss,
@@ -155,9 +151,17 @@ public class SeqSolver {
                                 }
                             }
 
-                            // Before of Epsilon
+                            // Unordered / Before of Epsilon
                             if (!out.contains(s)) {
+                                Set<State> witnessSet = new HashSet<>();
+                                witnessSet = p.stream()
+                                        .filter(w -> w.canAnyReaction(ts, w, channel) && !w.equals(s)
+                                                && p.contains(w.takeAnyReaction(ts, w, channel).getDestination()))
+                                        .collect(Collectors.toSet());
+                                if (witnessSet.isEmpty()) {
+                                    out.add(s);
 
+                                }
                             }
 
                         }
@@ -283,69 +287,6 @@ public class SeqSolver {
         return fixedPoint;
     }
 
-    public Set<Set<State>> buildFinalRho() {
-        Set<State> closed = new HashSet<>();
-        Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
-
-        HashMap<String, Set<State>> cares = new HashMap<>();
-
-        Set<String> ids = new HashSet<>();
-        ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
-
-        for (State state : eMap.keySet()) {
-            if (!state.equals(p.getInitState())) {
-                rho_intersect.retainAll(eMap.get(state));
-            }
-        }
-
-        for (String st : ids) {
-            Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
-                    .collect(Collectors.toSet()).iterator().next();
-            cares.put(st, states);
-
-        }
-
-        if (rho_intersect.equals(eMap.get(p.getInitState()))) {
-            return rho_intersect;
-        }
-        rho_intersect.clear();
-
-        for (String s : ids) {
-            if (!closed.contains(ts.getStateById(s))) {
-                Set<State> b = new HashSet<>();
-                b = cares.get(s);
-                Set<Set<State>> interSet = new HashSet<>();
-                for (State sPrime : b) {
-                    if (!sPrime.getId().equals(s)) {
-                        Set<State> pWise = new HashSet<>();
-                        pWise.addAll(b);
-                        if (pWise.retainAll(cares.get(sPrime.getId()))) {
-                            if (!pWise.isEmpty()) {
-                                interSet.add(pWise);
-                            }
-                        }
-                    }
-                }
-                Set<State> unionBi = new HashSet<>();
-                for (Set<State> pw : interSet) {
-                    unionBi.addAll(pw);
-                }
-                b.removeAll(unionBi);
-                if (b.isEmpty()) {
-                    rho_intersect.addAll(interSet);
-                    closed.addAll(unionBi);
-                } else {
-                    rho_intersect.addAll(interSet);
-                    rho_intersect.add(b);
-                    closed.addAll(unionBi);
-                    closed.addAll(b);
-                }
-            }
-        }
-        // System.err.println("rho final" + rho_intersect);
-        return rho_intersect;
-    }
-
     public Set<Set<State>> buildPartition() {
         Set<State> closed = new HashSet<>();
         Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
@@ -393,22 +334,24 @@ public class SeqSolver {
                         }
                     }
                 }
-                b.removeAll(excluded);
-                List<Pair<State, Set<State>>> cPW = new ArrayList<>(candidates);
-                for (Pair<State, Set<State>> p : cPW) {
-                    Set<State> pExec = new HashSet<>();
-                    pExec.addAll(p.getValue1());
-                    pExec.retainAll(excluded);
-                    if (!pExec.isEmpty()) {
-                        candidates.remove(p);
-                        p.getValue1().removeAll(pExec);
-                        candidates.add(p);
+                if (!excluded.isEmpty()) {
+                    List<Pair<State, Set<State>>> cPW = new ArrayList<>(candidates);
+                    for (Pair<State, Set<State>> p : cPW) {
+                        Set<State> pExec = new HashSet<>();
+                        pExec.addAll(p.getValue1());
+                        pExec.retainAll(excluded);
+                        if (!pExec.isEmpty()) {
+                            candidates.remove(p);
+                            p.getValue1().removeAll(pExec);
+                            candidates.add(p);
+                        }
                     }
                 }
                 if (candidates.isEmpty()) {
                     rho_intersect.add(new HashSet<>(Arrays.asList(ts.getStateById(s))));
                     closed.add(ts.getStateById(s));
                 } else {
+                    System.err.println(candidates);
                     for (Pair<State, Set<State>> candidate : candidates) {
                         Set<State> disagree = new HashSet<>();
                         for (State fState : candidate.getValue1()) {
