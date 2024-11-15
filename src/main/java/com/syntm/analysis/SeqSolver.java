@@ -143,12 +143,13 @@ public class SeqSolver {
                         if (!s.getListen().getChannels().contains(channel)) {
 
                             // Ahead of Epsilon
-                            for (State ss : outt) {
-                                if (p.contains(ss.takeAnyReaction(ss.getOwner(), ss,
-                                        channel).getDestination())) {
-                                    out.add(s);
-                                    break; // use functional PR to simplify
-                                }
+                            Set<State> ahead = outt
+                                    .stream()
+                                    .filter(h -> p.contains(h.takeAnyReaction(h.getOwner(), h,
+                                            channel).getDestination()))
+                                    .collect(Collectors.toSet());
+                            if (!ahead.isEmpty()) {
+                                out.add(s);
                             }
 
                             // Unordered / Before of Epsilon
