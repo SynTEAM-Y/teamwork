@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class State {
     private String id;
@@ -308,7 +309,9 @@ public class State {
         if (t.getInterface().getChannels().contains(ch)) {
             return false;
         }
-        if (s.canDirectReaction(t, s, ch) || s.canExactSilent(t, s, ch)) {
+        Set<Trans> sTrans = new HashSet<>();
+        sTrans = s.getTrans().stream().filter(tr -> tr.getAction().equals(ch)).collect(Collectors.toSet());
+        if (!sTrans.isEmpty()) {
             flag = true;
         }
 
@@ -316,11 +319,10 @@ public class State {
     }
 
     public Trans takeAnyReaction(TS t, State s, String ch) {
-        if (s.canExactSilent(t, s, ch)) {
-            return s.takeExactSilent(t, s, ch);
-        }
-        if (s.canDirectReaction(t, s, ch)) {
-            return s.takeDirectReaction(t, s, ch);
+        Set<Trans> sTrans = new HashSet<>();
+        sTrans = s.getTrans().stream().filter(tr -> tr.getAction().equals(ch)&& !t.getInterface().getChannels().contains(ch)).collect(Collectors.toSet());
+        if (!sTrans.isEmpty()) {
+            return sTrans.iterator().next();
         }
         return null;
     }

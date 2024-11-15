@@ -352,7 +352,6 @@ public class SeqSolver {
                     rho_intersect.add(new HashSet<>(Arrays.asList(ts.getStateById(s))));
                     closed.add(ts.getStateById(s));
                 } else {
-                    System.err.println(candidates);
                     for (Pair<State, Set<State>> candidate : candidates) {
                         Set<State> disagree = new HashSet<>();
                         for (State fState : candidate.getValue1()) {
