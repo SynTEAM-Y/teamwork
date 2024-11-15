@@ -102,16 +102,9 @@ public class Task implements Callable<Set<Set<State>>> {
     // 2. b, c, a with parameter invovled
     if (epsilon.enable(epsilon, channel)
         && trEpsilon.getAction().equals(channel)) {
-
+      // reaction from s
       if (epsilon.getOwner().getInterface().getChannels().contains(channel)) {
-        out = sAnyToE(p, ePrime, out, channel);
-        // Silent moves
-        // out = sSilentToE(p, ePrime, out, channel);
-
-        // reaction moves
-        // if (out.isEmpty()) {
-        // out = sReactToE(p, ePrime, out, channel);
-        // }
+        out = sRacToE(p, ePrime, out, channel);
       }
       // initiation by s
       if (out.isEmpty())
@@ -129,8 +122,7 @@ public class Task implements Callable<Set<Set<State>>> {
     return out;
   }
 
-  private Set<State> sAnyToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
-    // boolean flag = false;
+  private Set<State> sRacToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
     for (State s : p) {
       // 3.c
       if (s.canAnyReaction(s.getOwner(), s, channel)) {

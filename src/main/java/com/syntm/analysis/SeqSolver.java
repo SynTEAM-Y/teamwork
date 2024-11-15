@@ -249,7 +249,7 @@ public class SeqSolver {
         boolean fixed = false;
         while (!fixed) {
             // counter += 1;
-            // System.out.println("\n\n SYNCHRONISATION ROUND#" + counter + "\n\n");
+            // System.out.println("\n\n ROUND#" + counter + "\n\n");
             for (int i = 0; i < wList.size(); i++) {
                 wList.get(i).run();
             }
@@ -393,9 +393,6 @@ public class SeqSolver {
             gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
 
         }
-        // wList.sort((e1, e2) ->
-        // e1.getEpsilon().getId().compareTo(e2.getEpsilon().getId()));
         gp.printText();
-
     }
 }
