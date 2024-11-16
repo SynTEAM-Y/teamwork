@@ -140,7 +140,6 @@ public class SeqSolver {
                 for (State s : pPrime) {
                     if (!s.canAnyReaction(s.getOwner(), s, channel)) {
                         if (!s.getListen().getChannels().contains(channel)) {
-
                             // Ahead of Epsilon
                             Set<State> ahead = outt
                                     .stream()

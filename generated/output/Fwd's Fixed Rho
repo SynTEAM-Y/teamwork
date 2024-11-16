@@ -1,0 +1,141 @@
+[
+ An e-Cooperative Bisimulation for Fwd
+
+	0 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=1, L=[a]/[-], LS=[f])]
+
+	pre-> []
+
+	1 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=2, L=[]/[rP], LS=[p, a])]
+
+	pre-> [ State(id=4, L=[]/[-], LS=[a]),  State(id=0, L=[]/[-], LS=[a])]
+
+	10 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=11, L=[p]/[rD], LS=[d, f])]
+
+	pre-> [ State(id=8, L=[]/[-], LS=[a]),  State(id=2, L=[f]/[-], LS=[p, a])]
+
+	11 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=12, L=[d]/[-], LS=[f]),  State(id=6, L=[]/[rD, rP], LS=[a, d])]
+
+	pre-> [ State(id=9, L=[]/[rF], LS=[p]),  State(id=10, L=[]/[rF], LS=[p])]
+
+	12 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=2, L=[]/[rP], LS=[p, a])]
+
+	pre-> [ State(id=11, L=[]/[rF], LS=[d, f]),  State(id=5, L=[]/[rF], LS=[d, f])]
+
+	2 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=3, L=[p]/[rD], LS=[a, d]),  State(id=10, L=[a]/[rP], LS=[p])]
+
+	pre-> [ State(id=12, L=[]/[rF], LS=[f]),  State(id=1, L=[]/[rF], LS=[f])]
+
+	3 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=5, L=[a]/[rD], LS=[d, f]),  State(id=4, L=[d]/[-], LS=[a])]
+
+	pre-> [ State(id=2, L=[f]/[-], LS=[p, a])]
+
+	4 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=1, L=[a]/[-], LS=[f])]
+
+	pre-> [ State(id=3, L=[]/[-], LS=[a, d])]
+
+	5 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=12, L=[d]/[-], LS=[f]),  State(id=6, L=[]/[rD, rP], LS=[a, d])]
+
+	pre-> [ State(id=3, L=[]/[-], LS=[a, d])]
+
+	6 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=7, L=[a]/[rD, rP], LS=[d]),  State(id=8, L=[d]/[rP], LS=[a])]
+
+	pre-> [ State(id=11, L=[]/[rF], LS=[d, f]),  State(id=5, L=[]/[rF], LS=[d, f])]
+
+	7 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=9, L=[d]/[rP], LS=[p])]
+
+	pre-> [ State(id=6, L=[f]/[-], LS=[a, d])]
+
+	8 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+		[ State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d])]
+
+	post-> [ State(id=10, L=[a]/[rP], LS=[p])]
+
+	pre-> [ State(id=6, L=[f]/[-], LS=[a, d])]
+
+	9 ->
+		[ State(id=9, L=[]/[rF], LS=[p]),  State(id=7, L=[]/[rF], LS=[d])]
+		[ State(id=12, L=[]/[rF], LS=[f]),  State(id=11, L=[]/[rF], LS=[d, f])]
+		[ State(id=0, L=[]/[-], LS=[a]),  State(id=3, L=[]/[-], LS=[a, d]),  State(id=8, L=[]/[-], LS=[a])]
+		[ State(id=2, L=[f]/[-], LS=[p, a]),  State(id=6, L=[f]/[-], LS=[a, d])]
+
+	post-> [ State(id=11, L=[p]/[rD], LS=[d, f])]
+
+	pre-> [ State(id=7, L=[]/[rF], LS=[d])]
+
+
+]

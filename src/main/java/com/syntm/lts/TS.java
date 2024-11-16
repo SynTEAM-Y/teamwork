@@ -342,7 +342,6 @@ public class TS {
                 st.setListen(ls);
                 Set<String> chs = new HashSet<String>(
                         Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$1").split(",")));
-                        System.err.println(chs);
                 Set<String> o = new HashSet<>(Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$2").split(",")));
                 
 
