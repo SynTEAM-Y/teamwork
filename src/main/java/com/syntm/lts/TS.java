@@ -337,12 +337,14 @@ public class TS {
             if (!node.getId().equals("init") && !node.getId().equals("spec")) {
                 String[] parts = node.getAttribute("label").toString().split("\n\n");
                 State st = new State(node.getId());
-                Set<String> sch = new HashSet<>(Arrays.asList(parts[0].trim().split(",")));
+                Set<String> sch = new HashSet<>(Arrays.asList(parts[0].replaceAll("\\{([\\s\\S]*)\\}", "$1").split(",")));
                 Listen ls = new Listen(sch);
                 st.setListen(ls);
                 Set<String> chs = new HashSet<String>(
-                        Arrays.asList(parts[1].replaceAll("(\\w)\\/([\\S]*)", "$1").split(",")));
-                Set<String> o = new HashSet<>(Arrays.asList(parts[1].replaceAll("(\\w)\\/([\\S]*)", "$2").split(",")));
+                        Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$1").split(",")));
+                        System.err.println(chs);
+                Set<String> o = new HashSet<>(Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$2").split(",")));
+                
 
                 Label l = new Label(chs, o);
                 st.setLabel(l);

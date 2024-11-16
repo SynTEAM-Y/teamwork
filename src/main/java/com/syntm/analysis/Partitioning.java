@@ -59,7 +59,7 @@ public class Partitioning {
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.Parameter.getInterface().getChannels());
 
-        System.out.println("TS to be minimised -> " + this.T.getName() +" with "+this.T.getInterface());
+        System.out.println("TS to be minimised -> " + this.T.getName());// +" with "+this.T.getInterface());
         // ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
         // return d.run();
 

@@ -275,9 +275,9 @@ public class SeqSolver {
                 fixedPoint = false;
             }
         }
-        // if (fixedPoint) {
-        // printFixedRho(eMap);
-        // }
+        if (fixedPoint) {
+        printFixedRho(eMap);
+        }
 
         for (int i = 0; i < wList.size(); i++) {
             wList.get(i).setlMap(eMap);
