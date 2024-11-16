@@ -10,6 +10,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
+import org.graphstream.graph.*;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.*;
+import org.graphstream.stream.file.FileSource;
+import org.graphstream.stream.file.FileSourceFactory;
+
+import org.graphstream.graph.implementations.DefaultGraph;
+import org.graphstream.stream.file.FileSource;
+import org.graphstream.stream.file.FileSourceFactory;
+
 import java.util.function.BiFunction;
 
 import com.google.common.collect.Sets;
@@ -144,7 +154,7 @@ public class TS {
     public void toDot() {
         System.out.println("# of states of " + this.name + "-> " + this.getStates().size());
         Printer gp = new Printer(name);
-        gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=.6,nodesep=0.5" + ",label=\""
+        gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=0.6,nodesep=0.5" + ",label=\""
                 + "\n" + this.getName() + " : CH=" + this.getInterface().getChannels() + ", OUT="
                 + this.getInterface().getOutput() + " \"];\n");
         // gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\"
@@ -157,13 +167,13 @@ public class TS {
         // its channel is not included in\\l channel labelling of the reached
         // state.\\l\"]}");
         // gp.addln("\n\n\n\n");
-        gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
+        gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
 
         gp.addln("init [shape=point,style=invis];");
         for (State state : this.states) {
             gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                     + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
-                    + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"]" + "\n");
+                    + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"];" + "\n");
         }
 
         gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
@@ -181,11 +191,11 @@ public class TS {
 
     public Printer toDot(State simState, Trans transition) {
         Printer gp = new Printer(name);
-        gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=.6,nodesep=0.5" + ",label=\"" + "\n"
+        gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=0.6,nodesep=0.5" + ",label=\"" + "\n"
                 + this.getName() + " : CH=" + this.getInterface().getChannels() + ", OUT="
                 + this.getInterface().getOutput() + " \"];\n");
 
-        gp.addln("node[shape=circle style=filled fixedsize=true fontsize=10]\n");
+        gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
 
         gp.addln("init [shape=point,style=invis];");
         for (State state : this.states) {
@@ -194,20 +204,20 @@ public class TS {
                         + formatListen(state.getListen().getChannels())
                         + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                         + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
-                        + "#f25959\"]" + "\n");
+                        + "#f25959\"];" + "\n");
             } else {
                 if (state.equals(this.getStateById(simState.getId()))) {
                     gp.addln("\t" + this.formatTSName() + state.getId().toString() + "[label=\""
                             + formatListen(state.getListen().getChannels())
                             + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
                             + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\" color=\""
-                            + "#f25959\"]" + "\n");
+                            + "#f25959\"];" + "\n");
 
                 } else {
                     gp.addln("\t" + this.formatTSName() + state.getId().toString() + "[label=\""
                             + formatListen(state.getListen().getChannels())
                             + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
-                            + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"]" + "\n");
+                            + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"];" + "\n");
                 }
             }
         }
@@ -290,6 +300,80 @@ public class TS {
 
     public void setL(BiFunction<State, Label, Label> l) {
         L = l;
+    }
+
+    public void parseDot(final String filePath) throws IOException {
+        Graph g = new DefaultGraph("g");
+        FileSource fs = FileSourceFactory.sourceFor(filePath);
+
+        fs.addSink(g);
+
+        try {
+            fs.begin(filePath);
+            while (fs.nextEvents()) {
+                // Optionally some code here ...
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            fs.end();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            fs.removeSink(g);
+        }
+        Set<String> chan = new HashSet<>(Arrays.asList(g.getAttribute("label").toString()
+                .replaceAll("MainTS : CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$1")
+                .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
+
+        Set<String> out = new HashSet<>(Arrays.asList(g.getAttribute("label").toString()
+                .replaceAll("MainTS : CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$2")
+                .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
+        this.setInterface(new Int(chan, out));
+
+        for (Node node : g) {
+            if (!node.getId().equals("init") && !node.getId().equals("spec")) {
+                String[] parts = node.getAttribute("label").toString().split("\n\n");
+                State st = new State(node.getId());
+                Set<String> sch = new HashSet<>(Arrays.asList(parts[0].trim().split(",")));
+                Listen ls = new Listen(sch);
+                st.setListen(ls);
+                Set<String> chs = new HashSet<String>(
+                        Arrays.asList(parts[1].replaceAll("(\\w)\\/([\\S]*)", "$1").split(",")));
+                Set<String> o = new HashSet<>(Arrays.asList(parts[1].replaceAll("(\\w)\\/([\\S]*)", "$2").split(",")));
+
+                Label l = new Label(chs, o);
+                st.setLabel(l);
+                this.addState(st);
+
+            }
+        }
+
+        g.edges().forEach(e -> {
+            if (!e.getSourceNode().getId().equals("init")) {
+                this.getTransitions()
+                        .add(new Trans(this.getStateById(e.getSourceNode().getId()), e.getAttribute("label").toString(),
+                                this.getStateById(e.getTargetNode().getId())));
+                this.channels.add(e.getAttribute("label").toString());
+                this.getStateById(e.getSourceNode().getId()).getTrans()
+                        .add(new Trans(this.getStateById(e.getSourceNode().getId()), e.getAttribute("label").toString(),
+                                this.getStateById(e.getTargetNode().getId())));
+            } else {
+                this.setInitState(e.getTargetNode().getId());
+            }
+            
+        });
+        String[] parts = g.getNode("spec").getAttribute("label").toString().split("\n\n");
+        for (int i = 1; i < parts.length; i++) {
+        Set<String> achs = new HashSet<String>(Arrays.asList(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$2").split(",")));
+        Set<String> ao = new HashSet<>(Arrays.asList(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$3").split(",")));
+        this.initialDecomposition(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$1"), achs, ao);
+        }
+            
+        
+
     }
 
     public void parse(final String filePath) throws IOException {
@@ -375,7 +459,7 @@ public class TS {
 
         chan.addAll(T2.getInterface().getChannels());
         output.addAll(T2.getInterface().getOutput());
-       
+
         Int i = new Int(chan, output);
         t.setInterface(i);
         for (State s_1 : this.getStates()) {
@@ -618,6 +702,7 @@ public class TS {
         pOut.removeAll(outputs);
         mCh.addAll(pCh);
         mCh.addAll(channels);
+        mCh.remove("");
         mOut.addAll(outputs);
         mOut.addAll(pOut);
         Int pInt = new Int(pCh, pOut);
@@ -714,7 +799,7 @@ public class TS {
         for (Trans trans : last) {
 
             this.getStateById(trans.getSource().getId()).getTrans().remove(trans);
-            
+
         }
         this.getTransitions().removeAll(last);
         this.setStates(reachFrom(this, this.getInitState()));
@@ -724,7 +809,7 @@ public class TS {
                 trans.add(tr);
             }
         }
-       
+
         this.getTransitions().removeAll(trans);
 
         return this;

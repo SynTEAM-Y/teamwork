@@ -18,6 +18,10 @@ import com.google.common.collect.Sets;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 import com.syntm.util.Printer;
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
+import org.graphstream.stream.file.FileSource;
+import org.graphstream.stream.file.FileSourceFactory;
 
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
@@ -42,7 +46,7 @@ public class ParseTS {
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
 		Set<TS> sTS = parseTS.readInput(fileP);
-		
+
 		parseTS.mainTS.toDot();
 		// parseTS.writeOutput("TStext");
 		String exit = "";
@@ -51,7 +55,7 @@ public class ParseTS {
 			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
 
 			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
-		
+
 			System.out.println(ANSI_GREEN +
 					"[" + 1 + "] :  Generate distributed TS? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
@@ -106,7 +110,7 @@ public class ParseTS {
 
 	public Set<TS> readInput(final String fileP) throws InterruptedException {
 		try {
-			this.mainTS.parse(fileP);
+			this.mainTS.parseDot(fileP);
 			TS mTs = this.mainTS.reduce();
 			this.mainTS = mTs;
 			Set<TS> sTS = new HashSet<TS>();
@@ -116,14 +120,14 @@ public class ParseTS {
 				Partitioning lp = new Partitioning(pa, mTs.getAgentById(pa.getName()));
 				sTS.add(lp.computeCompressedTS());
 			}
-			// //create dummy TS 
+			// //create dummy TS
 			// TS dummy = new TS(" ");
 			// State sdummy = new State("");
 			// dummy.addState(sdummy);
 			// dummy.setInitState(sdummy.getId());
 			// for (TS ts : sTS) {
-			// 	dummy =dummy.openParallelCompTS(ts);
-			// 	//dummy.toDot();
+			// dummy =dummy.openParallelCompTS(ts);
+			// //dummy.toDot();
 			// }
 			// //dummy=dummy.prunedTS(dummy);
 			// TS closed =dummy.close();
@@ -178,7 +182,6 @@ public class ParseTS {
 		return cartesianProduct;
 	}
 
-	
 	private TS compose(Set<TS> sTS) {
 		TS t = new TS("");
 		Set<String> chan = new HashSet<>();
