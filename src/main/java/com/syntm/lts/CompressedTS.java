@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 CompressedTS.java (c) 2024
 Desc: Compute Quotient TS/Compress TS
 Created:  2024-11-17T10:50:26.221Z
-Updated:  17/11/2024 11:50:45
+Updated:  17/11/2024 21:56:40
 Version:  1.1
 */
 
@@ -256,7 +256,7 @@ public class CompressedTS {
         if (ts.getName().contains("T[")) {
             t.setName(ts.getName());
         } else {
-            t.setName("[" + ts.getName() + "]~");
+            t.setName("[" + ts.getName() + "]");
         }
         Int i = new Int(ts.getInterface().getChannels(), ts.getInterface().getOutput());
         t.setInterface(i);

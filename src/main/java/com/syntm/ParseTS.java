@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:44:52
+Updated:  17/11/2024 21:54:51
 Version:  1.1
 */
 
@@ -50,9 +50,12 @@ public class ParseTS {
 		System.out.println(ANSI_GREEN + "Enter a TS for decomposition: " + ANSI_RESET);
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
+		System.out.println(ANSI_GREEN +"Initial Decomposition"+ ANSI_RESET);
 		Set<TS> sTS = parseTS.readInput(fileP);
 
-		parseTS.mainTS.toDot();
+		//parseTS.mainTS.toDot();
+		
+
 		// parseTS.writeOutput("TStext");
 		String exit = "";
 		while (!exit.equals("x")) {
@@ -62,7 +65,7 @@ public class ParseTS {
 			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
 
 			System.out.println(ANSI_GREEN +
-					"[" + 1 + "] :  Generate distributed TS? " + ANSI_RESET);
+					"[" + 1 + "] :  Reconfigure, Minimize, and Generate distributed TS? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
 					"[" + 2 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
 			System.out.println(ANSI_GREEN +
@@ -81,11 +84,16 @@ public class ParseTS {
 			}
 			switch (in.toString()) {
 				case "1":
-					for (TS ts : sTS) {
+				System.out.println(ANSI_GREEN + "The original TS" + ANSI_RESET);
+					parseTS.mainTS.toDot();
+					
+					System.out.println(ANSI_GREEN + "Minimization according to Strong Bisimulation" + ANSI_RESET);
+					for (TS ts : parseTS.mainTS.getAgents()) {
+						ts.setName(" <"+ts.getName()+"> ");
 						ts.toDot();
 					}
-					parseTS.mainTS.toDot();
-					for (TS ts : parseTS.mainTS.getAgents()) {
+					System.out.println(ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation" + ANSI_RESET);
+					for (TS ts : sTS) {
 						ts.toDot();
 					}
 					System.out.println(

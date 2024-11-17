@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:45:21
+Updated:  17/11/2024 21:43:45
 Version:  1.1
 */
 
@@ -368,11 +368,12 @@ public class TS {
             }
             
         });
-        String[] parts = g.getNode("spec").getAttribute("label").toString().split("\n\n");
-        for (int i = 1; i < parts.length; i++) {
-        Set<String> achs = new HashSet<String>(Arrays.asList(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$2").split(",")));
-        Set<String> ao = new HashSet<>(Arrays.asList(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$3").split(",")));
-        this.initialDecomposition(parts[i].replaceAll("([A-Za-z1-9]+): CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$1"), achs, ao);
+        String spc = g.getNode("spec").getAttribute("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)","$2");
+        String[] parts = spc.split(";");
+        for (int i = 0; i < parts.length; i++) {
+        Set<String> achs = new HashSet<String>(Arrays.asList(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2").split(",")));
+        Set<String> ao = new HashSet<>(Arrays.asList(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$3").split(",")));
+        this.initialDecomposition(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1").replaceAll("\n", ""), achs, ao);
         }
             
         
@@ -780,7 +781,7 @@ public class TS {
 
         this.agents.add(t.reduce());
         this.parameters.add(p);
-        // t.toDot();
+         t.toDot();
         // p.toDot();
     }
 

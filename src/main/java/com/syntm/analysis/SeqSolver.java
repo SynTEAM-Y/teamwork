@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:46:21
+Updated:  17/11/2024 21:58:01
 Version:  1.1
 */
 
@@ -279,9 +279,9 @@ public class SeqSolver {
                 fixedPoint = false;
             }
         }
-        if (fixedPoint) {
-        printFixedRho(eMap);
-        }
+        // if (fixedPoint) {
+        // printFixedRho(eMap);
+        // }
 
         for (int i = 0; i < wList.size(); i++) {
             wList.get(i).setlMap(eMap);

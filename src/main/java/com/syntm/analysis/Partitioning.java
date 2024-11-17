@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Partitioning.java (c) 2024
 Desc: Initial lebel partitioning and pass to a specific solver
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:46:29
+Updated:  17/11/2024 21:29:31
 Version:  1.1
 */
 import java.util.HashSet;
@@ -66,7 +66,7 @@ public class Partitioning {
         Set<String> c = new HashSet<>(this.T.getInterface().getChannels());
         c.addAll(this.Parameter.getInterface().getChannels());
 
-        System.out.println("TS to be minimised -> " + this.T.getName());// +" with "+this.T.getInterface());
+        //System.out.println("TS to be minimised -> " + this.T.getName());// +" with "+this.T.getInterface());
         // ESolver d = new ESolver(sMap, this.T, this.Parameter, c);
         // return d.run();
 
