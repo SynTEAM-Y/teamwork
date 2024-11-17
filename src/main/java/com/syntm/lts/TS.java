@@ -12,14 +12,10 @@ import java.util.Set;
 import java.util.stream.*;
 import org.graphstream.graph.*;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.*;
 import org.graphstream.stream.file.FileSource;
 import org.graphstream.stream.file.FileSourceFactory;
 
 import org.graphstream.graph.implementations.DefaultGraph;
-import org.graphstream.stream.file.FileSource;
-import org.graphstream.stream.file.FileSourceFactory;
-
 import java.util.function.BiFunction;
 
 import com.google.common.collect.Sets;
