@@ -18,10 +18,6 @@ import com.google.common.collect.Sets;
 import com.syntm.analysis.Partitioning;
 import com.syntm.lts.*;
 import com.syntm.util.Printer;
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.*;
-import org.graphstream.stream.file.FileSource;
-import org.graphstream.stream.file.FileSourceFactory;
 
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
