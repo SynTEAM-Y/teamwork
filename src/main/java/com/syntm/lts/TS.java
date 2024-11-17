@@ -35,8 +35,6 @@ public class TS {
     private String status;
     private Set<String> channels;
 
-    // Set<Set<State>> rho = new HashSet<Set<State>>();
-
     public TS(String name, Set<State> states, State initState, Int interface1, Set<Trans> transitions) {
         this.name = name;
         this.states = states;
