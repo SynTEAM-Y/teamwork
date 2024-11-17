@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+State.java (c) 2024
+Desc: description
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 11:56:49
+Version:  1.1
+*/
 
 import java.util.HashMap;
 import java.util.HashSet;

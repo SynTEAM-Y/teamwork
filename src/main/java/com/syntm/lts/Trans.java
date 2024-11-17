@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Trans.java (C) 2024
+Desc: description
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 11:57:11
+Version:  1.1
+*/
 
 public class Trans implements Comparable<Trans> {
     public State source;

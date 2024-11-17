@@ -1,4 +1,12 @@
 package com.syntm.analysis;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+SeqSolver.java (c) 2024
+Desc: Sequential solver (uptodate)
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:46:21
+Version:  1.1
+*/
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,15 +15,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.javatuples.Pair;
-
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
-
 public class SeqSolver {
     private class Task {
         State epsilon;

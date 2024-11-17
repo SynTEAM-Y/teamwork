@@ -1,5 +1,12 @@
 package com.syntm.analysis;
-
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+ESolver.java (c) 2024
+Desc: Concurrent Solver based on Executor Service
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:46:38
+Version:  1.1
+*/
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+CompressedTS.java (c) 2024
+Desc: Compute Quotient TS/Compress TS
+Created:  2024-11-17T10:50:26.221Z
+Updated:  17/11/2024 11:50:45
+Version:  1.1
+*/
 
 import java.util.Arrays;
 import java.util.HashSet;

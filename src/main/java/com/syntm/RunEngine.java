@@ -1,4 +1,12 @@
 package com.syntm;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+RunEngine.java (c) 2024
+Desc: Spec synthesis engine
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:44:40
+Version:  1.1
+*/
 
 import java.io.BufferedReader;
 import java.io.File;

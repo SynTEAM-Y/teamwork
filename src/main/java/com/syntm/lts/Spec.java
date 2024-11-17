@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Spec.java (c) 2024
+Desc: LTL Spec parser and pre processing
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:45:39
+Version:  1.1
+*/
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.syntm.util.Printer;
-
 public class Spec {
     private String command;
     private Int sInterface;

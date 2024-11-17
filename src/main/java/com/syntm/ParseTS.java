@@ -1,4 +1,13 @@
 package com.syntm;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+ParseTS.java (c) 2024
+Desc: TS Decomposition driver class
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:44:52
+Version:  1.1
+*/
+
 
 import org.apache.commons.io.FileUtils;
 import java.io.BufferedReader;

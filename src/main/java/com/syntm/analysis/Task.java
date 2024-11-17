@@ -1,4 +1,12 @@
 package com.syntm.analysis;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Task.java (c) 2024
+Desc: Rho Epsilon computation for ESolver
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:46:12
+Version:  1.1
+*/
 
 import java.util.ArrayList;
 import java.util.HashMap;

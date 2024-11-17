@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Mealy.java (c) 2024
+Desc: Mealy machine helper class
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 11:54:24
+Version:  1.1
+*/
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.lang.Math;
 import com.syntm.util.Printer;
-
 public class Mealy {
     private String name;
     private Set<State> states;

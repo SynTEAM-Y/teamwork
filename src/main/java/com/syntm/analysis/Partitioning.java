@@ -1,5 +1,12 @@
 package com.syntm.analysis;
-
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Partitioning.java (c) 2024
+Desc: Initial lebel partitioning and pass to a specific solver
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:46:29
+Version:  1.1
+*/
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+PartitionTrans.java (c) 2024
+Desc: Quotient Transition
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 11:56:04
+Version:  1.1
+*/
 
 public class PartitionTrans implements Comparable<PartitionTrans> {
     public PartitionState source;

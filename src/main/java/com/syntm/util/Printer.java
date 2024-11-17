@@ -1,4 +1,12 @@
 package com.syntm.util;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Printer.java (c) 2024
+Desc: To Dot Printer
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:45:11
+Version:  1.1
+*/
 
 import java.io.FileOutputStream;
 import java.io.IOException;

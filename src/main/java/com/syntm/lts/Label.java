@@ -1,8 +1,16 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Label.java (c) 2024
+Desc: State label
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 12:46:00
+Version:  1.1
+*/
+
 
 import java.util.HashSet;
 import java.util.Set;
-
 public class Label {
     private Set<String> channel;
     private Set<String> output;

@@ -1,4 +1,12 @@
 package com.syntm.lts;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Int.java (c) 2024
+Desc: Interface of TS
+Created:  17/11/2024 09:45:55
+Updated:  17/11/2024 11:52:12
+Version:  1.1
+*/
 
 import java.util.HashSet;
 import java.util.Set;
