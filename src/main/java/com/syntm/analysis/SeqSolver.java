@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 21:58:01
+Updated:  21/11/2024 15:51:52
 Version:  1.1
 */
 
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.javatuples.Pair;
+
+import com.syntm.Defs;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
@@ -262,7 +264,7 @@ public class SeqSolver {
 
         Set<Set<State>> rho_f = new HashSet<>();
         rho_f = buildPartition();
-
+        this.ts.toDotPartition(rho_f);
         CompressedTS c = new CompressedTS("s-" + this.ts.getName());
         TS t = c.DoCompress(this.ts, rho_f);
         return t;

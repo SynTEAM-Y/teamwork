@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 21:43:45
+Updated:  21/11/2024 15:56:45
 Version:  1.1
 */
 
@@ -339,13 +339,14 @@ public class TS {
             if (!node.getId().equals("init") && !node.getId().equals("spec")) {
                 String[] parts = node.getAttribute("label").toString().split("\n\n");
                 State st = new State(node.getId());
-                Set<String> sch = new HashSet<>(Arrays.asList(parts[0].replaceAll("\\{([\\s\\S]*)\\}", "$1").split(",")));
+                Set<String> sch = new HashSet<>(
+                        Arrays.asList(parts[0].replaceAll("\\{([\\s\\S]*)\\}", "$1").split(",")));
                 Listen ls = new Listen(sch);
                 st.setListen(ls);
                 Set<String> chs = new HashSet<String>(
                         Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$1").split(",")));
-                Set<String> o = new HashSet<>(Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$2").split(",")));
-                
+                Set<String> o = new HashSet<>(
+                        Arrays.asList(parts[1].replaceAll("([\\w]*)\\/([\\S]*)", "$2").split(",")));
 
                 Label l = new Label(chs, o);
                 st.setLabel(l);
@@ -366,17 +367,21 @@ public class TS {
             } else {
                 this.setInitState(e.getTargetNode().getId());
             }
-            
+
         });
-        String spc = g.getNode("spec").getAttribute("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)","$2");
+        String spc = g.getNode("spec").getAttribute("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)", "$2");
         String[] parts = spc.split(";");
         for (int i = 0; i < parts.length; i++) {
-        Set<String> achs = new HashSet<String>(Arrays.asList(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2").split(",")));
-        Set<String> ao = new HashSet<>(Arrays.asList(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$3").split(",")));
-        this.initialDecomposition(parts[i].replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1").replaceAll("\n", ""), achs, ao);
+            Set<String> achs = new HashSet<String>(Arrays.asList(parts[i]
+                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2")
+                    .split(",")));
+            Set<String> ao = new HashSet<>(Arrays.asList(parts[i]
+                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$3")
+                    .split(",")));
+            this.initialDecomposition(parts[i]
+                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
+                    .replaceAll("\n", ""), achs, ao);
         }
-            
-        
 
     }
 
@@ -781,7 +786,7 @@ public class TS {
 
         this.agents.add(t.reduce());
         this.parameters.add(p);
-         t.toDot();
+        t.toDot();
         // p.toDot();
     }
 
@@ -1082,6 +1087,40 @@ public class TS {
 
         splitP.add(notsplitter);
         return splitP;
+    }
+
+    public void toDotPartition(Set<Set<State>> rho_f) {
+        Printer gp = new Printer("Mark["+name+"]");
+        System.out.println("Marked["+name+"]" + " is comptued");
+        gp.addln("\ngraph [rankdir=LR];\n");
+        gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
+
+        gp.addln("init [shape=point,style=invis];");
+
+        for (Set<State> set : rho_f) {
+            gp.addln("\n subgraph cluster" + set.iterator().next().getId() + " {" + "\n");
+
+            gp.addln("\n" + "style=dotted" + "\n");
+            gp.addln("\n" + "color=\"#df4949\"" + "\n");
+            gp.addln("\n" + "penwidth=1" + "\n");
+            for (State state : set) {
+                gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                        + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                        + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"];" + "\n");
+            }
+            gp.addln("}\n");
+        }
+
+        gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+                + ";\n");
+        for (Trans t : this.getTransitions()) {
+            String source = t.getSource().getId().toString();
+            String dest = t.getDestination().getId().toString();
+            String action = t.getAction().toString();
+            gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
+        }
+
+        gp.print();
     }
 
 }

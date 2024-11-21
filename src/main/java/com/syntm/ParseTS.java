@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 22:20:36
+Updated:  21/11/2024 15:55:49
 Version:  1.1
 */
 
@@ -30,15 +30,6 @@ import com.syntm.util.Printer;
 
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
-	public static final String ANSI_RESET = "\u001B[0m";
-	public static final String ANSI_BLACK = "\u001B[30m";
-	public static final String ANSI_RED = "\u001B[31m";
-	public static final String ANSI_GREEN = "\u001B[32m";
-	public static final String ANSI_YELLOW = "\u001B[33m";
-	public static final String ANSI_BLUE = "\u001B[34m";
-	public static final String ANSI_PURPLE = "\u001B[35m";
-	public static final String ANSI_CYAN = "\u001B[36m";
-	public static final String ANSI_WHITE = "\u001B[37m";
 
 	public static void main(final String[] args) throws IOException, InterruptedException {
 		ParseTS parseTS = new ParseTS();
@@ -47,10 +38,10 @@ public class ParseTS {
 		File outputFolder = new File("./generated/output/");
 		FileUtils.cleanDirectory(outputFolder);
 
-		System.out.println(ANSI_GREEN + "Enter a TS for decomposition: " + ANSI_RESET);
+		System.out.println(Defs.ANSI_GREEN + "Enter a TS for decomposition: " + Defs.ANSI_RESET);
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
-		System.out.println(ANSI_GREEN +"Initial Decomposition"+ ANSI_RESET);
+		System.out.println(Defs.ANSI_GREEN +"Initial Decomposition"+ Defs.ANSI_RESET);
 		Set<TS> sTS = parseTS.readInput(fileP);
 
 		//parseTS.mainTS.toDot();
@@ -60,52 +51,52 @@ public class ParseTS {
 		String exit = "";
 		while (!exit.equals("x")) {
 			System.out.println("");
-			System.out.println(ANSI_GREEN + "Select an option to proceed" + ANSI_RESET);
+			System.out.println(Defs.ANSI_GREEN + "Select an option to proceed" + Defs.ANSI_RESET);
 
 			Set<String> choice = new HashSet<>(Arrays.asList("1", "2", "3", "x"));
 
-			System.out.println(ANSI_GREEN +
-					"[" + 1 + "] :  Reconfigure, Minimize, and Generate distributed TS? " + ANSI_RESET);
-			System.out.println(ANSI_GREEN +
-					"[" + 2 + "] :  Compute composition & check Strong bisimulation? " + ANSI_RESET);
-			System.out.println(ANSI_GREEN +
-					"[" + 3 + "] :  On fly Simulatation of composition? " + ANSI_RESET);
-			System.out.println(ANSI_GREEN +
-					"[" + "x" + "] :  Exit? " + ANSI_RESET);
+			System.out.println(Defs.ANSI_GREEN +
+					"[" + 1 + "] :  Reconfigure, Minimize, and Generate distributed TS? " + Defs.ANSI_RESET);
+			System.out.println(Defs.ANSI_GREEN +
+					"[" + 2 + "] :  Compute composition & check Strong bisimulation? " + Defs.ANSI_RESET);
+			System.out.println(Defs.ANSI_GREEN +
+					"[" + 3 + "] :  On fly Simulatation of composition? " + Defs.ANSI_RESET);
+			System.out.println(Defs.ANSI_GREEN +
+					"[" + "x" + "] :  Exit? " + Defs.ANSI_RESET);
 
 			String in = "";
 
 			in = stdin.readLine();
 
 			while (!choice.contains(in.toString())) {
-				System.out.println(ANSI_RED + "Option does not exist!" + ANSI_RESET);
-				System.out.println(ANSI_RED + "Try again " + ANSI_RESET);
+				System.out.println(Defs.ANSI_RED + "Option does not exist!" + Defs.ANSI_RESET);
+				System.out.println(Defs.ANSI_RED + "Try again " + Defs.ANSI_RESET);
 				in = stdin.readLine();
 			}
 			switch (in.toString()) {
 				case "1":
-				System.out.println(ANSI_GREEN + "The original TS" + ANSI_RESET);
+				System.out.println(Defs.ANSI_GREEN + "The original TS" + Defs.ANSI_RESET);
 					parseTS.mainTS.toDot();
 					
-					System.out.println(ANSI_GREEN + "Minimization according to Strong Bisimulation" + ANSI_RESET);
+					System.out.println(Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
 					for (TS ts : parseTS.mainTS.getAgents()) {
 						ts.setName(" <"+ts.getName()+"> ");
 						ts.toDot();
 					}
-					System.out.println(ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation" + ANSI_RESET);
+					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation" + Defs.ANSI_RESET);
 					for (TS ts : sTS) {
 						ts.toDot();
 					}
 					System.out.println(
-							ANSI_BLUE + "Generated" + ANSI_RESET);
+						Defs.ANSI_BLUE + "Generated" + Defs.ANSI_RESET);
 					break;
 				case "2":
 					TS cComp = parseTS.compose(sTS);
 					cComp.toDot();
 
 					System.out.println(
-							ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
-									+ " -> " + parseTS.mainTS.equivCheck(cComp) + ANSI_RESET);
+						Defs.ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
+									+ " -> " + parseTS.mainTS.equivCheck(cComp) + Defs.ANSI_RESET);
 					break;
 				case "3":
 					parseTS.simulate(sTS);
@@ -158,8 +149,8 @@ public class ParseTS {
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		Set<State> simStates = new HashSet<>();
 		Printer simEnv = new Printer("SimulationEnv");
-		System.out.println(ANSI_GREEN +
-				"Choose a graph orientation, LR or T ?! " + ANSI_RESET);
+		System.out.println(Defs.ANSI_GREEN +
+				"Choose a graph orientation, LR or T ?! " + Defs.ANSI_RESET);
 		orientation = stdin.readLine().toString();
 		// while (true) {
 		for (TS ts : sTS) {
@@ -167,14 +158,14 @@ public class ParseTS {
 			ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
 			System.out.println(
-					ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + ANSI_RESET);
+				Defs.ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + Defs.ANSI_RESET);
 
 			in = stdin.readLine().toString();
 
 			while (!ids.contains(in)) {
-				System.out.println(ANSI_RED + "State does not exist!" + ANSI_RESET);
-				System.out.println(ANSI_RED + "Pick a state for Agent " + ts.getName()
-						+ " ONLY from this list -> " + ids + ANSI_RESET);
+				System.out.println(Defs.ANSI_RED + "State does not exist!" + Defs.ANSI_RESET);
+				System.out.println(Defs.ANSI_RED + "Pick a state for Agent " + ts.getName()
+						+ " ONLY from this list -> " + ids + Defs.ANSI_RESET);
 				in = stdin.readLine().toString();
 				simEnv.add(ts.toDot(ts.getStateById(in), new Trans()).formattedString());
 			}
@@ -335,33 +326,33 @@ public class ParseTS {
 			recvSet.removeAll(initiateSet);
 
 			if (initiateSet.isEmpty()) {
-				System.out.println(ANSI_RED + "System is Deadlocked!" + ANSI_RESET);
+				System.out.println(Defs.ANSI_RED + "System is Deadlocked!" + Defs.ANSI_RESET);
 				break;
 			} else {
-				System.out.println(ANSI_GREEN + "Select a send transition" + ANSI_RESET);
+				System.out.println(Defs.ANSI_GREEN + "Select a send transition" + Defs.ANSI_RESET);
 				int c = 0;
 				Set<String> choice = new HashSet<>();
 				choice.add("x");
 
 				HashMap<String, Trans> tMap = new HashMap<>();
 				for (Trans trans : initiateSet) {
-					System.out.println(ANSI_GREEN +
+					System.out.println(Defs.ANSI_GREEN +
 							"[" + c + "] : " + trans + " from Agent " + trans.getSource().getOwner().getName()
-							+ ANSI_RESET);
+							+ Defs.ANSI_RESET);
 					tMap.put(String.valueOf(c), trans);
 					choice.add(String.valueOf(c));
 					c++;
 				}
 
-				System.out.println(ANSI_GREEN +
-						"[x] :  Previous View " + ANSI_RESET);
+				System.out.println(Defs.ANSI_GREEN +
+						"[x] :  Previous View " + Defs.ANSI_RESET);
 
 				in = stdin.readLine();
 
 				// System.err.println(Integer.parseInt(in)+"???");
 				while (!choice.contains(in.toString())) {
-					System.out.println(ANSI_RED + "Option does not exist!" + ANSI_RESET);
-					System.out.println(ANSI_RED + "Try again " + ANSI_RESET);
+					System.out.println(Defs.ANSI_RED + "Option does not exist!" + Defs.ANSI_RESET);
+					System.out.println(Defs.ANSI_RED + "Try again " + Defs.ANSI_RESET);
 					in = stdin.readLine();
 				}
 
@@ -413,7 +404,7 @@ public class ParseTS {
 				break;
 			}
 
-			System.out.println(ANSI_RED + "File \"" + fileName + "\" not found, try again: " + ANSI_RESET);
+			System.out.println(Defs.ANSI_RED + "File \"" + fileName + "\" not found, try again: " + Defs.ANSI_RESET);
 
 			try {
 				fileName = stdin.readLine();
