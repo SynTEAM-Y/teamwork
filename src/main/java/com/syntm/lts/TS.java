@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 15:56:45
+Updated:  21/11/2024 21:06:45
 Version:  1.1
 */
 
@@ -784,7 +784,7 @@ public class TS {
             }
         }
 
-        this.agents.add(t.reduce());
+        this.agents.add(t);
         this.parameters.add(p);
         t.toDot();
         // p.toDot();
@@ -1090,7 +1090,7 @@ public class TS {
     }
 
     public void toDotPartition(Set<Set<State>> rho_f) {
-        Printer gp = new Printer("Mark["+name+"]");
+        Printer gp = new Printer("Marked["+name+"]");
         System.out.println("Marked["+name+"]" + " is comptued");
         gp.addln("\ngraph [rankdir=LR];\n");
         gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
@@ -1099,9 +1099,10 @@ public class TS {
 
         for (Set<State> set : rho_f) {
             gp.addln("\n subgraph cluster" + set.iterator().next().getId() + " {" + "\n");
-
-            gp.addln("\n" + "style=dotted" + "\n");
-            gp.addln("\n" + "color=\"#df4949\"" + "\n");
+            
+            gp.addln("\n" + "bgcolor=\"#fff9f9\";" + "\n");
+            gp.addln("\n" + "style=dashed" + "\n");
+            gp.addln("\n" + "color=\"#f49595\"" + "\n");
             gp.addln("\n" + "penwidth=1" + "\n");
             for (State state : set) {
                 gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())

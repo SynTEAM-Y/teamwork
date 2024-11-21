@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Mealy.java (c) 2024
 Desc: Mealy machine helper class
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 11:54:24
+Updated:  21/11/2024 21:09:59
 Version:  1.1
 */
 

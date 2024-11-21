@@ -1,4 +1,13 @@
 package com.syntm;
+/*
+Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
+Defs.java (c) 2024
+Desc: Output color formatting
+Created:  2024-11-21T18:55:08.932Z
+Updated:  21/11/2024 19:55:50
+Version:  1.1
+*/
+
 
 public class Defs {
     public static final String ANSI_RESET = "\u001B[0m";

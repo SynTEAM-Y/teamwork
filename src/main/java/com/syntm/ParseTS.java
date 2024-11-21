@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 15:55:49
+Updated:  21/11/2024 21:06:13
 Version:  1.1
 */
 
@@ -81,7 +81,7 @@ public class ParseTS {
 					System.out.println(Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
 					for (TS ts : parseTS.mainTS.getAgents()) {
 						ts.setName(" <"+ts.getName()+"> ");
-						ts.toDot();
+						ts.reduce().toDot();
 					}
 					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation" + Defs.ANSI_RESET);
 					for (TS ts : sTS) {
