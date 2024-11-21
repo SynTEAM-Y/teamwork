@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 State.java (c) 2024
 Desc: description
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 13:41:47
+Updated:  21/11/2024 13:58:58
 Version:  1.1
 */
 
@@ -305,13 +305,6 @@ public class State {
         if (s.getListen().getChannels().contains(ch)) {
             flag = true;
         }
-        // for (Trans tr : s.getTrans()) {
-        // if (!tr.getDestination().getLabel().equals(s.getLabel())
-        // && tr.getAction().equals(ch)) {
-        // flag = true;
-        // }
-
-        // }
         return flag;
     }
 
@@ -323,13 +316,6 @@ public class State {
         if (s.getListen().getChannels().contains(ch)) {
             flag = true;
         }
-        // Set<Trans> sTrans = new HashSet<>();
-        // sTrans = s.getTrans().stream().filter(tr ->
-        // tr.getAction().equals(ch)).collect(Collectors.toSet());
-        // if (!sTrans.isEmpty()) {
-        // flag = true;
-        // }
-
         return flag;
     }
 
@@ -358,11 +344,6 @@ public class State {
     public boolean canTakeInitiative(TS t, State s, String ch) {
         boolean flag = false;
         if (t.getInterface().getChannels().contains(ch)) {
-            // for (Trans tr : s.getTrans()) {
-            //     if (tr.getAction().equals(ch)) {
-            //         flag = true;
-            //     }
-            // }
             if (s.getListen().getChannels().contains(ch)) {
                 flag = true;
             }
@@ -382,11 +363,6 @@ public class State {
     }
 
     public Boolean enable(State s, String ch) {
-        // for (Trans tr : s.getTrans()) {
-        //     if (tr.getAction().equals(ch)) {
-        //         return true;
-        //     }
-        // }
         if (s.getListen().getChannels().contains(ch)) {
             return true;
         }
