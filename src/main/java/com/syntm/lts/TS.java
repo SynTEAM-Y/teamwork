@@ -4,11 +4,12 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 21:06:45
+Updated:  23/11/2024 19:39:11
 Version:  1.1
 */
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,17 +19,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
-import org.graphstream.graph.*;
-import org.graphstream.graph.Node;
-import org.graphstream.stream.file.FileSource;
-import org.graphstream.stream.file.FileSourceFactory;
-
-import org.graphstream.graph.implementations.DefaultGraph;
 import java.util.function.BiFunction;
 
 import com.google.common.collect.Sets;
 import com.syntm.util.Printer;
 import com.syntm.util.StringUtil;
+
+import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
+import guru.nidi.graphviz.parse.Parser;
 
 public class TS {
     private String name;
@@ -304,41 +303,26 @@ public class TS {
         L = l;
     }
 
+    @SuppressWarnings("null")
     public void parseDot(final String filePath) throws IOException {
-        Graph g = new DefaultGraph("g");
-        FileSource fs = FileSourceFactory.sourceFor(filePath);
-
-        fs.addSink(g);
-
-        try {
-            fs.begin(filePath);
-            while (fs.nextEvents()) {
-                // Optionally some code here ...
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            fs.end();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            fs.removeSink(g);
-        }
-        Set<String> chan = new HashSet<>(Arrays.asList(g.getAttribute("label").toString()
-                .replaceAll("MainTS : CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$1")
+        File dot = new File(filePath);
+            MutableGraph gg = new Parser().read(dot);
+        
+        Set<String> chan = new HashSet<>(Arrays.asList(gg.graphAttrs().get("label").toString()
+                .replaceAll("[\\s\\S]*[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
                 .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
 
-        Set<String> out = new HashSet<>(Arrays.asList(g.getAttribute("label").toString()
-                .replaceAll("MainTS : CH=\\[([\\s\\S]*)\\], OUT=\\[([\\s\\S]*)\\]", "$2")
+        Set<String> out = new HashSet<>(Arrays.asList(gg.graphAttrs().get("label").toString()
+                .replaceAll("[\\s\\S]*[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2")
                 .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
         this.setInterface(new Int(chan, out));
-
-        for (Node node : g) {
-            if (!node.getId().equals("init") && !node.getId().equals("spec")) {
-                String[] parts = node.getAttribute("label").toString().split("\n\n");
-                State st = new State(node.getId());
+        
+      
+        gg.nodes().forEach(node -> 
+        {
+            if (!node.name().toString().equals("init") && !node.name().toString().equals("spec")) {
+                String[] parts = node.get("label").toString().split("\n");
+                State st = new State(node.name().toString());
                 Set<String> sch = new HashSet<>(
                         Arrays.asList(parts[0].replaceAll("\\{([\\s\\S]*)\\}", "$1").split(",")));
                 Listen ls = new Listen(sch);
@@ -353,34 +337,37 @@ public class TS {
                 this.addState(st);
 
             }
-        }
-
-        g.edges().forEach(e -> {
-            if (!e.getSourceNode().getId().equals("init")) {
-                this.getTransitions()
-                        .add(new Trans(this.getStateById(e.getSourceNode().getId()), e.getAttribute("label").toString(),
-                                this.getStateById(e.getTargetNode().getId())));
-                this.channels.add(e.getAttribute("label").toString());
-                this.getStateById(e.getSourceNode().getId()).getTrans()
-                        .add(new Trans(this.getStateById(e.getSourceNode().getId()), e.getAttribute("label").toString(),
-                                this.getStateById(e.getTargetNode().getId())));
-            } else {
-                this.setInitState(e.getTargetNode().getId());
-            }
-
         });
-        String spc = g.getNode("spec").getAttribute("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)", "$2");
-        String[] parts = spc.split(";");
-        for (int i = 0; i < parts.length; i++) {
-            Set<String> achs = new HashSet<String>(Arrays.asList(parts[i]
-                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2")
-                    .split(",")));
-            Set<String> ao = new HashSet<>(Arrays.asList(parts[i]
-                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$3")
-                    .split(",")));
-            this.initialDecomposition(parts[i]
-                    .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
-                    .replaceAll("\n", ""), achs, ao);
+      
+        gg.edges().forEach(e ->{
+            if (!e.from().name().toString().equals("init")) {
+                this.getTransitions()
+                        .add(new Trans(this.getStateById(e.from().name().toString()), e.get("label").toString(),
+                                this.getStateById(e.to().name().toString())));
+                this.channels.add(e.get("label").toString());
+                this.getStateById(e.from().name().toString()).getTrans()
+                        .add(new Trans(this.getStateById(e.from().name().toString()), e.get("label").toString(),
+                                this.getStateById(e.to().name().toString())));
+            } else {
+                this.setInitState(e.to().name().toString());
+            }
+        });
+        Set<MutableNode> specs = gg.nodes().stream().filter(node -> node.name().toString().equals("spec")).collect(Collectors.toSet());
+        if (!specs.isEmpty()) {
+            String spc = specs.iterator().next().get("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)",
+                    "$2");
+            String[] parts = spc.split(";");
+            for (int i = 0; i < parts.length; i++) {
+                Set<String> achs = new HashSet<String>(Arrays.asList(parts[i]
+                        .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2")
+                        .split(",")));
+                Set<String> ao = new HashSet<>(Arrays.asList(parts[i]
+                        .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$3")
+                        .split(",")));
+                this.initialDecomposition(parts[i]
+                        .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
+                        .replaceAll("\n", ""), achs, ao);
+            }
         }
 
     }
@@ -1090,8 +1077,8 @@ public class TS {
     }
 
     public void toDotPartition(Set<Set<State>> rho_f) {
-        Printer gp = new Printer("Marked["+name+"]");
-        System.out.println("Marked["+name+"]" + " is comptued");
+        Printer gp = new Printer("Marked[" + name + "]");
+        System.out.println("Marked[" + name + "]" + " is comptued");
         gp.addln("\ngraph [rankdir=LR];\n");
         gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
 
@@ -1099,7 +1086,7 @@ public class TS {
 
         for (Set<State> set : rho_f) {
             gp.addln("\n subgraph cluster" + set.iterator().next().getId() + " {" + "\n");
-            
+
             gp.addln("\n" + "bgcolor=\"#fff9f9\";" + "\n");
             gp.addln("\n" + "style=dashed" + "\n");
             gp.addln("\n" + "color=\"#f49595\"" + "\n");

@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 15:51:52
+Updated:  22/11/2024 07:43:54
 Version:  1.1
 */
 
@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.javatuples.Pair;
 
-import com.syntm.Defs;
 import com.syntm.lts.CompressedTS;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;

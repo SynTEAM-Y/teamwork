@@ -4,10 +4,9 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 21:06:13
+Updated:  23/11/2024 19:19:07
 Version:  1.1
 */
-
 
 import org.apache.commons.io.FileUtils;
 import java.io.BufferedReader;
@@ -41,11 +40,10 @@ public class ParseTS {
 		System.out.println(Defs.ANSI_GREEN + "Enter a TS for decomposition: " + Defs.ANSI_RESET);
 		String fileP = stdin.readLine();
 		fileP = parseTS.checkFileName(fileP);
-		System.out.println(Defs.ANSI_GREEN +"Initial Decomposition"+ Defs.ANSI_RESET);
+		System.out.println(Defs.ANSI_GREEN + "Initial Decomposition" + Defs.ANSI_RESET);
 		Set<TS> sTS = parseTS.readInput(fileP);
 
-		//parseTS.mainTS.toDot();
-		
+		// parseTS.mainTS.toDot();
 
 		// parseTS.writeOutput("TStext");
 		String exit = "";
@@ -75,27 +73,30 @@ public class ParseTS {
 			}
 			switch (in.toString()) {
 				case "1":
-				System.out.println(Defs.ANSI_GREEN + "The original TS" + Defs.ANSI_RESET);
+					System.out.println(Defs.ANSI_GREEN + "The original TS" + Defs.ANSI_RESET);
 					parseTS.mainTS.toDot();
-					
-					System.out.println(Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
+
+					System.out.println(
+							Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
 					for (TS ts : parseTS.mainTS.getAgents()) {
-						ts.setName(" <"+ts.getName()+"> ");
+						ts.setName(" <" + ts.getName() + "> ");
 						ts.reduce().toDot();
 					}
-					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation" + Defs.ANSI_RESET);
+					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation"
+							+ Defs.ANSI_RESET);
 					for (TS ts : sTS) {
 						ts.toDot();
 					}
 					System.out.println(
-						Defs.ANSI_BLUE + "Generated" + Defs.ANSI_RESET);
+							Defs.ANSI_BLUE + "Generated" + Defs.ANSI_RESET);
 					break;
 				case "2":
 					TS cComp = parseTS.compose(sTS);
 					cComp.toDot();
 
 					System.out.println(
-						Defs.ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and " + cComp.getName()
+							Defs.ANSI_BLUE + "Check Equivalence of " + parseTS.mainTS.getName() + " and "
+									+ cComp.getName()
 									+ " -> " + parseTS.mainTS.equivCheck(cComp) + Defs.ANSI_RESET);
 					break;
 				case "3":
@@ -158,7 +159,7 @@ public class ParseTS {
 			ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
 			System.out.println(
-				Defs.ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + Defs.ANSI_RESET);
+					Defs.ANSI_GREEN + "Pick a state for Agent " + ts.getName() + " from  -> " + ids + Defs.ANSI_RESET);
 
 			in = stdin.readLine().toString();
 
@@ -186,7 +187,7 @@ public class ParseTS {
 		return cartesianProduct;
 	}
 
-	private TS compose(Set<TS> sTS) {
+	public TS compose(Set<TS> sTS) {
 		TS t = new TS("");
 		Set<String> chan = new HashSet<>();
 		Set<String> output = new HashSet<>();
@@ -210,7 +211,9 @@ public class ParseTS {
 			for (State st : list) {
 				ls.addAll(st.getListen().getChannels());
 				ch.addAll(st.getLabel().getChannel());
+				ch.remove("");
 				out.addAll(st.getLabel().getOutput());
+				out.remove("");
 				if (out.size() > 1) {
 					out.remove("-");
 				}
@@ -296,6 +299,11 @@ public class ParseTS {
 			}
 		}
 		t.getTransitions().removeAll(trans);
+		
+		for (State state : t.getStates()) {
+			Set<String> chans = state.getTrans().stream().map(Trans::getAction).collect(Collectors.toSet());
+			state.getListen().getChannels().retainAll(chans);
+		}
 
 		return t;
 	}
