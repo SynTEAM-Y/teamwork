@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  23/11/2024 19:39:11
+Updated:  24/11/2024 10:00:57
 Version:  1.1
 */
 
@@ -22,6 +22,7 @@ import java.util.stream.*;
 import java.util.function.BiFunction;
 
 import com.google.common.collect.Sets;
+import com.syntm.Defs;
 import com.syntm.util.Printer;
 import com.syntm.util.StringUtil;
 
@@ -368,6 +369,12 @@ public class TS {
                         .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
                         .replaceAll("\n", ""), achs, ao);
             }
+        }
+        else{
+            System.out.println(Defs.ANSI_RED +
+					"No specification Found!" + Defs.ANSI_RESET);
+                    System.out.println(Defs.ANSI_RED +
+					"Specify how would you like to distribute, and try again!" + Defs.ANSI_RESET);
         }
 
     }
