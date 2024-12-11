@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  22/11/2024 07:43:54
+Updated:  11/12/2024 08:50:10
 Version:  1.1
 */
 
@@ -22,6 +22,7 @@ import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
 import com.syntm.util.Printer;
+
 public class SeqSolver {
     private class Task {
         State epsilon;
@@ -158,14 +159,20 @@ public class SeqSolver {
 
                             // Unordered / Before of Epsilon
                             if (!out.contains(s)) {
-                                Set<State> witnessSet = new HashSet<>();
-                                witnessSet = p.stream()
-                                        .filter(w -> w.canAnyReaction(ts, w, channel) && !w.equals(s)
-                                                && p.contains(w.takeAnyReaction(ts, w, channel).getDestination()))
+                                Set<State> ownEpsilon = out.stream()
+                                        .filter(st -> st.getId().equals(this.epsilon.getId()))
                                         .collect(Collectors.toSet());
-                                if (witnessSet.isEmpty()) {
-                                    out.add(s);
+                                if (!ownEpsilon.isEmpty()) 
+                                {
+                                    Set<State> witnessSet = new HashSet<>();
+                                    witnessSet = p.stream()
+                                            .filter(w -> w.canAnyReaction(ts, w, channel) && !w.equals(s)
+                                                    && p.contains(w.takeAnyReaction(ts, w, channel).getDestination()))
+                                            .collect(Collectors.toSet());
+                                    if (witnessSet.isEmpty()) {
+                                        out.add(s);
 
+                                    }
                                 }
                             }
 
@@ -351,7 +358,9 @@ public class SeqSolver {
                         }
                     }
                 }
-                if (candidates.isEmpty()) {
+                Set<Pair<State, Set<State>>> rSet = new HashSet<>();
+                rSet = candidates.stream().filter(t -> !t.getValue1().isEmpty()).collect(Collectors.toSet());
+                if (rSet.isEmpty()) {
                     rho_intersect.add(new HashSet<>(Arrays.asList(ts.getStateById(s))));
                     closed.add(ts.getStateById(s));
                 } else {

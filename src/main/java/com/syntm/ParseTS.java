@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  24/11/2024 10:23:07
+Updated:  27/11/2024 09:49:47
 Version:  1.1
 */
 
@@ -313,9 +313,9 @@ public class ParseTS {
 			j++;
 		}
 
-		// for (State state : t.getStates()) {
-		// 	state.setId(rename.get(state).toString());
-		// }
+		for (State state : t.getStates()) {
+			state.setId(rename.get(state).toString());
+		}
 
 		return t;
 	}
