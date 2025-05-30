@@ -3,27 +3,21 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Pathn.java (c) 2025
 Desc: description
 Created:  2025-05-30T11:14:29.315Z
-Updated:  30/05/2025 15:46:30
+Updated:  30/05/2025 17:12:10
 Version:  1.1
 */
 
 package com.syntm;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.util.Combinations;
 
+import com.syntm.lts.Int;
 import com.syntm.lts.Label;
-import com.syntm.lts.Listen;
 import com.syntm.lts.State;
 import com.syntm.lts.TS;
 import com.syntm.lts.Trans;
@@ -32,7 +26,7 @@ public class Pathn {
 
     public static void main(final String[] args) {
         Pathn p = new Pathn();
-        p.buildPathn(4);
+        p.buildPathn(10);
     }
 
     public void buildPathn(int size) {
@@ -53,7 +47,7 @@ public class Pathn {
             sdummy.getListen().getChannels().add(is[0] + "" + is[1]);
             ts.addTransition(ts, sdummy, s.getId(), s);
         }
-        
+        ts.setInterface(new Int(ts.getInitState().getListen().getChannels(), new HashSet<>()));
         for (int[] list : comb) {
             combw.addAll(comb);
             combw.removeAll(Arrays.asList(list));
