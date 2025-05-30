@@ -1,2 +1,25 @@
-Lauching Strix with Parameters:  -f  --ins=null --outs=null --k
-Error: No input files or formula was given.
+Lauching Strix with Parameters:  -f (
+ !rs &
+ !r0 &
+ !r1 &
+ X G (rs | r0 | r1 ) &
+ X G ((!r0 & !r1 ) | (!rs & !r1 ) | (!rs & !r0 )  ) &
+ X (true) ) -> ( !g0 &
+ !g1 &
+ !g0 &
+ !g1 &
+ X (G (!rs -> (!g0 | !g1 ) & (rs -> (!g0 & !g1))) ) &
+ X (G (r0 -> F g0)) &
+ X (G (r1 -> F g1)) ) --ins=r0,rs,r1 --outs=g0,g1 --k
+REALIZABLE
+.inputs r0 rs r1
+.outputs g0 g1
+.i 3
+.o 2
+.p 4
+.s 2
+.r S0
+000 S0 S1 00
+010 S1 S1 00
+100 S1 S1 10
+001 S1 S1 01

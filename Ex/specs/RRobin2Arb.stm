@@ -1,0 +1,21 @@
+
+SPEC RRobin2Arb
+
+In(r0, r1) , Out(g0, g1)
+
+Agent A1 -> In(r0) , Out(g0)
+Agent A2 -> In(r1) , Out(g1)
+
+
+Assume Env
+G ((r0 & !g0) -> X r0)
+G ((r1 & !g1) -> X r1)
+G ((!r0 & g0) -> X !r0)
+G ((!r1 & g1) -> X !r1)
+G F (!r0 | !g0)
+G F (!r1 | !g1)
+
+Guarantee Sys
+G (!g0 | !g1)
+G (r0 -> F g0)
+G (r1 -> F g1)

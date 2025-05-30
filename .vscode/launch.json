@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Pathn",
+            "request": "launch",
+            "mainClass": "com.syntm.Pathn",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
             "name": "ReverseBsim",
             "request": "launch",
             "mainClass": "com.syntm.ReverseBsim",
