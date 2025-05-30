@@ -3,7 +3,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Pathn.java (c) 2025
 Desc: description
 Created:  2025-05-30T11:14:29.315Z
-Updated:  31/05/2025 00:03:54
+Updated:  31/05/2025 01:51:26
 Version:  1.1
 */
 
@@ -28,7 +28,7 @@ public class Pathn {
 
     public static void main(final String[] args) {
         Pathn p = new Pathn();
-        p.buildPathn(3);
+        p.buildPathn(4);
     }
 
     public void buildPathn(int size) {
@@ -70,22 +70,38 @@ public class Pathn {
         pr.addln(
                 "spec [fontcolor=\"green\",fontsize=14,peripheries=0,shape=square,fixedsize=false,style=\"\",label=\"Distribute to:\n");
         HashMap<String, Set<String>> map = new HashMap<>();
-
         for (int i = 0; i < size; i++) {
-            map.put("P" + i, new HashSet<>());
-            pr.add("P" + i + " : CH=" + ts.getInterface().getChannels() + ", OUT=[-]");
+            map.put("" + i, new HashSet<>());
+        }
+
+        Boolean flag = true;
+        int key = 0;
+        Set<String> sch = new HashSet<>(ts.getInterface().getChannels());
+        while (flag) {
+            String ch = sch.iterator().next();
+            sch.remove(ch);
+            while (!ch.contains(key + "")) {
+                if (key < size) {
+                    key++;
+                } else {
+                    key = 0;
+                }
+            }
+            map.get(key+"").add(ch);
+
+            if (sch.isEmpty()) {
+                flag = false;
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            pr.add("P" + i + " : CH=" + map.get(i+"").toString().replaceAll("\\s+", "") + ", OUT=[-]");
             if (i != size - 1) {
                 pr.addln(";\n");
             }
         }
-        Boolean flag = true;
-        Set<String> sch = new HashSet<>(ts.getInterface().getChannels());
-        while (flag) {
-            String ch= sch.
-        }
         pr.add("\"];\n");
         System.out.println(pr.getsBuilder().toString());
-        ts.toDot();
+        ts.toDot(pr);
 
     }
 }

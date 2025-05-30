@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  30/05/2025 23:30:36
+Updated:  31/05/2025 01:49:13
 Version:  1.1
 */
 
@@ -172,6 +172,45 @@ public class TS {
         gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
 
         gp.addln("init [shape=point,style=invis];");
+        for (State state : this.states) {
+            gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
+                    + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
+                    + this.shortString(state.getLabel().getOutput()) + "\n\n" + state.getId() + "\"];" + "\n");
+        }
+
+        gp.addln("\t" + " init -> " + this.getInitState().getId().toString() + "[penwidth=0,tooltip=\"initial state\"]"
+                + ";\n");
+        for (Trans t : this.getTransitions()) {
+            String source = t.getSource().getId().toString();
+            String dest = t.getDestination().getId().toString();
+            String action = t.getAction().toString();
+            gp.addln("\t" + source + " -> " + dest + "[label=\"" + action + "\"]" + ";\n");
+        }
+
+        gp.print();
+
+    }
+
+    public void toDot(Printer pr) {
+        System.out.println("# of states of " + this.name + "-> " + this.getStates().size());
+        Printer gp = new Printer(name);
+        gp.addln("\ngraph [fontcolor=\"green\",fontsize=14,rankdir=LR,ranksep=0.6,nodesep=0.5" + ",label=\""
+                + "\n" + this.getName() + " : CH=" + this.getInterface().getChannels() + ", OUT="
+                + this.getInterface().getOutput() + " \"];\n");
+        // gp.addln("\nsubgraph cluster_L { \"\" [shape=box fontsize=16 style=\"filled\"
+        // label=\n");
+        // gp.addln("\"" + this.getInterface().toString());
+        // gp.addln(
+        // "\nAny generated TS is open to interaction\\l with the external world. Some
+        // transtions\\l are only reactions and cannot execute\\l without an external
+        // initiator.\\l\\l According to the semantics, a transition is\\l a reaction if
+        // its channel is not included in\\l channel labelling of the reached
+        // state.\\l\"]}");
+        // gp.addln("\n\n\n\n");
+        gp.addln("node[shape=circle, style=filled, fixedsize=true, fontsize=10];\n");
+
+        gp.addln("init [shape=point,style=invis];");
+        gp.add(pr.getsBuilder().toString());
         for (State state : this.states) {
             gp.addln("\t" + state.getId().toString() + "[label=\"" + formatListen(state.getListen().getChannels())
                     + "\n\n" + this.shortString(state.getLabel().getChannel()) + "/"
