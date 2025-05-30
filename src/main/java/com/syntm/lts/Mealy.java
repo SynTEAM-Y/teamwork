@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Mealy.java (c) 2024
 Desc: Mealy machine helper class
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 21:09:59
+Updated:  30/01/2025 02:05:33
 Version:  1.1
 */
 
@@ -285,8 +285,8 @@ public class Mealy {
             switch (parts[0].trim()) {
                 case "REALIZABLE":
 
-                    System.out.println(
-                            "\n\n Specification is REALIZABLE for a single agent\n\n You may get a distributed Implementation!\n\n");
+                    // System.out.println(
+                    //         "\n\n Specification is REALIZABLE for a single agent\n\n You may get a distributed Implementation!\n\n");
                     this.setStatus("REALIZABLE");
                     this.setName("Mealy");
                     break;

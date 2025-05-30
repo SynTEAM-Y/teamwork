@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  27/11/2024 09:49:47
+Updated:  18/01/2025 21:08:06
 Version:  1.1
 */
 
@@ -117,6 +117,7 @@ public class ParseTS {
 		try {
 			this.mainTS.parseDot(fileP);
 			TS mTs = this.mainTS.reduce();
+			
 			this.mainTS = mTs;
 			Set<TS> sTS = new HashSet<TS>();
 

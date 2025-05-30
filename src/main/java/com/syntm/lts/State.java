@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 State.java (c) 2024
 Desc: description
 Created:  17/11/2024 09:45:55
-Updated:  21/11/2024 13:58:58
+Updated:  12/12/2024 10:09:42
 Version:  1.1
 */
 
@@ -24,6 +24,7 @@ public class State {
     private Set<String> qState = new HashSet<>();
     private Set<State> post = new HashSet<>();
     private Set<State> pre = new HashSet<>();
+    private Set<String> ch = new HashSet<>();
 
     public State() {
         this.id = "";
@@ -183,6 +184,10 @@ public class State {
     public void addTrans(Trans tr, TS ts) {
         tr.getSource().setOwner(ts);
         tr.getDestination().setOwner(ts);
+        if (ts.getInterface().getChannels().contains(tr.getAction())) {
+            this.ch.add(tr.getAction()); 
+        }
+        
         this.trans.add(tr);
     }
 
@@ -375,5 +380,13 @@ public class State {
 
     public void setqState(Set<String> qState) {
         this.qState = qState;
+    }
+
+    public Set<String> getCh() {
+        return ch;
+    }
+
+    public void setCh(Set<String> ch) {
+        this.ch = ch;
     }
 }

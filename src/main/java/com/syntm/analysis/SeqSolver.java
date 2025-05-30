@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  11/12/2024 08:50:10
+Updated:  30/01/2025 02:00:48
 Version:  1.1
 */
 
@@ -131,7 +131,7 @@ public class SeqSolver {
 
         private Set<State> sRacToE(Set<State> p, Set<State> ePrime, Set<State> out, String channel) {
             for (State s : p) {
-                // 3.c
+                // 3.b (i)
                 if (s.canAnyReaction(s.getOwner(), s, channel)) {
                     if (ePrime.contains(s.takeAnyReaction(s.getOwner(), s,
                             channel).getDestination())) {
@@ -139,6 +139,7 @@ public class SeqSolver {
                     }
                 }
             }
+            // 3.b (ii)
             Set<State> pPrime = new HashSet<>();
             Set<State> outt = new HashSet<>(out);
             pPrime.addAll(p);
@@ -162,17 +163,45 @@ public class SeqSolver {
                                 Set<State> ownEpsilon = out.stream()
                                         .filter(st -> st.getId().equals(this.epsilon.getId()))
                                         .collect(Collectors.toSet());
-                                if (!ownEpsilon.isEmpty()) 
-                                {
+                                if (!ownEpsilon.isEmpty()) {
                                     Set<State> witnessSet = new HashSet<>();
                                     witnessSet = p.stream()
                                             .filter(w -> w.canAnyReaction(ts, w, channel) && !w.equals(s)
                                                     && p.contains(w.takeAnyReaction(ts, w, channel).getDestination()))
                                             .collect(Collectors.toSet());
-                                    if (witnessSet.isEmpty()) {
+
+                                    if (witnessSet.isEmpty()) 
+                                    {
                                         out.add(s);
 
                                     }
+                                    //  else {
+
+                                    //     for (State state : witnessSet) {
+                                    //         Set<String> cSet = new HashSet<>();
+                                    //         cSet.addAll(s.getCh());
+                                    //         cSet.retainAll(state.getCh());
+                                    //         if (!cSet.isEmpty()) {
+                                    //             for (String rCH : cSet) {
+                                    //                 if (p.contains(s.takeAnyReaction(ts, s, rCH).getDestination())) {
+                                    //                     if (!p.contains(state.takeAnyReaction(ts, state, rCH)
+                                    //                             .getDestination())) {
+                                    //                         out.add(s);
+                                    //                         return out;
+                                    //                     }
+                                    //                 } else {
+                                    //                     if (p.contains(state.takeAnyReaction(ts, state, rCH)
+                                    //                             .getDestination())) {
+                                    //                         out.add(s);
+                                    //                         return out;
+                                    //                     }
+                                    //                 }
+                                    //             }
+
+                                    //         }
+                                    //     }
+
+                                    // }
                                 }
                             }
 
@@ -287,9 +316,9 @@ public class SeqSolver {
                 fixedPoint = false;
             }
         }
-        // if (fixedPoint) {
-        // printFixedRho(eMap);
-        // }
+        if (fixedPoint) {
+       // printFixedRho(eMap);
+        }
 
         for (int i = 0; i < wList.size(); i++) {
             wList.get(i).setlMap(eMap);

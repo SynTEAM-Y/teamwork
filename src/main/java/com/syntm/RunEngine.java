@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 RunEngine.java (c) 2024
 Desc: Spec synthesis engine
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 19:08:14
+Updated:  30/01/2025 02:02:55
 Version:  1.1
 */
 
@@ -64,7 +64,7 @@ public class RunEngine {
 		specfile = parse.checkFileName(specfile);
 		spec.specReader(specfile);
 		String command = spec.toString();
-		System.out.println(command);
+		//System.out.println(command);
 		ProcessBuilder p = new ProcessBuilder("docker", "run", "lazkany/strix", "-f", command, spec.inParam(),
 				spec.outParam(), "--k");
 
