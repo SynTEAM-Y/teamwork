@@ -3,7 +3,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Pathn.java (c) 2025
 Desc: description
 Created:  2025-05-30T11:14:29.315Z
-Updated:  31/05/2025 01:51:26
+Updated:  31/05/2025 02:31:44
 Version:  1.1
 */
 
@@ -12,6 +12,7 @@ package com.syntm;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
 
@@ -28,7 +29,7 @@ public class Pathn {
 
     public static void main(final String[] args) {
         Pathn p = new Pathn();
-        p.buildPathn(4);
+        p.buildPathn(5);
     }
 
     public void buildPathn(int size) {
@@ -75,19 +76,14 @@ public class Pathn {
         }
 
         Boolean flag = true;
-        int key = 0;
         Set<String> sch = new HashSet<>(ts.getInterface().getChannels());
         while (flag) {
             String ch = sch.iterator().next();
             sch.remove(ch);
-            while (!ch.contains(key + "")) {
-                if (key < size) {
-                    key++;
-                } else {
-                    key = 0;
-                }
-            }
-            map.get(key+"").add(ch);
+          List<String> keys =  map.keySet().stream().filter(k -> ch.contains(k)).collect(Collectors.toList());
+          keys.sort((e1, e2) -> map.get(e1).size() - map.get(e2).size());
+
+            map.get(keys.get(0)).add(ch);
 
             if (sch.isEmpty()) {
                 flag = false;
