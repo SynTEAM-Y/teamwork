@@ -3,7 +3,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Pathn.java (c) 2025
 Desc: description
 Created:  2025-05-30T11:14:29.315Z
-Updated:  31/05/2025 02:31:44
+Updated:  31/05/2025 03:19:41
 Version:  1.1
 */
 
@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
+
 
 import org.apache.commons.math3.util.Combinations;
 
@@ -29,7 +30,7 @@ public class Pathn {
 
     public static void main(final String[] args) {
         Pathn p = new Pathn();
-        p.buildPathn(5);
+        p.buildPathn(10);
     }
 
     public void buildPathn(int size) {
@@ -80,9 +81,8 @@ public class Pathn {
         while (flag) {
             String ch = sch.iterator().next();
             sch.remove(ch);
-          List<String> keys =  map.keySet().stream().filter(k -> ch.contains(k)).collect(Collectors.toList());
-          keys.sort((e1, e2) -> map.get(e1).size() - map.get(e2).size());
-
+            //System.err.println(Math.ceilDiv(ts.getInterface().getChannels().size(),size));
+          List<String> keys =  map.keySet().stream().filter(k -> ch.contains(k) && (map.get(k).size() < Math.ceilDiv(ts.getInterface().getChannels().size(),size))).collect(Collectors.toList());
             map.get(keys.get(0)).add(ch);
 
             if (sch.isEmpty()) {
@@ -90,7 +90,7 @@ public class Pathn {
             }
         }
         for (int i = 0; i < size; i++) {
-            pr.add("P" + i + " : CH=" + map.get(i+"").toString().replaceAll("\\s+", "") + ", OUT=[-]");
+            pr.add("P" + i + ": CH=" + map.get(i+"").toString().replaceAll("\\s+", "") + ", OUT=[-]");
             if (i != size - 1) {
                 pr.addln(";\n");
             }
