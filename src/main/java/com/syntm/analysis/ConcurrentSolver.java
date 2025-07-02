@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ConcurrentSolver.java (c) 2024
 Desc: Concurrent solver based on Circular Barriers
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:46:46
+Updated:  17/06/2025 22:38:09
 Version:  1.1
 */
 import java.util.ArrayList;
@@ -241,7 +241,7 @@ public class ConcurrentSolver {
     for (State s : eMap.keySet()) {
       Worker w = new Worker(s.getId(), eMap.get(s), eMap, channels);
       wList.add(i, w);
-      i += i;
+      i ++;
       service.execute(w);
     }
   }

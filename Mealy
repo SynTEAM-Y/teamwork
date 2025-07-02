@@ -1,25 +1,60 @@
 Lauching Strix with Parameters:  -f (
- !rs &
- !r0 &
- !r1 &
- X G (rs | r0 | r1 ) &
- X G ((!r0 & !r1 ) | (!rs & !r1 ) | (!rs & !r0 )  ) &
- X (true) ) -> ( !g0 &
- !g1 &
- !g0 &
- !g1 &
- X (G (!rs -> (!g0 | !g1 ) & (rs -> (!g0 & !g1))) ) &
- X (G (r0 -> F g0)) &
- X (G (r1 -> F g1)) ) --ins=r0,rs,r1 --outs=g0,g1 --k
-REALIZABLE
-.inputs r0 rs r1
-.outputs g0 g1
-.i 3
-.o 2
-.p 4
-.s 2
-.r S0
-000 S0 S1 00
-010 S1 S1 00
-100 S1 S1 10
-001 S1 S1 01
+ !init_counter_1 &
+ !init_counter_0 &
+ !init_counter_3 &
+ !init_counter_2 &
+ !inc_env &
+ X G (init_counter_1 | init_counter_0 | init_counter_3 | init_counter_2 | inc_env ) &
+ X G ((!init_counter_0 & !init_counter_3 & !init_counter_2 & !inc_env ) | (!init_counter_1 & !init_counter_3 & !init_counter_2 & !inc_env ) | (!init_counter_1 & !init_counter_0 & !init_counter_2 & !inc_env ) | (!init_counter_1 & !init_counter_0 & !init_counter_3 & !inc_env ) | (!init_counter_1 & !init_counter_0 & !init_counter_3 & !init_counter_2 )  ) &
+ X (true) ) -> ( !carry_env_3 &
+ !carry_env_2 &
+ !carry_env_1 &
+ !carry_env_0 &
+ !inc_sys &
+ !counter_sys_3 &
+ !counter_sys_2 &
+ !counter_sys_1 &
+ !counter_sys_0 &
+ !counter_env_2 &
+ !counter_env_1 &
+ !carry_sys_0 &
+ !counter_env_3 &
+ !carry_sys_1 &
+ !carry_sys_2 &
+ !carry_sys_3 &
+ !counter_env_0 &
+ !carry_env_3 &
+ !carry_env_2 &
+ !carry_env_1 &
+ !carry_env_0 &
+ !inc_sys &
+ !counter_sys_3 &
+ !counter_sys_2 &
+ !counter_sys_1 &
+ !counter_sys_0 &
+ !counter_env_2 &
+ !counter_env_1 &
+ !carry_sys_0 &
+ !counter_env_3 &
+ !carry_sys_1 &
+ !carry_sys_2 &
+ !carry_sys_3 &
+ !counter_env_0 &
+ X (((((X[!] counter_env_0 -> init_counter_0) && (init_counter_0 -> X counter_env_0)) && ((X[!] counter_env_1 -> init_counter_1) && (init_counter_1 -> X counter_env_1)) && ((X[!] counter_env_2 -> init_counter_2) && (init_counter_2 -> X counter_env_2)) && ((X[!] counter_env_3 -> init_counter_3) && (init_counter_3 -> X counter_env_3)) && !counter_sys_0 && !counter_sys_1 && !counter_sys_2 && !counter_sys_3 && !inc_sys) && (G ((inc_env -> !X[!] inc_env)) -> (X[!] G ((X[!] carry_env_0 -> inc_env) && (inc_env -> X carry_env_0) && (carry_sys_0 <-> inc_sys) && (X[!] carry_env_1 -> (counter_env_0 && X[!] carry_env_0)) && (X[!] carry_sys_1 -> (counter_sys_0 && X[!] carry_sys_0)) && (X[!] carry_env_2 -> (counter_env_1 && X[!] carry_env_1)) && (X[!] carry_sys_2 -> (counter_sys_1 && X[!] carry_sys_1)) && (X[!] carry_env_3 -> (counter_env_2 && X[!] carry_env_2)) && (X[!] carry_sys_3 -> (counter_sys_2 && X[!] carry_sys_2)) && ((counter_env_0 && X carry_env_0) -> X carry_env_1) && ((counter_sys_0 && X carry_sys_0) -> X carry_sys_1) && ((counter_env_1 && X carry_env_1) -> X carry_env_2) && ((counter_sys_1 && X carry_sys_1) -> X carry_sys_2) && ((counter_env_2 && X carry_env_2) -> X carry_env_3) && ((counter_sys_2 && X carry_sys_2) -> X carry_sys_3) && ((X[!] counter_env_0 -> !(counter_env_0 <-> X[!] carry_env_0)) && (!(counter_env_0 <-> X carry_env_0) -> X counter_env_0)) && ((X[!] counter_sys_0 -> !(counter_sys_0 <-> X[!] carry_sys_0)) && (!(counter_sys_0 <-> X carry_sys_0) -> X counter_sys_0)) && ((X[!] counter_env_1 -> !(counter_env_1 <-> X[!] carry_env_1)) && (!(counter_env_1 <-> X carry_env_1) -> X counter_env_1)) && ((X[!] counter_sys_1 -> !(counter_sys_1 <-> X[!] carry_sys_1)) && (!(counter_sys_1 <-> X carry_sys_1) -> X counter_sys_1)) && ((X[!] counter_env_2 -> !(counter_env_2 <-> X[!] carry_env_2)) && (!(counter_env_2 <-> X carry_env_2) -> X counter_env_2)) && ((X[!] counter_sys_2 -> !(counter_sys_2 <-> X[!] carry_sys_2)) && (!(counter_sys_2 <-> X carry_sys_2) -> X counter_sys_2)) && ((X[!] counter_env_3 -> !(counter_env_3 <-> X[!] carry_env_3)) && (!(counter_env_3 <-> X carry_env_3) -> X counter_env_3)) && ((X[!] counter_sys_3 -> !(counter_sys_3 <-> X[!] carry_sys_3)) && (!(counter_sys_3 <-> X carry_sys_3) -> X counter_sys_3))) && X[!] F ((counter_env_0 <-> counter_sys_0) && (counter_env_1 <-> counter_sys_1) && (counter_env_2 <-> counter_sys_2) && (counter_env_3 <-> counter_sys_3)))));) ) --ins=init_counter_0,init_counter_1,init_counter_2,init_counter_3,inc_env --outs=counter_env_0,counter_sys_0,counter_env_1,counter_sys_1,counter_env_2,counter_sys_2,counter_env_3,counter_sys_3,carry_env_0,carry_sys_0,carry_env_1,carry_sys_1,carry_env_2,carry_sys_2,carry_env_3,carry_sys_3,inc_sys --k
+line 43:9 no viable alternative at input '(!carry_env_3&!carry_env_2&!carry_env_1&!carry_env_0&!inc_sys&!counter_sys_3&!counter_sys_2&!counter_sys_1&!counter_sys_0&!counter_env_2&!counter_env_1&!carry_sys_0&!counter_env_3&!carry_sys_1&!carry_sys_2&!carry_sys_3&!counter_env_0&!carry_env_3&!carry_env_2&!carry_env_1&!carry_env_0&!inc_sys&!counter_sys_3&!counter_sys_2&!counter_sys_1&!counter_sys_0&!counter_env_2&!counter_env_1&!carry_sys_0&!counter_env_3&!carry_sys_1&!carry_sys_2&!carry_sys_3&!counter_env_0&X(((((X['
+org.antlr.v4.runtime.misc.ParseCancellationException
+	at org.antlr.v4.runtime.BailErrorStrategy.recover(BailErrorStrategy.java:51)
+	at owl.grammar.LTLParser.binaryExpression(LTLParser.java:424)
+	at owl.grammar.LTLParser.binaryExpression(LTLParser.java:408)
+	at owl.grammar.LTLParser.andExpression(LTLParser.java:303)
+	at owl.grammar.LTLParser.orExpression(LTLParser.java:235)
+	at owl.grammar.LTLParser.expression(LTLParser.java:183)
+	at owl.grammar.LTLParser.formula(LTLParser.java:136)
+	at owl.ltl.parser.LtlParser.parse(LtlParser.java:59)
+	at owl.cinterface.CLabelledFormula.parse(CLabelledFormula.java:81)
+Caused by: org.antlr.v4.runtime.NoViableAltException
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.noViableAlt(ParserATNSimulator.java:2026)
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.execATN(ParserATNSimulator.java:467)
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:393)
+	at owl.grammar.LTLParser.binaryExpression(LTLParser.java:398)
+	... 7 more

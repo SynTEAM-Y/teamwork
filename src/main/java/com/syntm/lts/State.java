@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 State.java (c) 2024
 Desc: description
 Created:  17/11/2024 09:45:55
-Updated:  12/12/2024 10:09:42
+Updated:  26/06/2025 21:18:31
 Version:  1.1
 */
 
@@ -25,6 +25,7 @@ public class State {
     private Set<State> post = new HashSet<>();
     private Set<State> pre = new HashSet<>();
     private Set<String> ch = new HashSet<>();
+    private boolean reachInitiate;
 
     public State() {
         this.id = "";
@@ -32,8 +33,9 @@ public class State {
         this.listen = new Listen();
         this.trans = new HashSet<Trans>();
         this.comStates = new HashSet<State>();
+        this.reachInitiate=false;
     }
-
+    
     public Set<State> getPost() {
         return post;
     }
@@ -56,6 +58,7 @@ public class State {
         this.listen = new Listen();
         this.trans = new HashSet<Trans>();
         this.comStates = new HashSet<State>();
+        this.reachInitiate=false;
     }
 
     public State(String id, Label label, Listen listen) {
@@ -64,6 +67,7 @@ public class State {
         this.listen = listen;
         this.trans = new HashSet<Trans>();
         this.comStates = new HashSet<State>();
+        this.reachInitiate=false;
     }
 
     public State(String id, Label label) {
@@ -72,6 +76,7 @@ public class State {
         this.listen = new Listen();
         this.trans = new HashSet<Trans>();
         this.comStates = new HashSet<State>();
+        this.reachInitiate=false;
     }
 
     public State(String id, Label label, Listen listen, Set<Trans> trans) {
@@ -80,6 +85,7 @@ public class State {
         this.listen = listen;
         this.trans = trans;
         this.comStates = new HashSet<State>();
+        this.reachInitiate=false;
     }
 
     @Override
@@ -388,5 +394,13 @@ public class State {
 
     public void setCh(Set<String> ch) {
         this.ch = ch;
+    }
+
+    public boolean isReachInitiate() {
+        return reachInitiate;
+    }
+
+    public void setReachInitiate(boolean reachInitiate) {
+        this.reachInitiate = reachInitiate;
     }
 }

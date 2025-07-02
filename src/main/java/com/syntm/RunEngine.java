@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 RunEngine.java (c) 2024
 Desc: Spec synthesis engine
 Created:  17/11/2024 09:45:55
-Updated:  30/01/2025 02:02:55
+Updated:  02/07/2025 21:36:17
 Version:  1.1
 */
 
@@ -52,9 +52,9 @@ public class RunEngine {
 	public static final String ANSI_CYAN = "\u001B[36m";
 	public static final String ANSI_WHITE = "\u001B[37m";
 
-	public static void main(final String[] args)
+	public static void main()
 			throws IOException, InterruptedException, ExecutionException, TimeoutException {
-		File outputFolder = new File("./generated/output/");
+		File outputFolder = new File("./generated/");
 		FileUtils.cleanDirectory(outputFolder);
 		RunEngine parse = new RunEngine();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
@@ -151,15 +151,32 @@ public class RunEngine {
 			}
 			switch (in.toString()) {
 				case "1":
-					for (TS tss : sTS) {
-						tss.toDot();
-					}
+					System.out.println(Defs.ANSI_GREEN + "The original TS" + Defs.ANSI_RESET);
 					ts.toDot();
-					for (TS tss : ts.getAgents()) {
-						tss.toDot();
+
+					System.out.println(
+							Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
+					
+					for (TS t : ts.getAgents()) {
+						t.setName(" <" + t.getName() + "> ");
+						t.reduce().toDot();
+						
+					}
+					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation"
+							+ Defs.ANSI_RESET);
+					float sum=0;
+					float avg=0;
+					for (TS t : sTS) {
+						t.toDot();
+						sum=sum+t.sConnectivity(ts);
+						System.out.println(Defs.ANSI_GREEN + "Average Connectivity for agent -> "+t.getName()+": "+t.sConnectivity(ts)/ts.getStates().size()
+							+ Defs.ANSI_RESET);
 					}
 					System.out.println(
-							ANSI_BLUE + "Generated" + ANSI_RESET);
+							Defs.ANSI_BLUE + "Generated" + Defs.ANSI_RESET);
+					avg =sum/(sTS.size()*ts.getStates().size());
+					System.out.println(Defs.ANSI_GREEN + "Average Connectivity -> "+avg
+							+ Defs.ANSI_RESET);
 					break;
 				case "2":
 					TS cComp = compose(sTS);

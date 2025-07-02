@@ -1,0 +1,26 @@
+Interface:d,p,f,a:rD,rP,rF
+A:A1:f,a:rF
+A:A2:p:rP
+A:A3:d:rD
+Assumptions
+G (a -> X (p R !a)) 
+G (f -> X (a R !f)) 
+G (d -> X (p R !d)) 
+G (p -> X (f R !p)) 
+G ((p & (X a) & (X X f)) -> X (d R !p)) 
+(a R !f) 
+(f R !p) 
+(p R !d) 
+G F d
+EndAssumptions
+
+Guarantees
+G (a -> rF) 
+G (f -> rP) 
+G (p -> rD) 
+G ((rF & (X !f)) -> (X rF)) 
+G ((rD & (X !d)) -> (X rD)) 
+G ((rP & (X !p)) -> (X rP)) 
+G F (rD) 
+G F (!rD)
+EndGuarantees

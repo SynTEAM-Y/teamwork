@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ESolver.java (c) 2024
 Desc: Concurrent Solver based on Executor Service
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:46:38
+Updated:  17/06/2025 22:37:09
 Version:  1.1
 */
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class ESolver {
     for (State s : eMap.keySet()) {
       Task w = new Task(s.getId(), eMap.get(s), eMap, channels);
       wList.add(i, w);
-      i += i;
+      i ++;
     }
 
   }

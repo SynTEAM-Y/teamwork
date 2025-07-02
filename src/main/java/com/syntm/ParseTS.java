@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ParseTS.java (c) 2024
 Desc: TS Decomposition driver class
 Created:  17/11/2024 09:45:55
-Updated:  18/01/2025 21:08:06
+Updated:  02/07/2025 21:28:16
 Version:  1.1
 */
 
@@ -30,11 +30,11 @@ import com.syntm.util.Printer;
 public class ParseTS {
 	private TS mainTS = new TS("MainTS");
 
-	public static void main(final String[] args) throws IOException, InterruptedException {
+	public static void main() throws IOException, InterruptedException {
 		ParseTS parseTS = new ParseTS();
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-		File outputFolder = new File("./generated/output/");
+		File outputFolder = new File("./generated/");
 		FileUtils.cleanDirectory(outputFolder);
 
 		System.out.println(Defs.ANSI_GREEN + "Enter a TS for decomposition: " + Defs.ANSI_RESET);
@@ -78,17 +78,27 @@ public class ParseTS {
 
 					System.out.println(
 							Defs.ANSI_GREEN + "Minimization according to Strong Bisimulation" + Defs.ANSI_RESET);
+					
 					for (TS ts : parseTS.mainTS.getAgents()) {
 						ts.setName(" <" + ts.getName() + "> ");
 						ts.reduce().toDot();
+						
 					}
 					System.out.println(Defs.ANSI_GREEN + "Minimization according to our Reconfigurable Bisimulation"
 							+ Defs.ANSI_RESET);
+					float sum=0;
+					float avg=0;
 					for (TS ts : sTS) {
 						ts.toDot();
+						sum=sum+ts.sConnectivity(parseTS.mainTS);
+						System.out.println(Defs.ANSI_GREEN + "Average Connectivity for agent -> "+ts.getName()+": "+ts.sConnectivity(parseTS.mainTS)/parseTS.mainTS.getStates().size()
+							+ Defs.ANSI_RESET);
 					}
 					System.out.println(
 							Defs.ANSI_BLUE + "Generated" + Defs.ANSI_RESET);
+					avg =sum/(sTS.size()*parseTS.mainTS.getStates().size());
+					System.out.println(Defs.ANSI_GREEN + "Average Connectivity -> "+avg
+							+ Defs.ANSI_RESET);
 					break;
 				case "2":
 					TS cComp = parseTS.compose(sTS);
@@ -333,7 +343,7 @@ public class ParseTS {
 					.map(State::getTrans)
 					.collect(Collectors.toSet())
 					.stream()
-					.flatMap(tr -> tr.stream())
+					.flatMap(trSet -> trSet.stream())
 					.collect(Collectors.toSet());
 
 			Set<Trans> initiateSet = new HashSet<>();
@@ -384,7 +394,9 @@ public class ParseTS {
 				Set<State> rcv = new HashSet<>();
 
 				simEnv.add(tMap.get(in).getSource().getOwner().next(tMap.get(in)).formattedString());
-
+				
+				System.out.println(Defs.ANSI_BLUE +tMap.get(in).getSource().getOwner().getName()+" initiates action: "+ tMap.get(input).getAction() +Defs.ANSI_RESET);
+				
 				sStates.remove(tMap.get(in).getSource());
 
 				sStates.add(
@@ -402,6 +414,9 @@ public class ParseTS {
 						Trans tr = new Trans();
 						tr = trs.iterator().next();
 						simEnv.add(st.getOwner().next(tr).formattedString());
+						
+						System.out.println(Defs.ANSI_BLUE +st.getOwner().getName()+" reacted"+ Defs.ANSI_RESET);
+						
 						sStates.remove(tr.getSource());
 						sStates.add(tr.getDestination().getOwner().getStateById(tr.getDestination().getId()));
 					} else {

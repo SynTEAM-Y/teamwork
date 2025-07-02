@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Printer.java (c) 2024
 Desc: To Dot Printer
 Created:  17/11/2024 09:45:55
-Updated:  17/11/2024 12:45:11
+Updated:  02/07/2025 20:54:21
 Version:  1.1
 */
 
@@ -128,7 +128,7 @@ public class Printer {
     }
 
     private void writeTextToFile(String fileName, String text) throws IOException {
-        FileOutputStream outputStream = new FileOutputStream("./generated/output/" + fileName);
+        FileOutputStream outputStream = new FileOutputStream("./generated/" + fileName);
         outputStream.write(text.getBytes());
         outputStream.close();
     }

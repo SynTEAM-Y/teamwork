@@ -79,7 +79,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>com.syntm.ParseTS</mainClass>
+              <mainClass>com.syntm.Engine</mainClass>
             </manifest>
           </archive>
         </configuration>

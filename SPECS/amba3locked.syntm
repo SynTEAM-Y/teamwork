@@ -1,0 +1,21 @@
+Interface:decide,hlock_0,hlock_1,hlock_2,hgrant_0,hgrant_1,hgrant_2:locked
+
+A:A1:hlock_0,hgrant_0:-
+A:A2:hlock_1,hgrant_1:-
+A:A3:hlock_2,hgrant_2:-
+A:A4:decide:locked
+
+
+
+Assumptions
+G ((!hgrant_0 & ! hgrant_1) | ((!hgrant_0 | ! hgrant_1) & !hgrant_2))
+G (hgrant_0 | hgrant_1 | hgrant_2)
+EndAssumptions
+
+
+Guarantees
+G ((decide & X hgrant_0) -> (X locked <-> X hlock_0))
+G ((decide & X hgrant_1) -> (X locked <-> X hlock_1))
+G ((decide & X hgrant_2) -> (X locked <-> X hlock_2))
+G (! decide -> (X locked <-> locked))
+EndGuarantees

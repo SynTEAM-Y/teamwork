@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  31/05/2025 01:49:13
+Updated:  02/07/2025 20:42:46
 Version:  1.1
 */
 
@@ -798,11 +798,17 @@ public class TS {
             t.getStateById(tr.source.getId()).getPost().add(t.getStateById(tr.destination.getId()));
 
             t.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
+            if (t.getInterface().getChannels().contains(tr.getAction())) {
+              t.getStateById(tr.destination.getId()).setReachInitiate(true);  
+            }
 
             p.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
             p.getStateById(tr.source.getId()).getPost().add(p.getStateById(tr.destination.getId()));
             p.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
+            if (p.getInterface().getChannels().contains(tr.getAction())) {
+              p.getStateById(tr.destination.getId()).setReachInitiate(true);  
+            }
         }
         for (State pr : this.getStates()) {
             pr.getTrans().clear();
@@ -1155,6 +1161,20 @@ public class TS {
         }
 
         gp.print();
+    }
+
+
+    public float sConnectivity(TS main) {
+        float sum=0;
+        Set<String> Y_k = new HashSet<>(main.getChannels());
+        Y_k.removeAll(this.getInterface().getChannels());
+        float y_k = Y_k.size();
+        for (State s : this.getStates()) {
+            Set<String> LS_sk = new HashSet<>(s.getListen().getChannels());
+            LS_sk.removeAll(this.getInterface().getChannels());
+            sum= sum + LS_sk.size();
+        }
+        return sum/y_k;
     }
 
 }

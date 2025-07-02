@@ -3,12 +3,13 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 Pathn.java (c) 2025
 Desc: description
 Created:  2025-05-30T11:14:29.315Z
-Updated:  31/05/2025 03:19:41
+Updated:  02/07/2025 21:20:08
 Version:  1.1
 */
 
 package com.syntm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,9 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.*;
 
-
 import org.apache.commons.math3.util.Combinations;
-
+import org.apache.commons.math3.util.MathUtils;
 import com.syntm.lts.Int;
 import com.syntm.lts.Label;
 import com.syntm.lts.State;
@@ -30,7 +30,7 @@ public class Pathn {
 
     public static void main(final String[] args) {
         Pathn p = new Pathn();
-        p.buildPathn(10);
+        p.buildPathn(3);
     }
 
     public void buildPathn(int size) {
@@ -40,7 +40,6 @@ public class Pathn {
         sdummy.setLabel(new Label(new HashSet<>(), new HashSet<>()));
         ts.addState(sdummy);
         ts.setInitState(sdummy.getId());
-
         Set<int[]> comb = new HashSet<>();
         Set<int[]> combw = new HashSet<>();
         for (int[] is : combinations) {
@@ -51,6 +50,7 @@ public class Pathn {
             sdummy.getListen().getChannels().add(is[0] + "" + is[1]);
             ts.addTransition(ts, sdummy, s.getId(), s);
         }
+
         ts.setInterface(new Int(ts.getInitState().getListen().getChannels(), new HashSet<>()));
         for (int[] list : comb) {
             combw.addAll(comb);
@@ -77,20 +77,26 @@ public class Pathn {
         }
 
         Boolean flag = true;
-        Set<String> sch = new HashSet<>(ts.getInterface().getChannels());
+        ArrayList<int[]> scha = new ArrayList<>(comb);
+        scha.sort((e1, e2) -> e1[1] - e2[1]);
+        scha.sort((e1, e2) -> e1[0] - e2[0]);
         while (flag) {
-            String ch = sch.iterator().next();
-            sch.remove(ch);
-            //System.err.println(Math.ceilDiv(ts.getInterface().getChannels().size(),size));
-          List<String> keys =  map.keySet().stream().filter(k -> ch.contains(k) && (map.get(k).size() < Math.ceilDiv(ts.getInterface().getChannels().size(),size))).collect(Collectors.toList());
-            map.get(keys.get(0)).add(ch);
+            int[] cha = scha.iterator().next();
+            scha.remove(cha);
 
-            if (sch.isEmpty()) {
+            List<String> keysa = map.keySet().stream()
+                    .filter(k -> ((Arrays.stream(cha).filter(x -> x == Integer.parseInt(k)).toArray()).length != 0)
+                            && (map.get(k).size() < Math.ceilDiv(ts.getInterface().getChannels().size(),
+                                    size)))
+                    .collect(Collectors.toList());
+
+            map.get(keysa.get(0)).add(cha[0] + "" + cha[1]);
+            if (scha.isEmpty()) {
                 flag = false;
             }
         }
         for (int i = 0; i < size; i++) {
-            pr.add("P" + i + ": CH=" + map.get(i+"").toString().replaceAll("\\s+", "") + ", OUT=[-]");
+            pr.add("P" + i + ": CH=" + map.get(i + "").toString().replaceAll("\\s+", "") + ", OUT=[-]");
             if (i != size - 1) {
                 pr.addln(";\n");
             }
