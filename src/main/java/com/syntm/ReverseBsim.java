@@ -17,7 +17,7 @@ public class ReverseBsim {
         ParseTS parseTS = new ParseTS();
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         Set<TS> sTS = new HashSet<>();
-        File outputFolder = new File("./generated/output/");
+        File outputFolder = new File("./generated/");
         FileUtils.cleanDirectory(outputFolder);
 
         System.out.println(Defs.ANSI_GREEN + "Enter a TS for composition: " + Defs.ANSI_RESET);
