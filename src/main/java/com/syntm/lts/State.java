@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 State.java (c) 2024
 Desc: description
 Created:  17/11/2024 09:45:55
-Updated:  26/06/2025 21:18:31
+Updated:  04/07/2025 18:04:16
 Version:  1.1
 */
 
@@ -22,8 +22,10 @@ public class State {
     private Set<State> comStates;
     private TS owner;
     private Set<String> qState = new HashSet<>();
-    private Set<State> post = new HashSet<>();
-    private Set<State> pre = new HashSet<>();
+    //private Set<State> post = new HashSet<>();
+    private HashMap<String,State> yPost = new HashMap<>();
+    private HashMap<String,Set<State>> yPre = new HashMap<>();
+    //private Set<State> pre = new HashSet<>();
     private Set<String> ch = new HashSet<>();
     private boolean reachInitiate;
 
@@ -36,21 +38,21 @@ public class State {
         this.reachInitiate=false;
     }
     
-    public Set<State> getPost() {
-        return post;
-    }
+    // public Set<State> getPost() {
+    //     return post;
+    // }
 
-    public void setPost(Set<State> post) {
-        this.post = post;
-    }
+    // public void setPost(Set<State> post) {
+    //     this.post = post;
+    // }
 
-    public Set<State> getPre() {
-        return pre;
-    }
+    // public Set<State> getPre() {
+    //     return pre;
+    // }
 
-    public void setPre(Set<State> pre) {
-        this.pre = pre;
-    }
+    // public void setPre(Set<State> pre) {
+    //     this.pre = pre;
+    // }
 
     public State(String id) {
         this.id = id;
@@ -402,5 +404,28 @@ public class State {
 
     public void setReachInitiate(boolean reachInitiate) {
         this.reachInitiate = reachInitiate;
+    }
+
+    public HashMap<String, State> getyPost() {
+        return yPost;
+    }
+
+    public State getyPost(String y) {
+        return yPost.get(y);
+    }
+
+    public void setyPost(HashMap<String, State> yPost) {
+        this.yPost = yPost;
+    }
+
+    public Set<State> getyPre(String y) {
+        return yPre.get(y);
+    }
+    public HashMap<String, Set<State>> getyPre() {
+        return yPre;
+    }
+
+    public void setyPre(HashMap<String, Set<State>> yPre) {
+        this.yPre = yPre;
     }
 }

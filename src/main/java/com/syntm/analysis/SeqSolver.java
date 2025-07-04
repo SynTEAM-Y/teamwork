@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  01/07/2025 23:02:31
+Updated:  05/07/2025 00:08:03
 Version:  1.1
 */
 
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -163,16 +164,14 @@ public class SeqSolver {
                                 Set<State> ownEpsilon = out.stream()
                                         .filter(st -> st.getId().equals(this.epsilon.getId()))
                                         .collect(Collectors.toSet());
-                                if (!ownEpsilon.isEmpty()) 
-                                {
+                                if (!ownEpsilon.isEmpty()) {
                                     Set<State> witnessSet = new HashSet<>();
                                     witnessSet = p.stream()
                                             .filter(w -> w.canAnyReaction(ts, w, channel) && !w.equals(s)
                                                     && p.contains(w.takeAnyReaction(ts, w, channel).getDestination()))
                                             .collect(Collectors.toSet());
 
-                                    if (witnessSet.isEmpty())
-                                     {
+                                    if (witnessSet.isEmpty()) {
                                         out.add(s);
 
                                     }
@@ -318,7 +317,7 @@ public class SeqSolver {
             }
         }
         // if (fixedPoint) {
-        //      printFixedRho(eMap);
+        //     printFixedRho(eMap);
         // }
 
         for (int i = 0; i < wList.size(); i++) {
@@ -333,103 +332,91 @@ public class SeqSolver {
         Set<String> ids = new HashSet<>();
         ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
-         
-        
-       Set<State> closed = new HashSet<>();
         Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
         for (State state : eMap.keySet()) {
             if (!state.equals(p.getInitState())) {
                 rho_intersect.retainAll(eMap.get(state));
             }
         }
+        if (rho_intersect.equals(eMap.get(p.getInitState()))) {
+            return rho_intersect;
+        }
 
-
-        
-        
         for (String st : ids) {
             Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
                     .collect(Collectors.toSet()).iterator().next();
             cares.put(st, states);
 
         }
-        //Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts, cares);
-        Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts, cares);
+
+        // Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts,
+        // cares);
+        Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts, this.preProcess(cares, eMap));
+        // Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts,
+        // cares);
+
         return partition;
 
-        
-        
-        
+    }
 
-        // if (rho_intersect.equals(eMap.get(p.getInitState()))) {
-        //     return rho_intersect;
-        // }
-        // rho_intersect.clear();
+    private Set<State> yPreC(String y, Set<State> C) {
+        Set<State> temp = new HashSet<>();
+        temp = C.stream()
+                .flatMap(s -> s.getyPre(y).stream())
+                .collect(Collectors.toSet());
 
-        // for (String s : ids) {
-        //     if (!closed.contains(ts.getStateById(s))) {
-        //         Set<State> b = new HashSet<>();
-        //         b = cares.get(s);
-        //         b.removeAll(closed);
-        //         Set<State> excluded = new HashSet<>();
-        //         List<Pair<State, Set<State>>> candidates = new ArrayList<>();
-        //         for (State sPrime : b) {
-        //             if (!sPrime.getId().equals(s)) {
-        //                 Set<State> pWise = new HashSet<>();
-        //                 pWise.addAll(b);
-        //                 pWise.retainAll(cares.get(sPrime.getId()));
-        //                 if (pWise.contains(ts.getStateById(s))) {
-        //                     candidates.add(new Pair<State, Set<State>>(sPrime, pWise));
-        //                 }
-        //                 if (!pWise.contains(ts.getStateById(s))) {
-        //                     excluded.add(sPrime);
-        //                 }
-        //             }
-        //         }
-        //         if (!excluded.isEmpty()) {
-        //             List<Pair<State, Set<State>>> cPW = new ArrayList<>(candidates);
-        //             for (Pair<State, Set<State>> p : cPW) {
-        //                 Set<State> pExec = new HashSet<>();
-        //                 pExec.addAll(p.getValue1());
-        //                 pExec.retainAll(excluded);
-        //                 if (!pExec.isEmpty()) {
-        //                     candidates.remove(p);
-        //                     p.getValue1().removeAll(pExec);
-        //                     candidates.add(p);
-        //                 }
-        //             }
-        //         }
-        //         Set<Pair<State, Set<State>>> rSet = new HashSet<>();
-        //         rSet = candidates.stream().filter(t -> !t.getValue1().isEmpty()).collect(Collectors.toSet());
-        //         if (rSet.isEmpty()) {
-        //             rho_intersect.add(new HashSet<>(Arrays.asList(ts.getStateById(s))));
-        //             closed.add(ts.getStateById(s));
-        //         } else {
-        //             for (Pair<State, Set<State>> candidate : candidates) {
-        //                 Set<State> disagree = new HashSet<>();
-        //                 for (State fState : candidate.getValue1()) {
-        //                     if (!fState.getId().equals(s) && !fState.getId().equals(candidate.getValue0().getId())) {
-        //                         Set<State> inSet = new HashSet<>(candidate.getValue1());
-        //                         inSet.retainAll(candidates.stream().filter(p -> p.getValue0().equals(fState))
-        //                                 .collect(Collectors.toSet()).iterator().next().getValue1());
-        //                         if (!inSet.equals(candidate.getValue1())) {
-        //                             disagree.add(fState);
-        //                         }
-        //                     }
-        //                 }
-        //                 candidate.getValue1().removeAll(disagree);
-        //             }
-        //             candidates.sort((e1, e2) -> e2.getValue1().size() - e1.getValue1().size());
-        //             rho_intersect.add(candidates.get(0).getValue1());
-        //             closed.addAll(candidates.get(0).getValue1());
-        //         }
-        //     }
-        // }
-        // // System.err.println("rho final" + rho_intersect);
-        // return rho_intersect;
+        return temp;
+    }
+
+    private HashMap<String, Set<State>> preProcess(HashMap<String, Set<State>> cares,
+            HashMap<State, Set<Set<State>>> eMap) {
+        HashMap<String, Set<State>> tempCare = new HashMap<>(cares);
+        for (String id : new HashSet<>(cares.keySet())) {
+            for (State s : new HashSet<>(cares.get(id))) {
+                if (!s.equals(ts.getStateById(id)) && cares.get(s.getId()).contains(ts.getStateById(id))) {
+                    for (String y : ts.getInterface().getChannels()) {
+                        Set<State> preCminusS = new HashSet<>(cares.get(id));
+                        preCminusS.remove(s);
+                        List<State> preC = new ArrayList<>(this.yPreC(y, preCminusS));
+                        if (violatesAgreement(id, s, y, preC,
+                                tempCare)) {
+                            tempCare.get(id).remove(s);
+                            tempCare.get(s.getId()).remove(ts.getStateById(id));
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+        }
+        return tempCare;
+    }
+
+    private boolean violatesAgreement(String id, State s, String y, List<State> preC,
+            Map<String, Set<State>> tempCare) {
+        for (int i = 0; i < preC.size(); i++) {
+            for (int j = i + 1; j < preC.size(); j++) {
+                State s1 = preC.get(i), s2 = preC.get(j);
+                State p1 = s1.getyPost(y), p2 = s2.getyPost(y);
+                if (p1 == null || p2 == null)
+                    continue;
+                if (tempCare.getOrDefault(s1.getId(), Set.of()).contains(s2)
+                        && tempCare.getOrDefault(s2.getId(), Set.of()).contains(s1)) {
+                    if (!tempCare.getOrDefault(p1.getId(), Set.of()).contains(s)
+                            || !tempCare.getOrDefault(p2.getId(), Set.of()).contains(s)
+                            || !tempCare.getOrDefault(s.getId(), Set.of()).contains(p1)
+                            || !tempCare.getOrDefault(s.getId(), Set.of()).contains(p2)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void printFixedRho(HashMap<State, Set<Set<State>>> map) {
-           HashMap<String, Set<State>> cares = new HashMap<>();
+        HashMap<String, Set<State>> cares = new HashMap<>();
         Set<String> ids = new HashSet<>();
         ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
@@ -441,9 +428,9 @@ public class SeqSolver {
         }
         Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
         gp.addln("\n An e-Cooperative Bisimulation for " + this.ts.getName() + "\n");
-        
+
         List<String> skeys = new ArrayList<String>();
-         for (String id : cares.keySet()) {
+        for (String id : cares.keySet()) {
             skeys.add(id);
         }
         skeys.sort((e1, e2) -> e1.compareTo(e2));
@@ -452,183 +439,11 @@ public class SeqSolver {
             for (State set : cares.get(idString)) {
                 gp.addln("\t\t" + set);
             }
-            gp.addln("\n\t" + "post-> " + ts.getStateById(idString).getPost() + "\n");
-            gp.addln("\t" + "pre-> " + ts.getStateById(idString).getPre() + "\n");
+            // gp.addln("\n\t" + "post-> " + ts.getStateById(idString).getPost() + "\n");
+            // gp.addln("\t" + "pre-> " + ts.getStateById(idString).getPre() + "\n");
 
         }
         gp.printText();
-        
-        // List<State> keys = new ArrayList<State>();
 
-        // for (State epsilon : map.keySet()) {
-        //     keys.add(epsilon);
-        // }
-        // keys.sort((e1, e2) -> e1.getId().compareTo(e2.getId()));
-
-        // for (State epsilon : keys) {
-        //     gp.addln("\t" + epsilon.getId() + " ->");
-        //     for (Set<State> set : map.get(epsilon)) {
-        //         gp.addln("\t\t" + set);
-        //     }
-        //     gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
-        //     gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
-
-        // }
-        // gp.printText();
     }
 }
-
-
-
-// package com.syntm.analysis;
-// /*
-// Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
-// SeqSolver.java (c) 2024
-// Desc: Sequential solver (uptodate) optimized with BitSet internally
-// Created:  17/11/2024 09:45:55
-// Updated:  23/06/2025
-// Version:  1.3
-// */
-
-// import java.util.ArrayList;
-// import java.util.BitSet;
-// import java.util.HashMap;
-// import java.util.HashSet;
-// import java.util.List;
-// import java.util.Map;
-// import java.util.Set;
-// import java.util.concurrent.ConcurrentHashMap;
-
-// import com.syntm.lts.CompressedTS;
-// import com.syntm.lts.State;
-// import com.syntm.lts.TS;
-// import com.syntm.analysis.Task;
-// import com.syntm.util.Printer;
-
-// public class SeqSolver {
-
-//     static ConcurrentHashMap<State, Set<Set<State>>> eMap;
-
-//     private final TS ts;
-//     private final TS p;
-//     private final Set<String> channels;
-//     private final List<Task> wList;
-
-//     private final Task.StateIndexer indexer;
-
-//     // Constructor now accepts any Map (e.g. HashMap) for flexibility
-//     public SeqSolver(Map<State, Set<Set<State>>> indexedFamily, TS t, TS p, Set<String> sch) {
-//         eMap = new ConcurrentHashMap<>(indexedFamily);
-//         this.channels = sch;
-//         this.ts = t;
-//         this.p = p;
-
-//         // Build indexer for all states in ts for BitSet optimizations in Task
-//         this.indexer = buildStateIndexer(ts.getStates());
-
-//         wList = new ArrayList<>();
-//         for (State s : eMap.keySet()) {
-//             Task task = new Task(s.getId(), eMap.get(s), eMap, channels, indexer);
-//             wList.add(task);
-//         }
-//     }
-
-//     private Task.StateIndexer buildStateIndexer(Set<State> states) {
-//         List<State> stateList = new ArrayList<>(states);
-//         HashMap<State, Integer> stateToIndex = new HashMap<>();
-//         for (int i = 0; i < stateList.size(); i++) {
-//             stateToIndex.put(stateList.get(i), i);
-//         }
-//         return new Task.StateIndexer() {
-//             public int size() { return stateList.size(); }
-//             public int toIndex(State s) { return stateToIndex.get(s); }
-//             public State fromIndex(int i) { return stateList.get(i); }
-//             public BitSet toBitSet(Set<State> states) {
-//                 BitSet bs = new BitSet(size());
-//                 for (State st : states) {
-//                     bs.set(toIndex(st));
-//                 }
-//                 return bs;
-//             }
-//             public Set<State> fromBitSet(BitSet bs) {
-//                 Set<State> result = new HashSet<>();
-//                 for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i + 1)) {
-//                     result.add(fromIndex(i));
-//                 }
-//                 return result;
-//             }
-//         };
-//     }
-
-//     public TS run() {
-//         boolean fixed = false;
-//         while (!fixed) {
-//             for (Task task : wList) {
-//                 try {
-//                     task.call();
-//                 } catch (Exception ex) {
-//                     throw new RuntimeException("Task call failed", ex);
-//                 }
-//             }
-//             fixed = updateMap();
-//         }
-
-//         Set<Set<State>> rho_f = buildPartition();
-//         this.ts.toDotPartition(rho_f);
-//         CompressedTS c = new CompressedTS("s-" + this.ts.getName());
-//         return c.DoCompress(this.ts, rho_f);
-//     }
-
-//     private boolean updateMap() {
-//         boolean fixedPoint = true;
-
-//         for (Task task : wList) {
-//             if (!task.getRho_epsilon().equals(task.getRho_temp())) {
-//                 task.setRho_epsilon(task.getRho_temp());
-//                 eMap.put(task.getEpsilon(), task.getRho_temp());
-//                 fixedPoint = false;
-//             }
-//         }
-
-//         for (Task task : wList) {
-//             task.setlMap(eMap);
-//         }
-
-//         return fixedPoint;
-//     }
-
-//     public Set<Set<State>> buildPartition() {
-//         HashMap<String, Set<State>> cares = new HashMap<>();
-//         Set<String> ids = ts.getStates().stream().map(State::getId).collect(HashSet::new, HashSet::add, HashSet::addAll);
-
-//         for (String st : ids) {
-//             State pState = p.getStateById(st);
-//             Set<Set<State>> blocks = eMap.get(pState);
-//             if (blocks == null) continue;
-//             Set<State> states = blocks.stream()
-//                 .filter(block -> block.contains(ts.getStateById(st)))
-//                 .findFirst()
-//                 .orElse(new HashSet<>());
-//             cares.put(st, states);
-//         }
-//         // Assuming ResponsibleAgreementBitSet.computeCliquePartition is optimized and works with these
-//         return com.syntm.util.ResponsibleAgreementBitSet.computeCliquePartition(ts, cares);
-//     }
-
-//     public void printFixedRho(ConcurrentHashMap<State, Set<Set<State>>> map) {
-//         Printer gp = new Printer(this.ts.getName() + "'s Fixed Rho");
-//         gp.addln("\n An e-Cooperative Bisimulation for " + this.ts.getName() + "\n");
-//         List<State> keys = new ArrayList<>(map.keySet());
-//         keys.sort((e1, e2) -> e1.getId().compareTo(e2.getId()));
-
-//         for (State epsilon : keys) {
-//             gp.addln("\t" + epsilon.getId() + " ->");
-//             for (Set<State> set : map.get(epsilon)) {
-//                 gp.addln("\t\t" + set);
-//             }
-//             gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
-//             gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
-//         }
-//         gp.printText();
-//     }
-// }

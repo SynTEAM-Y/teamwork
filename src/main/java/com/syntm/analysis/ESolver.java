@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ESolver.java (c) 2024
 Desc: Concurrent Solver based on Executor Service
 Created:  17/11/2024 09:45:55
-Updated:  17/06/2025 22:37:09
+Updated:  04/07/2025 16:38:24
 Version:  1.1
 */
 import java.util.ArrayList;
@@ -185,8 +185,8 @@ public class ESolver {
       for (Set<State> set : map.get(epsilon)) {
         gp.addln("\t\t" + set);
       }
-      gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
-      gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
+     // gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
+     // gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
 
     }
     // wList.sort((e1, e2) ->

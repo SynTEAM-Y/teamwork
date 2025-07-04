@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 TS.java (c) 2024
 Desc: TS transition system
 Created:  17/11/2024 09:45:55
-Updated:  02/07/2025 20:42:46
+Updated:  04/07/2025 22:48:23
 Version:  1.1
 */
 
@@ -346,8 +346,8 @@ public class TS {
     @SuppressWarnings("null")
     public void parseDot(final String filePath) throws IOException {
         File dot = new File(filePath);
-            MutableGraph gg = new Parser().read(dot);
-        
+        MutableGraph gg = new Parser().read(dot);
+
         Set<String> chan = new HashSet<>(Arrays.asList(gg.graphAttrs().get("label").toString()
                 .replaceAll("[\\s\\S]*[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
                 .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
@@ -356,10 +356,8 @@ public class TS {
                 .replaceAll("[\\s\\S]*[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$2")
                 .replaceAll("([\\w-])([,]*)([\\s]*)", "$1$2").replaceAll("\n", "").split(",")));
         this.setInterface(new Int(chan, out));
-        
-      
-        gg.nodes().forEach(node -> 
-        {
+
+        gg.nodes().forEach(node -> {
             if (!node.name().toString().equals("init") && !node.name().toString().equals("spec")) {
                 String[] parts = node.get("label").toString().split("\n");
                 State st = new State(node.name().toString());
@@ -378,8 +376,8 @@ public class TS {
 
             }
         });
-      
-        gg.edges().forEach(e ->{
+
+        gg.edges().forEach(e -> {
             if (!e.from().name().toString().equals("init")) {
                 this.getTransitions()
                         .add(new Trans(this.getStateById(e.from().name().toString()), e.get("label").toString(),
@@ -392,7 +390,8 @@ public class TS {
                 this.setInitState(e.to().name().toString());
             }
         });
-        Set<MutableNode> specs = gg.nodes().stream().filter(node -> node.name().toString().equals("spec")).collect(Collectors.toSet());
+        Set<MutableNode> specs = gg.nodes().stream().filter(node -> node.name().toString().equals("spec"))
+                .collect(Collectors.toSet());
         if (!specs.isEmpty()) {
             String spc = specs.iterator().next().get("label").toString().replaceAll("(Distribute to:)([\\s\\S]*)",
                     "$2");
@@ -408,12 +407,11 @@ public class TS {
                         .replaceAll("([\\s\\S]*)[\\s]*:[\\s]*CH=\\[([\\s\\S]*)\\],[\\s]*OUT=\\[([\\s\\S]*)\\]", "$1")
                         .replaceAll("\n", ""), achs, ao);
             }
-        }
-        else{
+        } else {
             System.out.println(Defs.ANSI_RED +
-					"No specification Found!" + Defs.ANSI_RESET);
-                    System.out.println(Defs.ANSI_RED +
-					"Specify how would you like to distribute, and try again!" + Defs.ANSI_RESET);
+                    "No specification Found!" + Defs.ANSI_RESET);
+            System.out.println(Defs.ANSI_RED +
+                    "Specify how would you like to distribute, and try again!" + Defs.ANSI_RESET);
         }
 
     }
@@ -788,6 +786,13 @@ public class TS {
 
         t.setInitState(this.getInitState().getId());
         p.setInitState(this.getInitState().getId());
+
+        for (State s : t.getStates()) {
+            HashMap<String, Set<State>> yPre = new HashMap<>();
+            for (String y : this.getChannels())
+                yPre.put(y, new HashSet<>());
+            s.setyPre(yPre);
+        }
         for (Trans tr : this.getTransitions()) {
             t.addTransition(t, t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId()));
 
@@ -795,19 +800,26 @@ public class TS {
 
             t.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(t.getStateById(tr.source.getId()), tr.action, t.getStateById(tr.destination.getId())));
-            t.getStateById(tr.source.getId()).getPost().add(t.getStateById(tr.destination.getId()));
+            // t.getStateById(tr.source.getId()).getPost().add(t.getStateById(tr.destination.getId()));
 
-            t.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
-            if (t.getInterface().getChannels().contains(tr.getAction())) {
-              t.getStateById(tr.destination.getId()).setReachInitiate(true);  
-            }
+            // t.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
+            // if (t.getInterface().getChannels().contains(tr.getAction())) {
+            //     t.getStateById(tr.destination.getId()).setReachInitiate(true);
+            // }
+
+            t.getStateById(tr.source.getId()).getyPost().put(tr.getAction(), t.getStateById(tr.getDestination().getId()));
+
+
+
+            t.getStateById(tr.destination.getId()).getyPre().get(tr.getAction()).add(t.getStateById(tr.getSource().getId()));
+
 
             p.getStateById(tr.source.getId()).getTrans().add(
                     new Trans(p.getStateById(tr.source.getId()), tr.action, p.getStateById(tr.destination.getId())));
-            p.getStateById(tr.source.getId()).getPost().add(p.getStateById(tr.destination.getId()));
-            p.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
+            // p.getStateById(tr.source.getId()).getPost().add(p.getStateById(tr.destination.getId()));
+            // p.getStateById(tr.destination.getId()).getPre().add(t.getStateById(tr.source.getId()));
             if (p.getInterface().getChannels().contains(tr.getAction())) {
-              p.getStateById(tr.destination.getId()).setReachInitiate(true);  
+                p.getStateById(tr.destination.getId()).setReachInitiate(true);
             }
         }
         for (State pr : this.getStates()) {
@@ -822,7 +834,7 @@ public class TS {
                 }
             }
         }
-
+        
         this.agents.add(t);
         this.parameters.add(p);
         t.toDot();
@@ -1163,18 +1175,17 @@ public class TS {
         gp.print();
     }
 
-
     public float sConnectivity(TS main) {
-        float sum=0;
+        float sum = 0;
         Set<String> Y_k = new HashSet<>(main.getChannels());
         Y_k.removeAll(this.getInterface().getChannels());
         float y_k = Y_k.size();
         for (State s : this.getStates()) {
             Set<String> LS_sk = new HashSet<>(s.getListen().getChannels());
             LS_sk.removeAll(this.getInterface().getChannels());
-            sum= sum + LS_sk.size();
+            sum = sum + LS_sk.size();
         }
-        return sum/y_k;
+        return sum / y_k;
     }
 
 }

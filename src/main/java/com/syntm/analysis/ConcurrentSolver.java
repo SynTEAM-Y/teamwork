@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 ConcurrentSolver.java (c) 2024
 Desc: Concurrent solver based on Circular Barriers
 Created:  17/11/2024 09:45:55
-Updated:  17/06/2025 22:38:09
+Updated:  04/07/2025 16:39:36
 Version:  1.1
 */
 import java.util.ArrayList;
@@ -373,8 +373,8 @@ public class ConcurrentSolver {
       for (Set<State> set : map.get(epsilon)) {
         gp.addln("\t\t" + set);
       }
-      gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
-      gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
+     // gp.addln("\n\t" + "post-> " + epsilon.getPost() + "\n");
+     // gp.addln("\t" + "pre-> " + epsilon.getPre() + "\n");
 
     }
     gp.printText();

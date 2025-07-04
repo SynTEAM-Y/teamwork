@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 CompressedTS.java (c) 2024
 Desc: Compute Quotient TS/Compress TS
 Created:  2024-11-17T10:50:26.221Z
-Updated:  17/11/2024 22:37:49
+Updated:  04/07/2025 16:38:05
 Version:  1.1
 */
 
@@ -329,9 +329,9 @@ public class CompressedTS {
             ts.getTransitions().add(tr.toTrans());
             ts.getStateById(tr.getSource().getId()).addTrans(tr.toTrans(), ts);
 
-            ts.getStateById(tr.getSource().getId()).getPost().add(ts.getStateById(tr.getDestination().getId()));
+           // ts.getStateById(tr.getSource().getId()).getPost().add(ts.getStateById(tr.getDestination().getId()));
 
-            ts.getStateById(tr.getDestination().getId()).getPre().add(ts.getStateById(tr.getSource().getId()));
+           // ts.getStateById(tr.getDestination().getId()).getPre().add(ts.getStateById(tr.getSource().getId()));
         }
 
         return ts;
