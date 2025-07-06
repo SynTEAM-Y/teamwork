@@ -6,107 +6,29 @@
     "configurations": [
         {
             "type": "java",
+            "name": "OverlappingSetRefinement",
+            "request": "launch",
+            "mainClass": "com.syntm.OverlappingSetRefinement",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
+            "name": "DeterministicPartitionRefinement",
+            "request": "launch",
+            "mainClass": "com.syntm.DeterministicPartitionRefinement",
+            "projectName": "teamwork"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
             "name": "Engine",
             "request": "launch",
             "mainClass": "com.syntm.Engine",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BalancedPairAssignment",
-            "request": "launch",
-            "mainClass": "com.syntm.util.BalancedPairAssignment",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "PaigeTarjanBisimulation",
-            "request": "launch",
-            "mainClass": "com.syntm.util.PaigeTarjanBisimulation",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "ResponsibleAgreement",
-            "request": "launch",
-            "mainClass": "com.syntm.ResponsibleAgreement",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "AgreementPartitionTest",
-            "request": "launch",
-            "mainClass": "com.syntm.AgreementPartitionTest",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "ResponsiblePartitionTest",
-            "request": "launch",
-            "mainClass": "com.syntm.ResponsiblePartitionTest",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BuildPartitionExact",
-            "request": "launch",
-            "mainClass": "com.syntm.BuildPartitionExact",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "JointPartitionRefinement",
-            "request": "launch",
-            "mainClass": "com.syntm.JointPartitionRefinement",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "PaigeTarjanJointPartition",
-            "request": "launch",
-            "mainClass": "com.syntm.PaigeTarjanJointPartition",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BuildPartitionOptimized",
-            "request": "launch",
-            "mainClass": "com.syntm.BuildPartitionOptimized",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BalancedPairAssignment",
-            "request": "launch",
-            "mainClass": "com.syntm.BalancedPairAssignment",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BalancedAssignmentDinic",
-            "request": "launch",
-            "mainClass": "com.syntm.BalancedAssignmentDinic",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BalancedAssignmentMaxFlow",
-            "request": "launch",
-            "mainClass": "com.syntm.BalancedAssignmentMaxFlow",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "BalancedProcessAssignment",
-            "request": "launch",
-            "mainClass": "com.syntm.BalancedProcessAssignment",
-            "projectName": "teamwork"
-        },
-        {
-            "type": "java",
-            "name": "ProcessAssignment",
-            "request": "launch",
-            "mainClass": "com.syntm.ProcessAssignment",
             "projectName": "teamwork"
         },
         {
@@ -125,16 +47,16 @@
         },
         {
             "type": "java",
-            "name": "RunEngine",
+            "name": "BalancedPairAssignment",
             "request": "launch",
-            "mainClass": "com.syntm.RunEngine",
+            "mainClass": "com.syntm.util.BalancedPairAssignment",
             "projectName": "teamwork"
         },
         {
             "type": "java",
-            "name": "ParseTS",
+            "name": "PaigeTarjanBisimulation",
             "request": "launch",
-            "mainClass": "com.syntm.ParseTS",
+            "mainClass": "com.syntm.util.PaigeTarjanBisimulation",
             "projectName": "teamwork"
         }
     ]

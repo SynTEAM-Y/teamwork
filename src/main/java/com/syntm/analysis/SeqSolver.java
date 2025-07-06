@@ -4,7 +4,7 @@ Author:  Yehia Abd Alrahman (yehiaa@chalmers.se)
 SeqSolver.java (c) 2024
 Desc: Sequential solver (uptodate)
 Created:  17/11/2024 09:45:55
-Updated:  05/07/2025 00:08:03
+Updated:  06/07/2025 15:31:44
 Version:  1.1
 */
 
@@ -316,9 +316,9 @@ public class SeqSolver {
                 fixedPoint = false;
             }
         }
-        // if (fixedPoint) {
-        //     printFixedRho(eMap);
-        // }
+        if (fixedPoint) {
+            printFixedRho(eMap);
+        }
 
         for (int i = 0; i < wList.size(); i++) {
             wList.get(i).setlMap(eMap);
@@ -332,15 +332,15 @@ public class SeqSolver {
         Set<String> ids = new HashSet<>();
         ids = ts.getStates().stream().map(State::getId).collect(Collectors.toSet());
 
-        Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
-        for (State state : eMap.keySet()) {
-            if (!state.equals(p.getInitState())) {
-                rho_intersect.retainAll(eMap.get(state));
-            }
-        }
-        if (rho_intersect.equals(eMap.get(p.getInitState()))) {
-            return rho_intersect;
-        }
+        // Set<Set<State>> rho_intersect = new HashSet<>(eMap.get(p.getInitState()));
+        // for (State state : eMap.keySet()) {
+        // if (!state.equals(p.getInitState())) {
+        // rho_intersect.retainAll(eMap.get(state));
+        // }
+        // }
+        // if (rho_intersect.equals(eMap.get(p.getInitState()))) {
+        // return rho_intersect;
+        // }
 
         for (String st : ids) {
             Set<State> states = eMap.get(p.getStateById(st)).stream().filter(p -> p.contains(ts.getStateById(st)))
@@ -349,14 +349,94 @@ public class SeqSolver {
 
         }
 
+        HashMap<String, Set<State>> preP = new HashMap<>();
+        preP = this.preProcess(cares, eMap);
+        Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts, preP);
         // Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts,
         // cares);
-        Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts, this.preProcess(cares, eMap));
-        // Set<Set<State>> partition = ResponsibleAgreement.computeCliquePartition(ts,
-        // cares);
+        
+        Set<Set<State>> pRefine = strongRefine(this.ts, partition);
+        return pRefine;
 
-        return partition;
+    }
 
+    private Set<Set<State>> strongRefine(TS ts2, Set<Set<State>> partition) {
+        Set<Set<State>> parSet = new HashSet<>(partition);
+        Set<Set<State>> waiting = new HashSet<Set<State>>(partition);
+        Boolean changedW = true;
+        while (changedW) {
+            Set<State> pprime = this.popStates(waiting);
+            for (String action : ts2.getChannels()) {
+                HashMap<Set<State>, Set<State>> splitters = new HashMap<>();
+                for (Set<State> part : parSet) {
+                    Set<State> splitter = this.strongBism(part, pprime, action);
+
+                    if (!splitter.isEmpty() && !splitter.equals(part)) {
+                        splitters.put(part, splitter);
+                    }
+                }
+                for (Set<State> p : splitters.keySet()) {
+                    Set<Set<State>> splitP = split(p, splitters.get(p));
+                    parSet.remove(p);
+                    parSet.addAll(splitP);
+                    waiting.remove(p);
+                    waiting.addAll(splitP);
+                }
+            }
+            if (waiting.isEmpty()) {
+                changedW = false;
+            }
+        }
+        return parSet;
+    }
+
+    private Set<State> popStates(Set<Set<State>> stateSets) {
+        Set<State> states = stateSets.iterator().next();
+        stateSets.remove(states);
+        return states;
+    }
+
+    private Set<State> strongBism(Set<State> partition, Set<State> pprime, String action) {
+        Set<State> acc = new HashSet<>();
+        Set<State> canNot = new HashSet<>();
+        if (!partition.equals(pprime)) 
+        {
+
+            acc = partition
+                    .stream()
+                    .filter(
+                            s -> !(s.getTrans()
+                                    .stream()
+                                    .filter(tr -> tr.getAction().equals(action) &&
+                                            pprime.contains(tr.getDestination()))
+                                    .collect(Collectors.toSet())).isEmpty())
+                    .collect(Collectors.toSet());
+
+            if (!acc.isEmpty()) {
+                canNot = partition
+                        .stream()
+                        .filter(
+                                s -> (s.getTrans()
+                                        .stream()
+                                        .filter(tr -> tr.getAction().equals(action))
+                                        .collect(Collectors.toSet())).isEmpty())
+                        .collect(Collectors.toSet());
+                
+            }
+        }
+        acc.addAll(canNot);
+        return acc;
+    }
+
+    private Set<Set<State>> split(Set<State> p, Set<State> splitter) {
+        Set<Set<State>> splitP = new HashSet<Set<State>>();
+        Set<State> notsplitter = new HashSet<State>(p);
+        notsplitter.removeAll(splitter);
+
+        splitP.add(splitter);
+
+        splitP.add(notsplitter);
+        return splitP;
     }
 
     private Set<State> yPreC(String y, Set<State> C) {
@@ -370,19 +450,49 @@ public class SeqSolver {
 
     private HashMap<String, Set<State>> preProcess(HashMap<String, Set<State>> cares,
             HashMap<State, Set<Set<State>>> eMap) {
-        HashMap<String, Set<State>> tempCare = new HashMap<>(cares);
+
         for (String id : new HashSet<>(cares.keySet())) {
             for (State s : new HashSet<>(cares.get(id))) {
-                if (!s.equals(ts.getStateById(id)) && cares.get(s.getId()).contains(ts.getStateById(id))) {
+                if (!cares.get(s.getId()).contains(ts.getStateById(id))) {
+                    cares.get(id).remove(s);
+                }
+            }
+        }
+
+        HashMap<String, Set<State>> tempCare = new HashMap<>(cares);
+        Boolean me = false;
+        Boolean withYou = false;
+        for (String id : new HashSet<>(cares.keySet())) {
+            for (State s : new HashSet<>(cares.get(id))) {
+                if (!s.equals(ts.getStateById(id))) {
                     for (String y : ts.getInterface().getChannels()) {
-                        Set<State> preCminusS = new HashSet<>(cares.get(id));
+                        Set<State> preCminusS = new HashSet<>();
+                        preCminusS.addAll(cares.get(id));
                         preCminusS.remove(s);
+                        ////
+                        preCminusS.remove(ts.getStateById(id));
+                        ////
                         List<State> preC = new ArrayList<>(this.yPreC(y, preCminusS));
-                        if (violatesAgreement(id, s, y, preC,
-                                tempCare)) {
+                        List<State> preMe = new ArrayList<>(ts.getStateById(id).getyPre(y));
+                        for (int i = 0; i < preMe.size(); i++) {
+                            for (int j = 0; j < preC.size(); j++) {
+                                State s1 = preMe.get(i), s2 = preC.get(j);
+                                State p1 = ts.getStateById(id), p2 = s2.getyPost(y);
+                                if (p1 == null || p2 == null)
+                                    continue;
+                                if (tempCare.getOrDefault(s1.getId(), Set.of()).contains(s2)
+                                        && tempCare.getOrDefault(s2.getId(), Set.of()).contains(s1)) {
+                                    me = true;
+                                    if (tempCare.getOrDefault(p2.getId(), Set.of()).contains(s)
+                                            && tempCare.getOrDefault(s.getId(), Set.of()).contains(p2)) {
+                                        withYou = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (me && !withYou) {
                             tempCare.get(id).remove(s);
                             tempCare.get(s.getId()).remove(ts.getStateById(id));
-                            break;
                         }
 
                     }
@@ -393,19 +503,18 @@ public class SeqSolver {
         return tempCare;
     }
 
-    private boolean violatesAgreement(String id, State s, String y, List<State> preC,
-            Map<String, Set<State>> tempCare) {
-        for (int i = 0; i < preC.size(); i++) {
-            for (int j = i + 1; j < preC.size(); j++) {
-                State s1 = preC.get(i), s2 = preC.get(j);
-                State p1 = s1.getyPost(y), p2 = s2.getyPost(y);
+    private boolean violatesAgreement(String id, State s, String y, List<State> preC, List<State> preMe,
+            Map<String, Set<State>> tempCare, boolean me, boolean withYou) {
+        for (int i = 0; i < preMe.size(); i++) {
+            for (int j = 0; j < preC.size(); j++) {
+                State s1 = preMe.get(i), s2 = preC.get(j);
+                State p1 = ts.getStateById(id), p2 = s2.getyPost(y);
                 if (p1 == null || p2 == null)
                     continue;
                 if (tempCare.getOrDefault(s1.getId(), Set.of()).contains(s2)
                         && tempCare.getOrDefault(s2.getId(), Set.of()).contains(s1)) {
-                    if (!tempCare.getOrDefault(p1.getId(), Set.of()).contains(s)
-                            || !tempCare.getOrDefault(p2.getId(), Set.of()).contains(s)
-                            || !tempCare.getOrDefault(s.getId(), Set.of()).contains(p1)
+
+                    if (!tempCare.getOrDefault(p2.getId(), Set.of()).contains(s)
                             || !tempCare.getOrDefault(s.getId(), Set.of()).contains(p2)) {
                         return true;
                     }

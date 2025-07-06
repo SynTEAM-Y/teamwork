@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
+import com.syntm.lts.State;
 import com.syntm.lts.TS;
+import com.syntm.lts.Trans;
 
 public class ReverseBsim {
 
@@ -44,8 +47,21 @@ public class ReverseBsim {
                 e.printStackTrace();
             }
         }
-        
+        boolean nd=false;
         TS fin = parseTS.compose(sTS);
+       
+        for (String y : fin.getChannels()) {
+            for (State st : fin.getStates()) {
+                Set<Trans> det = st.getTrans().stream().filter(tr -> tr.getAction().equals(y)).collect(Collectors.toSet());
+                System.err.println(det);
+                if (det.size()>1) {
+                   
+                   nd=true;
+                }
+            }
+            
+        }
+        System.err.println("nondeterminism detected"+nd); 
         fin.toDot();
     }
 }
